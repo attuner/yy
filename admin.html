@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Yaady's Kitchen Partner | Central Operations Console</title>
+  <title>Yaady's Kitchen Partner | Console</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -30,7 +30,7 @@
   <style>
     body {
       background-color: #FAF7F2;
-      font-size: 16px;
+      font-size: 15px;
       -webkit-tap-highlight-color: transparent;
       overscroll-behavior-y: contain;
       padding-top: env(safe-area-inset-top, 0px);
@@ -38,343 +38,344 @@
       padding-left: env(safe-area-inset-left, 0px);
       padding-right: env(safe-area-inset-right, 0px);
     }
-    .min-h-dvh { min-height: 100dvh; }
-    .max-h-sheet { max-height: 88dvh; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-linen text-stone-800 antialiased font-sans pb-16 text-sm md:text-base select-none">
+<body class="bg-linen text-stone-800 antialiased font-sans pb-16 select-none w-full min-w-0">
 
   <!-- HIGHEST PRIORITY TOAST CONTAINER -->
-  <div id="toastContainer" class="fixed top-4 right-4 z-[9999] flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none"></div>
+  <div id="toastContainer" class="fixed top-3 right-3 z-[9999] flex flex-col gap-2 max-w-sm w-full px-3 pointer-events-none"></div>
 
-  <!-- HEADER -->
-  <header class="bg-forest-800 text-white border-b border-forest-900 sticky top-0 z-40 px-5 py-4 flex items-center justify-between shadow-md">
-    <div class="flex items-center gap-3.5">
-      <div class="w-11 h-11 rounded-2xl bg-amber-500 text-forest-900 flex items-center justify-center font-black text-2xl shadow-sm">
+  <!-- COMPACT STICKY APP HEADER -->
+  <header class="bg-forest-800 text-white border-b border-forest-900 sticky top-0 z-40 px-3.5 py-2.5 sm:px-5 sm:py-3.5 flex items-center justify-between shadow-md w-full">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <div class="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl bg-amber-500 text-forest-900 flex items-center justify-center font-black text-xl shadow-xs shrink-0">
         Y
       </div>
-      <div>
-        <h1 class="text-lg font-black text-white leading-tight">Yaady's Kitchen Partner</h1>
-        <p class="text-xs text-amber-300 font-bold">Neknampur Hub • Central Operations (Strict IST)</p>
+      <div class="min-w-0">
+        <h1 class="text-base sm:text-lg font-black text-white leading-tight truncate">Yaady's Partner</h1>
+        <p class="text-[11px] text-amber-300 font-bold truncate">Neknampur Hub • Operations</p>
       </div>
     </div>
 
-    <div class="flex items-center gap-3">
-      <button onclick="openOnlineUsersModal()" class="flex items-center gap-2 bg-forest-900/80 hover:bg-forest-900 text-white px-4 py-2 rounded-2xl border border-forest-700 transition shadow-sm min-h-[44px]" title="Click to view online customers">
-        <span class="w-2.5 h-2.5 rounded-full bg-green-400 animate-ping"></span>
-        <span class="text-xs font-black text-white" id="onlineUsersCountPill">🟢 Online: 0</span>
+    <div class="flex items-center gap-2 shrink-0">
+      <button onclick="openOnlineUsersModal()" class="flex items-center gap-1.5 bg-forest-900/80 hover:bg-forest-900 text-white px-3 py-1.5 rounded-xl border border-forest-700 transition shadow-xs" title="Click to view online customers">
+        <span class="w-2 h-2 rounded-full bg-green-400 animate-ping"></span>
+        <span class="text-xs font-black text-white" id="onlineUsersCountPill">0</span>
       </button>
 
-      <button onclick="logoutAdmin()" id="logoutBtn" class="hidden text-xs font-black text-stone-200 hover:text-white px-3.5 py-2 rounded-xl border border-forest-700 hover:bg-forest-900 transition min-h-[44px]">
+      <button onclick="logoutAdmin()" id="logoutBtn" class="hidden text-xs font-black text-stone-200 hover:text-white px-3 py-1.5 rounded-xl border border-forest-700 hover:bg-forest-900 transition">
         Lock
       </button>
     </div>
   </header>
 
   <!-- AUTH PIN GATEWAY -->
-  <div id="adminPinAuth" class="max-w-sm mx-auto mt-20 p-7 bg-white border border-stone-200 rounded-3xl text-center space-y-4 shadow-xl">
-    <div class="w-14 h-14 bg-amber-100 text-amberBrand-600 rounded-2xl flex items-center justify-center mx-auto">
-      <i data-lucide="shield-check" class="w-7 h-7"></i>
+  <div id="adminPinAuth" class="max-w-sm mx-auto mt-16 p-6 bg-white border border-stone-200 rounded-3xl text-center space-y-4 shadow-xl w-[92%]">
+    <div class="w-12 h-12 bg-amber-100 text-amberBrand-600 rounded-2xl flex items-center justify-center mx-auto">
+      <i data-lucide="shield-check" class="w-6 h-6"></i>
     </div>
-    <h3 class="text-xl font-black text-forest-900">Kitchen Console Gateway</h3>
+    <h3 class="text-lg font-black text-forest-900">Operations Console</h3>
     <p class="text-xs text-stone-500 font-medium">Enter Admin PIN configured in Google Sheets Config tab.</p>
-    <input type="password" id="adminPinInput" placeholder="Default: 1234" class="w-full px-4 py-3.5 bg-stone-50 border border-stone-300 rounded-2xl text-center text-xl font-mono font-black text-forest-900 outline-none focus:border-forest-800 min-h-[48px]" />
-    <button onclick="unlockConsole()" class="w-full py-4 bg-amber-500 hover:bg-amber-600 text-forest-900 font-black text-base rounded-2xl transition shadow min-h-[48px]">
-      Unlock Operations Console
+    <input type="password" id="adminPinInput" placeholder="PIN" class="w-full px-4 py-3 bg-stone-50 border border-stone-300 rounded-2xl text-center text-xl font-mono font-black text-forest-900 outline-none focus:border-forest-800 min-h-[48px]" />
+    <button onclick="unlockConsole()" class="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-forest-900 font-black text-sm rounded-2xl transition shadow min-h-[48px]">
+      Unlock Console
     </button>
   </div>
 
   <!-- MAIN DASHBOARD -->
-  <main id="adminDashboard" class="hidden max-w-7xl mx-auto px-4 py-6 space-y-6">
+  <main id="adminDashboard" class="hidden max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 w-full min-w-0">
 
-    <!-- MASTER OPERATIONS SWITCHES & ANNOUNCEMENT BANNER CONTROLS -->
-    <section class="bg-white border border-stone-200 p-6 rounded-3xl space-y-5 shadow-sm">
-      <h3 class="text-xs font-black text-stone-400 uppercase tracking-wider flex items-center gap-2">
-        <i data-lucide="sliders" class="w-4 h-4 text-amberBrand-600"></i> Master Kitchen Controls
-      </h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-200">
+    <!-- MASTER OPERATIONS SWITCHES & ANNOUNCEMENT CONTROLS -->
+    <section class="bg-white border border-stone-200 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl space-y-4 shadow-xs w-full">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+        <div class="flex items-center justify-between p-3 sm:p-4 bg-stone-50 rounded-xl sm:rounded-2xl border border-stone-200 w-full">
           <div>
-            <h4 class="font-black text-base text-forest-900">Kitchen Order Acceptance</h4>
-            <p class="text-xs text-stone-500">Controls whether customers can place pickup orders.</p>
+            <h4 class="font-black text-sm sm:text-base text-forest-900">Accepting Orders</h4>
+            <p class="text-[11px] sm:text-xs text-stone-500">Order acceptance toggle</p>
           </div>
-          <button onclick="toggleKitchenOpen()" id="btnKitchenOpenToggle" class="px-5 py-2.5 rounded-xl font-black text-xs bg-green-600 text-white shadow-sm min-h-[44px]">
+          <button onclick="toggleKitchenOpen()" id="btnKitchenOpenToggle" class="px-4 py-2 rounded-xl font-black text-xs bg-green-600 text-white shadow-xs min-h-[40px] shrink-0">
             OPEN
           </button>
         </div>
 
-        <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-200">
+        <div class="flex items-center justify-between p-3 sm:p-4 bg-stone-50 rounded-xl sm:rounded-2xl border border-stone-200 w-full">
           <div>
-            <h4 class="font-black text-base text-forest-900">Wallet & Prepay System</h4>
-            <p class="text-xs text-stone-500">Disables top-ups & wallet deductions when paused.</p>
+            <h4 class="font-black text-sm sm:text-base text-forest-900">Wallet System</h4>
+            <p class="text-[11px] sm:text-xs text-stone-500">Discounts & top-ups</p>
           </div>
-          <button onclick="toggleWalletSystem()" id="btnWalletSystemToggle" class="px-5 py-2.5 rounded-xl font-black text-xs bg-green-600 text-white shadow-sm min-h-[44px]">
+          <button onclick="toggleWalletSystem()" id="btnWalletSystemToggle" class="px-4 py-2 rounded-xl font-black text-xs bg-green-600 text-white shadow-xs min-h-[40px] shrink-0">
             ENABLED
           </button>
         </div>
       </div>
 
       <!-- ANNOUNCEMENT BANNER CONTROLLER -->
-      <div class="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-2">
+      <div class="p-3 sm:p-4 bg-stone-50 rounded-xl sm:rounded-2xl border border-stone-200 space-y-2 w-full">
         <div class="flex items-center justify-between">
           <label class="text-xs font-black text-forest-900 uppercase tracking-wider flex items-center gap-1.5">
-            <i data-lucide="megaphone" class="w-4 h-4 text-amberBrand-600"></i>
-            <span>Customer Announcement Banner</span>
+            <i data-lucide="megaphone" class="w-3.5 h-3.5 text-amberBrand-600"></i>
+            <span>Announcement Banner</span>
           </label>
-          <span class="text-[11px] text-stone-400 font-semibold">Broadcasts purely across top bar</span>
         </div>
-        <div class="flex flex-col sm:flex-row gap-2.5">
-          <input type="text" id="adminAnnouncementInput" placeholder="e.g. Fresh Harvest Specials: Hot Jowar & Ragi Rotis made live upon pickup!" class="flex-1 px-4 py-3 bg-white border border-stone-300 rounded-xl text-sm font-semibold text-stone-800 outline-none focus:ring-2 focus:ring-forest-800 min-h-[48px]" />
-          <button onclick="saveAnnouncementBanner()" id="btnSaveAnnouncement" class="px-5 py-3 bg-forest-800 hover:bg-forest-900 text-white font-black text-xs md:text-sm rounded-xl shadow-sm transition min-h-[48px] flex items-center justify-center gap-1.5 whitespace-nowrap">
-            <i data-lucide="check" class="w-4 h-4"></i>
+        <div class="flex flex-col sm:flex-row gap-2 w-full">
+          <input type="text" id="adminAnnouncementInput" placeholder="Announcement broadcast..." class="flex-1 px-3.5 py-2.5 bg-white border border-stone-300 rounded-xl text-xs sm:text-sm font-semibold text-stone-800 outline-none focus:ring-2 focus:ring-forest-800 min-h-[44px] w-full" />
+          <button onclick="saveAnnouncementBanner()" id="btnSaveAnnouncement" class="px-4 py-2.5 bg-forest-800 hover:bg-forest-900 text-white font-black text-xs rounded-xl shadow-xs transition min-h-[44px] flex items-center justify-center gap-1.5 whitespace-nowrap w-full sm:w-auto shrink-0">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
             <span>Update Banner</span>
           </button>
         </div>
       </div>
     </section>
 
-    <!-- NAVIGATION TABS -->
-    <div class="flex gap-2 border-b border-stone-200 pb-2 overflow-x-auto no-scrollbar">
-      <button onclick="switchAdminTab('orders')" id="tabBtnOrders" class="px-5 py-2.5 rounded-2xl bg-forest-800 text-white font-black text-xs md:text-sm whitespace-nowrap shadow-sm transition min-h-[44px]">
-        Live Orders Cockpit
+    <!-- HORIZONTAL SCROLLABLE TABS PILL BAR WITH REAL-TIME ACTION BADGES -->
+    <div class="flex gap-1.5 border-b border-stone-200 pb-2 overflow-x-auto no-scrollbar w-full">
+      <button onclick="switchAdminTab('orders')" id="tabBtnOrders" class="px-4 py-2.5 rounded-xl sm:rounded-2xl bg-forest-800 text-white font-black text-xs whitespace-nowrap shadow-xs transition flex items-center shrink-0">
+        <span>Orders</span>
+        <span id="badgeTabOrders" class="hidden px-1.5 py-0.5 text-[10px] font-black rounded-full bg-red-600 text-white ml-1.5 leading-none">0</span>
       </button>
-      <button onclick="switchAdminTab('reports')" id="tabBtnReports" class="px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]">
-        Business Reports
+      <button onclick="switchAdminTab('reports')" id="tabBtnReports" class="px-4 py-2.5 rounded-xl sm:rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs whitespace-nowrap hover:bg-stone-50 transition shrink-0">
+        Reports
       </button>
-      <button onclick="switchAdminTab('traffic')" id="tabBtnTraffic" class="px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]">
-        Hourly Telemetry Radar
+      <button onclick="switchAdminTab('traffic')" id="tabBtnTraffic" class="px-4 py-2.5 rounded-xl sm:rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs whitespace-nowrap hover:bg-stone-50 transition shrink-0">
+        Traffic
       </button>
-      <button onclick="switchAdminTab('chat')" id="tabBtnChat" class="px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]">
-        Customer Support Chat
+      <button onclick="switchAdminTab('chat')" id="tabBtnChat" class="px-4 py-2.5 rounded-xl sm:rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs whitespace-nowrap hover:bg-stone-50 transition flex items-center shrink-0">
+        <span>Chat</span>
+        <span id="badgeTabChat" class="hidden px-1.5 py-0.5 text-[10px] font-black rounded-full bg-amber-500 text-white ml-1.5 leading-none">0</span>
       </button>
-      <button onclick="switchAdminTab('menu')" id="tabBtnMenu" class="px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]">
-        Menu Master & Inventory
+      <button onclick="switchAdminTab('menu')" id="tabBtnMenu" class="px-4 py-2.5 rounded-xl sm:rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs whitespace-nowrap hover:bg-stone-50 transition shrink-0">
+        Menu
       </button>
-      <button onclick="switchAdminTab('claims')" id="tabBtnClaims" class="px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]">
-        Wallet Claims & Top-Ups
+      <button onclick="switchAdminTab('claims')" id="tabBtnClaims" class="px-4 py-2.5 rounded-xl sm:rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs whitespace-nowrap hover:bg-stone-50 transition flex items-center shrink-0">
+        <span>Wallet</span>
+        <span id="badgeTabWallet" class="hidden px-1.5 py-0.5 text-[10px] font-black rounded-full bg-red-600 text-white ml-1.5 leading-none">0</span>
       </button>
     </div>
 
-    <!-- COCKPIT 1: LIVE ORDERS WITH DIRECT CALLING ACTIONS -->
-    <section id="cockpitOrders" class="space-y-4">
-      <div class="flex gap-2.5 overflow-x-auto no-scrollbar">
-        <button onclick="filterOrders('ALL')" class="order-filter-btn active px-4 py-2 rounded-xl bg-forest-800 text-xs font-black text-white shadow-sm transition min-h-[40px]">All Orders</button>
-        <button onclick="filterOrders('Pending_Verification')" class="order-filter-btn px-4 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition min-h-[40px]">Pending Verification</button>
-        <button onclick="filterOrders('Kitchen_Accepted')" class="order-filter-btn px-4 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition min-h-[40px]">Accepted</button>
-        <button onclick="filterOrders('Preparing')" class="order-filter-btn px-4 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition min-h-[40px]">Millet Stove</button>
-        <button onclick="filterOrders('Ready_For_Pickup')" class="order-filter-btn px-4 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition min-h-[40px]">Ready for Counter</button>
+    <!-- COCKPIT 1: ORDERS COCKPIT WITH FILTER ACTION BADGES -->
+    <section id="cockpitOrders" class="space-y-3.5 w-full">
+      <div class="flex gap-1.5 overflow-x-auto no-scrollbar w-full">
+        <button onclick="filterOrders('ALL')" id="filterBtnAll" class="order-filter-btn active px-3.5 py-2 rounded-xl bg-forest-800 text-xs font-black text-white shadow-xs transition shrink-0">
+          All
+        </button>
+        <button onclick="filterOrders('Pending_Verification')" id="filterBtnPending" class="order-filter-btn px-3 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition flex items-center gap-1 shrink-0">
+          <span>Pending</span>
+          <span id="subBadgePending" class="hidden px-1.5 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-white leading-none">0</span>
+        </button>
+        <button onclick="filterOrders('Kitchen_Accepted')" id="filterBtnAccepted" class="order-filter-btn px-3 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition flex items-center gap-1 shrink-0">
+          <span>Accepted</span>
+          <span id="subBadgeAccepted" class="hidden px-1.5 py-0.5 rounded-full text-[10px] font-black bg-blue-600 text-white leading-none">0</span>
+        </button>
+        <button onclick="filterOrders('Preparing')" id="filterBtnStove" class="order-filter-btn px-3 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition flex items-center gap-1 shrink-0">
+          <span>Stove</span>
+          <span id="subBadgeStove" class="hidden px-1.5 py-0.5 rounded-full text-[10px] font-black bg-amber-600 text-white leading-none">0</span>
+        </button>
+        <button onclick="filterOrders('Ready_For_Pickup')" id="filterBtnReady" class="order-filter-btn px-3 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition flex items-center gap-1 shrink-0">
+          <span>Ready</span>
+          <span id="subBadgeReady" class="hidden px-1.5 py-0.5 rounded-full text-[10px] font-black bg-green-600 text-white leading-none">0</span>
+        </button>
       </div>
 
-      <div id="adminOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div id="adminOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3.5 w-full">
         <p class="text-stone-400 py-10 text-sm col-span-2 text-center">Loading orders queue...</p>
       </div>
     </section>
 
-    <!-- COCKPIT 2: DAILY BUSINESS REPORTS -->
-    <section id="cockpitReports" class="hidden space-y-5">
-      <div class="bg-white border border-stone-200 p-6 rounded-3xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 shadow-sm">
+    <!-- COCKPIT 2: REPORTS -->
+    <section id="cockpitReports" class="hidden space-y-4 w-full">
+      <div class="bg-white border border-stone-200 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 shadow-xs w-full">
         <div>
-          <h4 class="text-lg font-black text-forest-900">Kitchen Daily Ledger Report (IST)</h4>
-          <p class="text-xs text-stone-500 font-medium">Real-time revenue, conversions, and roti production metrics.</p>
+          <h4 class="text-base sm:text-lg font-black text-forest-900">Kitchen Ledger Report</h4>
+          <p class="text-xs text-stone-500 font-medium">Daily revenue and meal production totals</p>
         </div>
-        <input type="date" id="reportDateInput" onchange="fetchDaywiseReport()" class="bg-stone-50 border border-stone-300 text-forest-900 font-black text-sm p-3 rounded-xl outline-none min-h-[44px]" />
+        <input type="date" id="reportDateInput" onchange="fetchDaywiseReport()" class="bg-stone-50 border border-stone-300 text-forest-900 font-black text-xs sm:text-sm p-2.5 rounded-xl outline-none min-h-[42px] w-full sm:w-auto" />
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
-          <p class="text-xs text-stone-500 font-extrabold">Gross Revenue</p>
-          <h3 class="text-2xl md:text-3xl font-black text-amberBrand-600 mt-1" id="repGrossRev">₹0</h3>
-          <p class="text-xs text-stone-400 mt-1 font-semibold" id="repRevSplit">UPI: ₹0 | Wallet: ₹0</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 w-full">
+        <div class="bg-white border border-stone-200 p-3.5 sm:p-4 rounded-2xl shadow-xs">
+          <p class="text-[11px] text-stone-500 font-extrabold">Gross Revenue</p>
+          <h3 class="text-xl sm:text-2xl font-black text-amberBrand-600 mt-0.5" id="repGrossRev">₹0</h3>
+          <p class="text-[10px] text-stone-400 mt-0.5 font-semibold" id="repRevSplit">UPI: ₹0 | Wallet: ₹0</p>
         </div>
-        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
-          <p class="text-xs text-stone-500 font-extrabold">Total Orders</p>
-          <h3 class="text-2xl md:text-3xl font-black text-forest-900 mt-1" id="repTotalOrders">0</h3>
-          <p class="text-xs text-green-700 mt-1 font-bold" id="repCompletedOrders">0 Picked Up</p>
+        <div class="bg-white border border-stone-200 p-3.5 sm:p-4 rounded-2xl shadow-xs">
+          <p class="text-[11px] text-stone-500 font-extrabold">Total Orders</p>
+          <h3 class="text-xl sm:text-2xl font-black text-forest-900 mt-0.5" id="repTotalOrders">0</h3>
+          <p class="text-[10px] text-green-700 mt-0.5 font-bold" id="repCompletedOrders">0 Picked Up</p>
         </div>
-        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
-          <p class="text-xs text-stone-500 font-extrabold">Rotis Prepped</p>
-          <h3 class="text-2xl md:text-3xl font-black text-green-700 mt-1" id="repRotisCount">0</h3>
-          <p class="text-xs text-stone-400 mt-1 font-medium">Sorghum & Finger Millet</p>
+        <div class="bg-white border border-stone-200 p-3.5 sm:p-4 rounded-2xl shadow-xs">
+          <p class="text-[11px] text-stone-500 font-extrabold">Rotis Prepped</p>
+          <h3 class="text-xl sm:text-2xl font-black text-green-700 mt-0.5" id="repRotisCount">0</h3>
+          <p class="text-[10px] text-stone-400 mt-0.5 font-medium">Jowar & Ragi</p>
         </div>
-        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
-          <p class="text-xs text-stone-500 font-extrabold">In-Prep / Queue</p>
-          <h3 class="text-2xl md:text-3xl font-black text-amberBrand-500 mt-1" id="repActiveQueue">0</h3>
-          <p class="text-xs text-red-600 mt-1 font-bold" id="repCancelledCount">0 Rejected</p>
+        <div class="bg-white border border-stone-200 p-3.5 sm:p-4 rounded-2xl shadow-xs">
+          <p class="text-[11px] text-stone-500 font-extrabold">Active Queue</p>
+          <h3 class="text-xl sm:text-2xl font-black text-amberBrand-500 mt-0.5" id="repActiveQueue">0</h3>
+          <p class="text-[10px] text-red-600 mt-0.5 font-bold" id="repCancelledCount">0 Rejected</p>
         </div>
       </div>
 
-      <div class="bg-white border border-stone-200 p-6 rounded-3xl space-y-4 shadow-sm">
-        <div class="flex items-center justify-between">
-          <h4 class="text-xs font-black text-stone-400 uppercase tracking-wider">Itemized Orders Ledger</h4>
-          <div class="flex gap-2 text-xs">
-            <button onclick="sortReportOrders('time')" class="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-stone-700 font-bold transition min-h-[38px]">Sort by Time</button>
-            <button onclick="sortReportOrders('value')" class="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-stone-700 font-bold transition min-h-[38px]">Sort by Amount</button>
-            <button onclick="sortReportOrders('status')" class="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-stone-700 font-bold transition min-h-[38px]">Sort by Status</button>
+      <div class="bg-white border border-stone-200 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl space-y-3 shadow-xs w-full">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <h4 class="text-xs font-black text-stone-400 uppercase tracking-wider">Itemized Ledger</h4>
+          <div class="flex gap-1.5 text-xs w-full sm:w-auto overflow-x-auto no-scrollbar">
+            <button onclick="sortReportOrders('time')" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-stone-700 font-bold transition shrink-0">Time</button>
+            <button onclick="sortReportOrders('value')" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-stone-700 font-bold transition shrink-0">Amount</button>
+            <button onclick="sortReportOrders('status')" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-stone-700 font-bold transition shrink-0">Status</button>
           </div>
         </div>
 
-        <div id="reportOrdersTable" class="overflow-x-auto divide-y divide-stone-100 text-xs md:text-sm text-stone-700">
+        <div id="reportOrdersTable" class="overflow-x-auto divide-y divide-stone-100 text-xs md:text-sm text-stone-700 w-full">
           <p class="text-stone-400 py-6 text-center">No orders for selected report date.</p>
         </div>
       </div>
     </section>
 
     <!-- COCKPIT 3: COMPACT HOURLY TELEMETRY RADAR -->
-    <section id="cockpitTraffic" class="hidden space-y-5">
-      <div class="bg-white border border-stone-200 p-6 rounded-3xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 shadow-sm">
+    <section id="cockpitTraffic" class="hidden space-y-4 w-full">
+      <div class="bg-white border border-stone-200 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 shadow-xs w-full">
         <div>
-          <h4 class="text-lg font-black text-forest-900">Compact Hourly Telemetry Radar (Strict IST)</h4>
-          <p class="text-xs text-stone-500 font-medium">Inspect active hourly traffic distribution and conversion performance.</p>
+          <h4 class="text-base sm:text-lg font-black text-forest-900">Hourly Telemetry Radar</h4>
+          <p class="text-xs text-stone-500 font-medium">Hourly traffic distribution and conversions</p>
         </div>
-        <div class="flex items-center gap-2">
-          <label class="text-xs text-stone-600 font-bold">Select Date:</label>
-          <input type="date" id="trafficDateFilter" onchange="fetchHourlyTrafficReport()" class="bg-stone-50 border border-stone-300 text-forest-900 font-black text-sm p-3 rounded-xl outline-none min-h-[44px]" />
+        <input type="date" id="trafficDateFilter" onchange="fetchHourlyTrafficReport()" class="bg-stone-50 border border-stone-300 text-forest-900 font-black text-xs sm:text-sm p-2.5 rounded-xl outline-none min-h-[42px] w-full sm:w-auto" />
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 w-full">
+        <div class="bg-white border border-stone-200 p-3.5 sm:p-4 rounded-2xl shadow-xs">
+          <p class="text-[11px] text-stone-500 font-extrabold">Total Day Visits</p>
+          <h3 class="text-2xl font-black text-green-700 mt-0.5" id="hourlyTotalVisits">0</h3>
+          <p class="text-[10px] text-stone-400 mt-0.5 font-medium">New + Repeat</p>
+        </div>
+        <div class="bg-white border border-stone-200 p-3.5 sm:p-4 rounded-2xl shadow-xs">
+          <p class="text-[11px] text-stone-500 font-extrabold">New Visits</p>
+          <h3 class="text-2xl font-black text-forest-900 mt-0.5" id="hourlyNewVisits">0</h3>
+          <p class="text-[10px] text-stone-400 mt-0.5 font-medium">Unique visitors</p>
+        </div>
+        <div class="bg-white border border-stone-200 p-3.5 sm:p-4 rounded-2xl shadow-xs">
+          <p class="text-[11px] text-stone-500 font-extrabold">Repeat Visits</p>
+          <h3 class="text-2xl font-black text-amberBrand-600 mt-0.5" id="hourlyRepeatVisits">0</h3>
+          <p class="text-[10px] text-stone-400 mt-0.5 font-medium">Returning sessions</p>
+        </div>
+        <div class="bg-white border border-stone-200 p-3.5 sm:p-4 rounded-2xl shadow-xs">
+          <p class="text-[11px] text-stone-500 font-extrabold">Converted Orders</p>
+          <h3 class="text-2xl font-black text-forest-800 mt-0.5" id="hourlyOrdersPlaced">0</h3>
+          <p class="text-[10px] text-stone-400 mt-0.5 font-medium">Completed</p>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
-          <p class="text-xs text-stone-500 font-extrabold">Total Day Visits</p>
-          <h3 class="text-3xl font-black text-green-700 mt-1" id="hourlyTotalVisits">0</h3>
-          <p class="text-xs text-stone-400 mt-1 font-medium">New + Repeat</p>
-        </div>
-        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
-          <p class="text-xs text-stone-500 font-extrabold">New First-Time Visits</p>
-          <h3 class="text-3xl font-black text-forest-900 mt-1" id="hourlyNewVisits">0</h3>
-          <p class="text-xs text-stone-400 mt-1 font-medium">Unique visitors</p>
-        </div>
-        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
-          <p class="text-xs text-stone-500 font-extrabold">Repeat Visits</p>
-          <h3 class="text-3xl font-black text-amberBrand-600 mt-1" id="hourlyRepeatVisits">0</h3>
-          <p class="text-xs text-stone-400 mt-1 font-medium">Returning sessions</p>
-        </div>
-        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
-          <p class="text-xs text-stone-500 font-extrabold">Orders Converted</p>
-          <h3 class="text-3xl font-black text-forest-800 mt-1" id="hourlyOrdersPlaced">0</h3>
-          <p class="text-xs text-stone-400 mt-1 font-medium">Completed orders</p>
-        </div>
-      </div>
-
-      <div class="bg-white border border-stone-200 p-6 rounded-3xl space-y-4 shadow-sm">
-        <div class="flex justify-between items-center">
-          <h4 class="text-xs font-black text-stone-400 uppercase tracking-wider" id="hourlyTableHeading">Active Hourly Traffic Strip</h4>
-          <span class="text-xs font-mono text-amberBrand-600 font-bold">Timezone: Asia/Kolkata (IST)</span>
-        </div>
-
-        <div id="hourlyRadarContainer" class="overflow-x-auto text-xs md:text-sm text-stone-700">
-          <p class="text-stone-400 py-6 text-center">Loading hourly telemetry radar...</p>
+      <div class="bg-white border border-stone-200 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl space-y-3 shadow-xs w-full">
+        <h4 class="text-xs font-black text-stone-400 uppercase tracking-wider" id="hourlyTableHeading">Active Traffic Windows</h4>
+        <div id="hourlyRadarContainer" class="overflow-x-auto text-xs md:text-sm text-stone-700 w-full">
+          <p class="text-stone-400 py-6 text-center">Loading hourly radar...</p>
         </div>
       </div>
     </section>
 
     <!-- COCKPIT 4: 2-WAY SUPPORT CHAT -->
-    <section id="cockpitChat" class="hidden grid grid-cols-1 md:grid-cols-12 gap-4 h-[72dvh]">
-      <div class="md:col-span-4 bg-white border border-stone-200 rounded-3xl p-4 overflow-y-auto space-y-2 shadow-sm">
+    <section id="cockpitChat" class="hidden grid grid-cols-1 md:grid-cols-12 gap-3.5 h-[75dvh] w-full">
+      <div class="md:col-span-4 bg-white border border-stone-200 rounded-2xl sm:rounded-3xl p-3.5 overflow-y-auto space-y-1.5 shadow-xs w-full">
         <h4 class="text-xs font-black text-stone-400 uppercase tracking-wider mb-2">Customer Threads</h4>
-        <div id="chatThreadsList" class="space-y-1.5">
-          <p class="text-stone-400 text-xs">No active chat threads.</p>
+        <div id="chatThreadsList" class="space-y-1.5 w-full">
+          <p class="text-stone-400 text-xs">No active threads.</p>
         </div>
       </div>
 
-      <div class="md:col-span-8 bg-white border border-stone-200 rounded-3xl flex flex-col overflow-hidden shadow-sm">
-        <div class="p-4 bg-stone-50 border-b border-stone-200 flex justify-between items-center">
+      <div class="md:col-span-8 bg-white border border-stone-200 rounded-2xl sm:rounded-3xl flex flex-col overflow-hidden shadow-xs w-full">
+        <div class="p-3.5 bg-stone-50 border-b border-stone-200 flex justify-between items-center w-full">
           <div>
-            <h5 class="text-sm font-black text-forest-900" id="activeChatCustomerName">Select a thread</h5>
-            <p class="text-xs text-stone-500 font-mono" id="activeChatCustomerId">---</p>
+            <h5 class="text-sm font-black text-forest-900" id="activeChatCustomerName">Select thread</h5>
+            <p class="text-[11px] text-stone-500 font-mono" id="activeChatCustomerId">---</p>
           </div>
         </div>
-        <div id="adminChatMessagesBox" class="flex-1 p-4 overflow-y-auto space-y-3 bg-stone-50/50 text-sm">
-          <p class="text-stone-400 text-center py-12 text-sm">Select a customer thread on the left to review messages.</p>
+        <div id="adminChatMessagesBox" class="flex-1 p-3.5 overflow-y-auto space-y-2.5 bg-stone-50/50 text-xs sm:text-sm w-full">
+          <p class="text-stone-400 text-center py-10 text-xs">Select a customer thread to view messages.</p>
         </div>
-        <div class="p-3.5 bg-white border-t border-stone-200 flex gap-2">
-          <input type="text" id="adminReplyInput" onkeydown="if(event.key==='Enter') sendAdminChatReply()" placeholder="Type reply as Kitchen Desk..." class="flex-1 px-4 py-3 bg-stone-50 border border-stone-300 rounded-xl text-sm text-stone-900 outline-none focus:ring-2 focus:ring-forest-800 min-h-[48px]" />
-          <button onclick="sendAdminChatReply()" class="px-5 py-3 bg-forest-800 hover:bg-forest-900 text-white font-black text-sm rounded-xl transition shadow min-h-[48px]">
+        <div class="p-3 bg-white border-t border-stone-200 flex gap-2 w-full">
+          <input type="text" id="adminReplyInput" onkeydown="if(event.key==='Enter') sendAdminChatReply()" placeholder="Type reply as Kitchen Desk..." class="flex-1 px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:ring-2 focus:ring-forest-800 min-h-[44px]" />
+          <button onclick="sendAdminChatReply()" class="px-4 py-2.5 bg-forest-800 hover:bg-forest-900 text-white font-black text-xs sm:text-sm rounded-xl transition shadow min-h-[44px] shrink-0">
             Reply
           </button>
         </div>
       </div>
     </section>
 
-    <!-- COCKPIT 5: MENU ITEM MASTER -->
-    <section id="cockpitMenu" class="hidden bg-white border border-stone-200 p-6 rounded-3xl space-y-4 shadow-sm">
-      <div class="flex justify-between items-center">
+    <!-- COCKPIT 5: MENU MASTER -->
+    <section id="cockpitMenu" class="hidden bg-white border border-stone-200 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl space-y-3.5 shadow-xs w-full">
+      <div class="flex justify-between items-center gap-2">
         <div>
-          <h4 class="text-base font-black text-forest-900">Menu Item Master & Stock Control</h4>
-          <p class="text-xs text-stone-500 font-medium">Update pricing, toggle stock, or add seasonal preparations.</p>
+          <h4 class="text-sm sm:text-base font-black text-forest-900">Menu & Stock</h4>
+          <p class="text-[11px] text-stone-500">Live meal prices and availability</p>
         </div>
-        <button onclick="openAddMealModal()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-forest-900 font-black text-xs md:text-sm rounded-xl flex items-center gap-1.5 shadow transition min-h-[44px]">
-          <i data-lucide="plus" class="w-4 h-4"></i>
-          <span>Add New Meal Item</span>
+        <button onclick="openAddMealModal()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-forest-900 font-black text-xs rounded-xl flex items-center gap-1 shadow transition min-h-[40px] shrink-0">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>Add Meal</span>
         </button>
       </div>
 
-      <div id="adminMenuContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+      <div id="adminMenuContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 w-full">
         <p class="text-stone-400 text-sm col-span-2">Loading menu items...</p>
       </div>
     </section>
 
     <!-- COCKPIT 6: WALLET CLAIMS & TOP-UPS -->
-    <section id="cockpitClaims" class="hidden space-y-6">
-      <div class="bg-white border border-stone-200 p-6 rounded-3xl space-y-3.5 shadow-sm">
-        <h4 class="text-base font-black text-forest-900 flex items-center gap-2">
-          <i data-lucide="arrow-down-left" class="w-5 h-5 text-amberBrand-600"></i> Balance Refund Claims
+    <section id="cockpitClaims" class="hidden space-y-4 w-full">
+      <div class="bg-white border border-stone-200 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl space-y-3 shadow-xs w-full">
+        <h4 class="text-sm sm:text-base font-black text-forest-900 flex items-center gap-2">
+          <i data-lucide="arrow-down-left" class="w-4 h-4 text-amberBrand-600"></i> Balance Refund Claims
         </h4>
-        <div id="adminClaimsContainer" class="space-y-3">
-          <p class="text-stone-400 text-sm">No pending claims.</p>
+        <div id="adminClaimsContainer" class="space-y-2.5 w-full">
+          <p class="text-stone-400 text-xs">No pending refund claims.</p>
         </div>
       </div>
 
-      <div class="bg-white border border-stone-200 p-6 rounded-3xl space-y-3.5 shadow-sm">
-        <h4 class="text-base font-black text-forest-900 flex items-center gap-2">
-          <i data-lucide="plus-circle" class="w-5 h-5 text-green-700"></i> Pending Wallet Recharges
+      <div class="bg-white border border-stone-200 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl space-y-3 shadow-xs w-full">
+        <h4 class="text-sm sm:text-base font-black text-forest-900 flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-4 h-4 text-green-700"></i> Pending Wallet Recharges
         </h4>
-        <div id="adminRechargesContainer" class="space-y-3">
-          <p class="text-stone-400 text-sm">No pending top-ups.</p>
+        <div id="adminRechargesContainer" class="space-y-2.5 w-full">
+          <p class="text-stone-400 text-xs">No pending recharges.</p>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- ONLINE CUSTOMERS RADAR MODAL / DRAWER -->
+  <!-- ONLINE CUSTOMERS MODAL -->
   <div id="onlineUsersModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white border border-stone-200 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4 max-h-sheet overflow-y-auto">
-      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
-
-      <div class="flex justify-between items-center border-b border-stone-100 pb-3">
-        <h3 class="text-base font-black text-forest-900 flex items-center gap-2">
-          <span class="w-3 h-3 rounded-full bg-green-500 animate-ping"></span>
+    <div class="bg-white border border-stone-200 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl space-y-3 max-h-[85dvh] overflow-y-auto">
+      <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-1 sm:hidden"></div>
+      <div class="flex justify-between items-center border-b border-stone-100 pb-2">
+        <h3 class="text-sm font-black text-forest-900 flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping"></span>
           <span>Online Customers (Last 60s)</span>
         </h3>
-        <button onclick="closeOnlineUsersModal()" class="text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">&times;</button>
+        <button onclick="closeOnlineUsersModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold min-h-[36px] min-w-[36px] flex items-center justify-center">&times;</button>
       </div>
-      <div id="onlineUsersList" class="divide-y divide-stone-100 max-h-64 overflow-y-auto text-xs md:text-sm text-stone-700">
-        <p class="text-stone-400 text-center py-4">Checking telemetry sessions...</p>
+      <div id="onlineUsersList" class="divide-y divide-stone-100 max-h-60 overflow-y-auto text-xs text-stone-700 w-full">
+        <p class="text-stone-400 text-center py-4">Checking active sessions...</p>
       </div>
     </div>
   </div>
 
-  <!-- ADD NEW MEAL ITEM MODAL / DRAWER -->
+  <!-- ADD MEAL MODAL -->
   <div id="addMealModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white border border-stone-200 w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4 max-h-sheet overflow-y-auto">
-      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
-
-      <div class="flex justify-between items-center border-b border-stone-100 pb-3">
-        <h3 class="text-lg font-black text-forest-900">Add New Meal Item to Menu</h3>
-        <button onclick="closeAddMealModal()" class="text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">&times;</button>
+    <div class="bg-white border border-stone-200 w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl space-y-3.5 max-h-[88dvh] overflow-y-auto">
+      <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-1 sm:hidden"></div>
+      <div class="flex justify-between items-center border-b border-stone-100 pb-2">
+        <h3 class="text-base font-black text-forest-900">Add Meal Item</h3>
+        <button onclick="closeAddMealModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold min-h-[36px] min-w-[36px] flex items-center justify-center">&times;</button>
       </div>
 
-      <form id="addMealForm" onsubmit="submitNewMeal(event)" class="space-y-3.5 text-xs md:text-sm">
+      <form id="addMealForm" onsubmit="submitNewMeal(event)" class="space-y-3 text-xs sm:text-sm w-full">
         <div>
           <label class="block text-stone-600 font-extrabold mb-1">Meal Name</label>
-          <input type="text" id="newMealName" required placeholder="e.g. Bajra Masala Roti Plate" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none font-bold min-h-[48px]" />
+          <input type="text" id="newMealName" required placeholder="e.g. Bajra Masala Roti Plate" class="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none font-bold min-h-[44px]" />
         </div>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 gap-2.5 w-full">
           <div>
             <label class="block text-stone-600 font-extrabold mb-1">Category</label>
-            <select id="newMealCategory" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[48px]">
+            <select id="newMealCategory" class="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[44px]">
               <option value="Millet Rotis">Millet Rotis</option>
               <option value="Combo Meals">Combo Meals</option>
               <option value="Curries & Sides">Curries & Sides</option>
@@ -383,58 +384,57 @@
           </div>
           <div>
             <label class="block text-stone-600 font-extrabold mb-1">Millet Type</label>
-            <input type="text" id="newMealMillet" placeholder="e.g. Bajra / Pearl Millet" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[48px]" />
+            <input type="text" id="newMealMillet" placeholder="e.g. Bajra / Jowar" class="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[44px]" />
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 gap-2.5 w-full">
           <div>
             <label class="block text-stone-600 font-extrabold mb-1">Base Price (₹)</label>
-            <input type="number" id="newMealPrice" required min="10" placeholder="140" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 font-black outline-none min-h-[48px]" />
+            <input type="number" id="newMealPrice" required min="10" placeholder="140" class="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 font-black outline-none min-h-[44px]" />
           </div>
           <div>
             <label class="block text-stone-600 font-extrabold mb-1">Prep Time (Mins)</label>
-            <input type="number" id="newMealPrep" value="20" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[48px]" />
+            <input type="number" id="newMealPrep" value="20" class="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[44px]" />
           </div>
         </div>
         <div>
           <label class="block text-stone-600 font-extrabold mb-1">Description</label>
-          <textarea id="newMealDesc" rows="2" placeholder="Ingredients, accompaniment details..." class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none"></textarea>
+          <textarea id="newMealDesc" rows="2" placeholder="Ingredients and details..." class="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none"></textarea>
         </div>
         <div>
-          <label class="block text-stone-600 font-extrabold mb-1">Nutritional Info String</label>
-          <input type="text" id="newMealNutrition" value="Cal: 340kcal | Protein: 8g | Fiber: 9g" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[48px]" />
+          <label class="block text-stone-600 font-extrabold mb-1">Nutritional Info</label>
+          <input type="text" id="newMealNutrition" value="Cal: 340kcal | Protein: 8g | Fiber: 9g" class="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[44px]" />
         </div>
         <div>
-          <label class="block text-stone-600 font-extrabold mb-1">Photo Upload (Saved to Drive)</label>
-          <input type="file" id="newMealPhoto" accept="image/*" class="w-full text-stone-600 file:mr-2 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-stone-200 file:text-stone-800" />
+          <label class="block text-stone-600 font-extrabold mb-1">Photo Upload</label>
+          <input type="file" id="newMealPhoto" accept="image/*" class="w-full text-stone-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-stone-200 file:text-stone-800" />
         </div>
 
-        <button type="submit" id="btnSubmitNewMeal" class="w-full py-3.5 bg-forest-800 hover:bg-forest-900 text-white font-black text-sm rounded-xl transition mt-2 shadow min-h-[48px]">
-          Save & Publish to Active Menu
+        <button type="submit" id="btnSubmitNewMeal" class="w-full py-3 bg-forest-800 hover:bg-forest-900 text-white font-black text-xs sm:text-sm rounded-xl transition shadow min-h-[44px]">
+          Save & Publish
         </button>
       </form>
     </div>
   </div>
 
-  <!-- DISBURSEMENT CLAIM MODAL / DRAWER -->
+  <!-- DISBURSEMENT CLAIM MODAL -->
   <div id="claimApprovalModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white border border-stone-200 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4 max-h-sheet overflow-y-auto">
-      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
-
-      <h3 class="text-base font-black text-forest-900">Approve & Issue Claim Acknowledgment</h3>
-      <div class="p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-xs space-y-1">
+    <div class="bg-white border border-stone-200 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl space-y-3.5 max-h-[85dvh] overflow-y-auto">
+      <div class="w-10 h-1 bg-stone-300 rounded-full mx-auto mb-1 sm:hidden"></div>
+      <h3 class="text-sm sm:text-base font-black text-forest-900">Disburse Claim</h3>
+      <div class="p-3 bg-stone-50 border border-stone-200 rounded-xl text-xs space-y-1 w-full">
         <p class="text-stone-500">Claim ID: <span id="modalClaimId" class="font-bold text-stone-900"></span></p>
         <p class="text-stone-500">Beneficiary UPI: <span id="modalClaimUpi" class="font-black text-forest-800"></span></p>
-        <p class="text-stone-500">Amount to Disburse: <span id="modalClaimAmount" class="font-black text-green-700 text-sm"></span></p>
+        <p class="text-stone-500">Amount: <span id="modalClaimAmount" class="font-black text-green-700"></span></p>
       </div>
       <div>
-        <label class="block text-xs font-black text-stone-700 mb-1">Bank Transfer 12-Digit UTR <span class="text-red-500">*</span></label>
-        <input type="text" id="modalTransferUtr" maxlength="12" placeholder="e.g. 423512349876" class="w-full px-4 py-3 bg-white border border-stone-300 rounded-2xl text-base font-mono font-black text-stone-900 outline-none focus:ring-2 focus:ring-forest-800 min-h-[48px]" />
+        <label class="block text-xs font-black text-stone-700 mb-1">Bank 12-Digit UTR <span class="text-red-500">*</span></label>
+        <input type="text" id="modalTransferUtr" maxlength="12" placeholder="e.g. 423512349876" class="w-full px-3.5 py-2.5 bg-white border border-stone-300 rounded-xl text-sm font-mono font-black text-stone-900 outline-none focus:ring-2 focus:ring-forest-800 min-h-[44px]" />
       </div>
-      <div class="flex gap-2">
-        <button onclick="closeClaimModal()" class="flex-1 py-3 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs rounded-2xl transition min-h-[44px]">Cancel</button>
-        <button onclick="confirmClaimDisbursement()" id="btnConfirmClaimDisburse" class="flex-1 py-3 bg-green-700 hover:bg-green-800 text-white font-black text-xs rounded-2xl transition shadow min-h-[44px]">
-          Disburse & Issue PDF
+      <div class="flex gap-2 w-full">
+        <button onclick="closeClaimModal()" class="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs rounded-xl transition min-h-[40px]">Cancel</button>
+        <button onclick="confirmClaimDisbursement()" id="btnConfirmClaimDisburse" class="flex-1 py-2.5 bg-green-700 hover:bg-green-800 text-white font-black text-xs rounded-xl transition shadow min-h-[40px]">
+          Disburse
         </button>
       </div>
     </div>
@@ -503,72 +503,39 @@
           osc1.stop(now + 0.35);
           osc2.start(now + 0.15);
           osc2.stop(now + 0.65);
-
         } else if (eventType === "WALLET_TOPUP") {
           const osc1 = audioCtx.createOscillator();
-          const osc2 = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
-
           osc1.type = 'triangle';
-          osc2.type = 'sine';
           osc1.frequency.setValueAtTime(987.77, now);
-          osc2.frequency.setValueAtTime(1318.51, now);
-
           gain.gain.setValueAtTime(0.25, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-
           osc1.connect(gain);
-          osc2.connect(gain);
           gain.connect(audioCtx.destination);
-
           osc1.start(now);
-          osc2.start(now);
           osc1.stop(now + 0.5);
-          osc2.stop(now + 0.5);
-
         } else if (eventType === "WALLET_CLAIM") {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
-
           osc.type = 'sawtooth';
           osc.frequency.setValueAtTime(392.00, now);
-          osc.frequency.linearRampToValueAtTime(261.63, now + 0.4);
-
           gain.gain.setValueAtTime(0.2, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
-
           osc.connect(gain);
           gain.connect(audioCtx.destination);
-
           osc.start(now);
           osc.stop(now + 0.55);
-
         } else if (eventType === "SUPPORT_CHAT") {
-          const osc1 = audioCtx.createOscillator();
-          const osc2 = audioCtx.createOscillator();
-          const gain1 = audioCtx.createGain();
-          const gain2 = audioCtx.createGain();
-
-          osc1.type = 'sine';
-          osc2.type = 'sine';
-          osc1.frequency.setValueAtTime(523.25, now);
-          osc2.frequency.setValueAtTime(659.25, now + 0.09);
-
-          gain1.gain.setValueAtTime(0.2, now);
-          gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-
-          gain2.gain.setValueAtTime(0.2, now + 0.09);
-          gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-
-          osc1.connect(gain1);
-          gain1.connect(audioCtx.destination);
-          osc2.connect(gain2);
-          gain2.connect(audioCtx.destination);
-
-          osc1.start(now);
-          osc1.stop(now + 0.08);
-          osc2.start(now + 0.09);
-          osc2.stop(now + 0.22);
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.2);
         }
       } catch (err) {}
     }
@@ -598,14 +565,14 @@
       const c = document.getElementById("toastContainer");
       const toast = document.createElement("div");
       const bg = type === "error" ? "bg-red-900 text-white" : type === "success" ? "bg-forest-800 text-white" : "bg-stone-800 text-white";
-      toast.className = `${bg} p-4 rounded-2xl text-xs md:text-sm font-bold shadow-2xl flex items-center justify-between gap-3 border border-white/20 pointer-events-auto transition-transform`;
+      toast.className = `${bg} p-3.5 rounded-xl text-xs sm:text-sm font-bold shadow-2xl flex items-center justify-between gap-3 border border-white/20 pointer-events-auto transition-transform w-full`;
       
       let actionBtnHtml = "";
       if (actionText) {
-        actionBtnHtml = `<button class="toast-action-btn bg-amber-500 hover:bg-amber-600 text-forest-900 px-3 py-1 rounded-xl text-xs font-black shadow-sm">${actionText}</button>`;
+        actionBtnHtml = `<button class="toast-action-btn bg-amber-500 hover:bg-amber-600 text-forest-900 px-2.5 py-1 rounded-lg text-xs font-black shadow-xs shrink-0">${actionText}</button>`;
       }
 
-      toast.innerHTML = `<span>${msg}</span><div class="flex items-center gap-2">${actionBtnHtml}<button onclick="this.closest('div.pointer-events-auto').remove()" class="opacity-70 hover:opacity-100 text-lg">&times;</button></div>`;
+      toast.innerHTML = `<span>${msg}</span><div class="flex items-center gap-2 shrink-0">${actionBtnHtml}<button onclick="this.closest('div.pointer-events-auto').remove()" class="opacity-70 hover:opacity-100 text-lg leading-none">&times;</button></div>`;
       
       if (actionText && actionCb) {
         const btn = toast.querySelector(".toast-action-btn");
@@ -662,7 +629,7 @@
               if (!seenOrderIds.has(oId)) {
                 seenOrderIds.add(oId);
                 playAdminChime("NEW_ORDER");
-                showToast(`🔔 New Order #${oId.slice(-4)} (${o.customerName}) received!`, "success", "View", () => {
+                showToast(`🔔 New Order #${oId.slice(-4)} (${o.customerName})`, "success", "View", () => {
                   switchAdminTab('orders');
                 });
               }
@@ -673,7 +640,7 @@
               if (!seenRechargeIds.has(rId)) {
                 seenRechargeIds.add(rId);
                 playAdminChime("WALLET_TOPUP");
-                showToast(`💰 New Wallet Top-Up (₹${r.amount}) awaiting UTR verification!`, "info", "Review", () => {
+                showToast(`💰 Wallet Top-Up (₹${r.amount}) pending`, "info", "Review", () => {
                   switchAdminTab('claims');
                 });
               }
@@ -684,7 +651,7 @@
               if (!seenClaimIds.has(cId)) {
                 seenClaimIds.add(cId);
                 playAdminChime("WALLET_CLAIM");
-                showToast(`⚠️ Refund Claim (₹${c.amount}) awaiting UPI disbursement!`, "error", "Process", () => {
+                showToast(`⚠️ Refund Claim (₹${c.amount}) pending`, "error", "Process", () => {
                   switchAdminTab('claims');
                 });
               }
@@ -707,21 +674,58 @@
       const isKitchenOpen = String(data.config.KITCHEN_OPEN).toUpperCase() === "TRUE";
       const btnKitchen = document.getElementById("btnKitchenOpenToggle");
       btnKitchen.innerText = isKitchenOpen ? "OPEN" : "CLOSED";
-      btnKitchen.className = `px-5 py-2.5 rounded-xl font-black text-xs ${isKitchenOpen ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} shadow-sm min-h-[44px]`;
+      btnKitchen.className = `px-4 py-2 rounded-xl font-black text-xs ${isKitchenOpen ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} shadow-xs min-h-[40px] shrink-0`;
 
       const isWalletOn = String(data.config.WALLET_SYSTEM_ENABLED).toUpperCase() === "TRUE";
       const btnWallet = document.getElementById("btnWalletSystemToggle");
       btnWallet.innerText = isWalletOn ? "ENABLED" : "PAUSED";
-      btnWallet.className = `px-5 py-2.5 rounded-xl font-black text-xs ${isWalletOn ? 'bg-green-600 text-white' : 'bg-amber-600 text-white'} shadow-sm min-h-[44px]`;
+      btnWallet.className = `px-4 py-2 rounded-xl font-black text-xs ${isWalletOn ? 'bg-green-600 text-white' : 'bg-amber-600 text-white'} shadow-xs min-h-[40px] shrink-0`;
 
       if (data.config && data.config.ANNOUNCEMENT_BANNER) {
         const inp = document.getElementById("adminAnnouncementInput");
         if (inp && !inp.value) inp.value = data.config.ANNOUNCEMENT_BANNER;
       }
 
+      updateActionPendingBadges(data);
       renderOrdersList();
       renderClaimsList();
       renderMenuList();
+    }
+
+    // -------------------------------------------------------------
+    // REAL-TIME ACTION-PENDING STATUS BADGES
+    // -------------------------------------------------------------
+    function updateActionPendingBadges(data) {
+      const orders = data.orders || [];
+      const pendingVerifCount = orders.filter(o => o.orderStatus === 'Pending_Verification').length;
+      const acceptedCount = orders.filter(o => o.orderStatus === 'Kitchen_Accepted').length;
+      const preparingCount = orders.filter(o => o.orderStatus === 'Preparing').length;
+      const readyCount = orders.filter(o => o.orderStatus === 'Ready_For_Pickup').length;
+
+      // Sub-filter badges
+      const setBadge = (elId, count) => {
+        const el = document.getElementById(elId);
+        if (el) {
+          if (count > 0) {
+            el.innerText = count;
+            el.classList.remove("hidden");
+          } else {
+            el.classList.add("hidden");
+          }
+        }
+      };
+
+      setBadge("subBadgePending", pendingVerifCount);
+      setBadge("subBadgeAccepted", acceptedCount);
+      setBadge("subBadgeStove", preparingCount);
+      setBadge("subBadgeReady", readyCount);
+
+      // Main Navigation Tabs Badges
+      const totalPendingOrders = pendingVerifCount + acceptedCount + preparingCount;
+      const totalPendingWallet = (data.pendingRecharges || []).length + (data.pendingClaims || []).length;
+
+      setBadge("badgeTabOrders", totalPendingOrders);
+      setBadge("badgeTabWallet", totalPendingWallet);
     }
 
     async function saveAnnouncementBanner() {
@@ -742,7 +746,7 @@
           value: val
         });
         if (res.status === "SUCCESS") {
-          showToast("Announcement banner published live!", "success");
+          showToast("Banner updated live!", "success");
           refreshAdminData();
         } else {
           showToast(res.message, "error");
@@ -751,7 +755,7 @@
         showToast("Banner update failed.", "error");
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>Update Banner</span>`;
+        btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Update Banner</span>`;
         lucide.createIcons();
       }
     }
@@ -759,9 +763,9 @@
     function filterOrders(status) {
       currentOrderFilter = status;
       document.querySelectorAll(".order-filter-btn").forEach(b => {
-        b.className = "order-filter-btn px-4 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition min-h-[40px]";
+        b.className = "order-filter-btn px-3 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition flex items-center gap-1 shrink-0";
       });
-      event.target.className = "order-filter-btn active px-4 py-2 rounded-xl bg-forest-800 text-xs font-black text-white shadow-sm transition min-h-[40px]";
+      event.currentTarget.className = "order-filter-btn active px-3 py-2 rounded-xl bg-forest-800 text-xs font-black text-white shadow-xs transition flex items-center gap-1 shrink-0";
       renderOrdersList();
     }
 
@@ -771,12 +775,12 @@
       const filtered = adminDataCache.orders.filter(o => currentOrderFilter === "ALL" || o.orderStatus === currentOrderFilter);
 
       if (filtered.length === 0) {
-        container.innerHTML = `<p class="text-stone-400 text-sm py-8 col-span-2 text-center">No orders match filter.</p>`;
+        container.innerHTML = `<p class="text-stone-400 text-xs sm:text-sm py-8 col-span-2 text-center">No orders match filter.</p>`;
         return;
       }
 
       container.innerHTML = filtered.map(o => {
-        const istPlaced = new Date(o.timestamp).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
+        const cleanPlaced = new Date(o.timestamp).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
         
         let cleanDate = "Today";
         if (o.pickupDate) {
@@ -790,46 +794,46 @@
         const phoneClean = String(o.customerPhone || "").replace(/\D/g, '').slice(-10);
 
         return `
-          <div class="p-5 bg-white border border-stone-200 rounded-3xl space-y-3.5 shadow-sm hover:shadow-md transition">
-            <div class="flex justify-between items-start">
-              <div>
+          <div class="p-3.5 sm:p-5 bg-white border border-stone-200 rounded-2xl sm:rounded-3xl space-y-3 shadow-xs hover:shadow-md transition w-full block">
+            <div class="flex justify-between items-start gap-2 w-full">
+              <div class="min-w-0">
                 <span class="text-xs font-mono font-black text-amberBrand-600">#${String(o.orderId).slice(-4)}</span>
-                <h4 class="font-black text-forest-900 text-lg">${o.customerName}</h4>
-                <p class="text-xs text-stone-600 font-semibold">+91 ${o.customerPhone} • Scheduled: <strong class="text-forest-800 font-black">${cleanTime} (IST)</strong></p>
-                <p class="text-[11px] text-stone-400">Placed: ${istPlaced} IST (${cleanDate})</p>
+                <h4 class="font-black text-forest-900 text-base sm:text-lg leading-tight truncate">${o.customerName}</h4>
+                <p class="text-xs text-stone-600 font-semibold truncate">+91 ${o.customerPhone} • Pickup: <strong class="text-forest-800 font-black">${cleanTime}</strong></p>
+                <p class="text-[11px] text-stone-400">Placed: ${cleanPlaced} (${cleanDate})</p>
               </div>
-              <span class="px-3 py-1 rounded-xl text-xs font-black ${o.orderStatus === 'Ready_For_Pickup' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}">
+              <span class="px-2.5 py-1 rounded-xl text-[11px] font-black ${o.orderStatus === 'Ready_For_Pickup' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'} shrink-0">
                 ${String(o.orderStatus).replace('_', ' ')}
               </span>
             </div>
 
-            <!-- DIRECT MOBILE & WHATSAPP VOICE CALLING BAR -->
-            <div class="flex items-center gap-2 pt-1 border-t border-stone-100">
-              <a href="tel:+91${phoneClean}" class="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition min-h-[38px]">
+            <!-- DIRECT MOBILE & WHATSAPP ACTIONS -->
+            <div class="flex items-center gap-2 pt-1 border-t border-stone-100 w-full">
+              <a href="tel:+91${phoneClean}" class="flex-1 py-2 px-3 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition min-h-[38px]">
                 <i data-lucide="phone" class="w-3.5 h-3.5 text-forest-800"></i>
-                <span>Call Mobile</span>
+                <span>Call</span>
               </a>
-              <a href="https://wa.me/91${phoneClean}?text=${encodeURIComponent(`Hello ${o.customerName}! Contacting from Yaady's Millet Roti Meals regarding Order Token #${String(o.orderId).slice(-4)} scheduled for pickup at ${cleanTime} IST.`)}" target="_blank" rel="noopener noreferrer" class="px-3 py-2 bg-green-700 hover:bg-green-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition min-h-[38px]">
-                <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
-                <span>WhatsApp Call</span>
+              <a href="https://wa.me/91${phoneClean}?text=${encodeURIComponent(`Hello ${o.customerName}! Contacting from Yaady's regarding Order Token #${String(o.orderId).slice(-4)} scheduled for pickup at ${cleanTime}.`)}" target="_blank" rel="noopener noreferrer" class="flex-1 py-2 px-3 bg-green-700 hover:bg-green-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition min-h-[38px]">
+                <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                <span>WhatsApp</span>
               </a>
             </div>
 
-            <div class="text-xs md:text-sm text-stone-600 border-t border-b border-stone-100 py-2.5 space-y-1">
+            <div class="text-xs text-stone-600 border-t border-b border-stone-100 py-2 space-y-1 w-full">
               ${(o.items || []).map(i => `<div>${i.quantity}x ${i.name}</div>`).join("")}
-              <div class="font-bold text-stone-900 pt-1">Total: ₹${o.finalPayable} via ${o.paymentMode} ${o.utr ? `(UTR: ${o.utr})` : ''}</div>
+              <div class="font-bold text-stone-900 pt-0.5">Total: ₹${o.finalPayable} via ${o.paymentMode} ${o.utr ? `(UTR: ${o.utr})` : ''}</div>
               ${o.screenshotUrl && o.screenshotUrl.length > 10 ? `
-                <a href="${o.screenshotUrl}" target="_blank" rel="noopener noreferrer" class="inline-block mt-1 text-xs text-amberBrand-600 underline font-bold">View Screenshot Proof</a>
+                <a href="${o.screenshotUrl}" target="_blank" rel="noopener noreferrer" class="inline-block mt-0.5 text-xs text-amberBrand-600 underline font-bold">Screenshot Proof</a>
               ` : ''}
             </div>
 
-            <div class="flex flex-wrap gap-2 pt-1">
+            <div class="flex flex-wrap gap-1.5 pt-0.5 w-full">
               ${o.orderStatus === 'Pending_Verification' ? `
-                <button onclick="approveOrderPayment(${o.rowIndex})" class="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-xl text-xs font-black shadow-sm transition min-h-[40px]">Verify Payment</button>
+                <button onclick="approveOrderPayment(${o.rowIndex})" class="flex-1 py-2 px-3 bg-green-700 hover:bg-green-800 text-white rounded-xl text-xs font-black shadow-xs transition min-h-[38px]">Verify</button>
               ` : ''}
-              <button onclick="setOrderStatus(${o.rowIndex}, 'Preparing')" class="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-bold transition min-h-[40px]">Millet Stove</button>
-              <button onclick="setOrderStatus(${o.rowIndex}, 'Ready_For_Pickup')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-forest-900 rounded-xl text-xs font-black shadow-sm transition min-h-[40px]">Ready Counter</button>
-              <button onclick="setOrderStatus(${o.rowIndex}, 'Completed')" class="px-4 py-2 bg-forest-800 hover:bg-forest-900 text-white rounded-xl text-xs font-bold shadow-sm transition min-h-[40px]">Picked Up</button>
+              <button onclick="setOrderStatus(${o.rowIndex}, 'Preparing')" class="flex-1 py-2 px-3 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-bold transition min-h-[38px]">Stove</button>
+              <button onclick="setOrderStatus(${o.rowIndex}, 'Ready_For_Pickup')" class="flex-1 py-2 px-3 bg-amber-500 hover:bg-amber-600 text-forest-900 rounded-xl text-xs font-black shadow-xs transition min-h-[38px]">Ready</button>
+              <button onclick="setOrderStatus(${o.rowIndex}, 'Completed')" class="flex-1 py-2 px-3 bg-forest-800 hover:bg-forest-900 text-white rounded-xl text-xs font-bold shadow-xs transition min-h-[38px]">Picked Up</button>
             </div>
           </div>
         `;
@@ -882,19 +886,19 @@
     function renderReportOrdersTable(orders) {
       const container = document.getElementById("reportOrdersTable");
       if (orders.length === 0) {
-        container.innerHTML = `<p class="text-stone-400 py-6 text-center">No orders for selected report date.</p>`;
+        container.innerHTML = `<p class="text-stone-400 py-6 text-center text-xs">No orders for selected report date.</p>`;
         return;
       }
 
       container.innerHTML = orders.map(o => `
-        <div class="py-3.5 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+        <div class="py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1.5 w-full">
           <div>
             <span class="font-mono font-bold text-amberBrand-600">#${String(o.orderId).slice(-4)}</span> • <strong class="text-forest-900">${o.customerName}</strong> (${o.customerPhone})
-            <p class="text-xs text-stone-500">Pickup Time: <strong class="text-forest-800">${o.pickupTime} IST</strong> | ${(o.items || []).map(i => `${i.quantity}x ${i.name}`).join(", ")}</p>
+            <p class="text-xs text-stone-500">Pickup: <strong class="text-forest-800">${o.pickupTime}</strong> | ${(o.items || []).map(i => `${i.quantity}x ${i.name}`).join(", ")}</p>
           </div>
-          <div class="flex items-center gap-3">
-            <span class="font-black text-forest-900">₹${o.finalPayable} (${o.paymentMode})</span>
-            <span class="px-2.5 py-1 rounded-lg text-xs font-black ${o.orderStatus === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-stone-100 text-stone-700'}">${o.orderStatus}</span>
+          <div class="flex items-center gap-2 self-end sm:self-auto">
+            <span class="font-black text-forest-900">₹${o.finalPayable}</span>
+            <span class="px-2 py-0.5 rounded-lg text-[11px] font-black ${o.orderStatus === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-stone-100 text-stone-700'}">${o.orderStatus}</span>
           </div>
         </div>
       `).join("");
@@ -912,12 +916,12 @@
     }
 
     // -------------------------------------------------------------
-    // COMPACT HOURLY TELEMETRY RADAR
+    // HOURLY TELEMETRY RADAR
     // -------------------------------------------------------------
     async function fetchHourlyTrafficReport() {
       const dateVal = document.getElementById("trafficDateFilter").value || getIstTodayDateString();
       const container = document.getElementById("hourlyRadarContainer");
-      container.innerHTML = `<p class="text-stone-400 py-6 text-center">Loading hourly radar for ${dateVal} (IST)...</p>`;
+      container.innerHTML = `<p class="text-stone-400 py-6 text-center text-xs">Loading hourly radar...</p>`;
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=GET_HOURLY_TRAFFIC_REPORT&pin=${currentAdminPin}&date=${dateVal}`).then(r => r.json());
@@ -938,9 +942,8 @@
           const activeHours = res.hourlyData.filter(h => h.totalVisits > 0 || h.ordersPlaced > 0);
 
           if (activeHours.length === 0) {
-            container.innerHTML = `<div class="p-8 text-center text-stone-400 space-y-1">
-              <p class="font-bold text-sm">No customer activity recorded for this date (${dateVal}).</p>
-              <p class="text-xs">Active traffic windows appear here automatically when visits or checkouts occur.</p>
+            container.innerHTML = `<div class="p-6 text-center text-stone-400 space-y-1">
+              <p class="font-bold text-xs sm:text-sm">No visitor activity recorded for ${dateVal}.</p>
             </div>`;
             return;
           }
@@ -948,12 +951,12 @@
           container.innerHTML = `
             <table class="w-full text-left border-collapse">
               <thead>
-                <tr class="border-b border-stone-200 text-stone-500 text-xs font-extrabold">
-                  <th class="py-2.5 px-3">Hour Window (IST)</th>
-                  <th class="py-2.5 px-3">Visits (New / Repeat)</th>
-                  <th class="py-2.5 px-3">Total Visits</th>
-                  <th class="py-2.5 px-3">Orders Converted</th>
-                  <th class="py-2.5 px-3">Conversion %</th>
+                <tr class="border-b border-stone-200 text-stone-500 text-[11px] font-extrabold">
+                  <th class="py-2 px-2.5">Window</th>
+                  <th class="py-2 px-2.5">Visits (N / R)</th>
+                  <th class="py-2 px-2.5">Total</th>
+                  <th class="py-2 px-2.5">Converted</th>
+                  <th class="py-2 px-2.5">%</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-stone-100">
@@ -961,11 +964,11 @@
                   const convRate = row.totalVisits > 0 ? ((row.ordersPlaced / row.totalVisits) * 100).toFixed(1) + "%" : "0.0%";
                   return `
                     <tr class="hover:bg-stone-50 transition">
-                      <td class="py-2 px-3 font-mono font-bold text-forest-900">${row.label}</td>
-                      <td class="py-2 px-3 text-stone-700 font-semibold">${row.newVisits} new / ${row.repeatVisits} rep</td>
-                      <td class="py-2 px-3 text-green-700 font-black">${row.totalVisits}</td>
-                      <td class="py-2 px-3 text-amberBrand-600 font-black">${row.ordersPlaced}</td>
-                      <td class="py-2 px-3 text-stone-500 font-semibold">${row.ordersPlaced > 0 ? convRate : '—'}</td>
+                      <td class="py-2 px-2.5 font-mono font-bold text-forest-900">${row.label}</td>
+                      <td class="py-2 px-2.5 text-stone-700 font-semibold">${row.newVisits} / ${row.repeatVisits}</td>
+                      <td class="py-2 px-2.5 text-green-700 font-black">${row.totalVisits}</td>
+                      <td class="py-2 px-2.5 text-amberBrand-600 font-black">${row.ordersPlaced}</td>
+                      <td class="py-2 px-2.5 text-stone-500 font-semibold">${convRate}</td>
                     </tr>
                   `;
                 }).join("")}
@@ -974,7 +977,7 @@
           `;
         }
       } catch (e) {
-        container.innerHTML = `<p class="text-red-600 py-6 text-center">Failed to load hourly traffic radar.</p>`;
+        container.innerHTML = `<p class="text-red-600 py-6 text-center text-xs">Failed to load hourly traffic radar.</p>`;
       }
     }
 
@@ -987,17 +990,20 @@
         const res = await fetch(`${SCRIPT_URL}?action=GET_ALL_CHAT_THREADS&pin=${currentAdminPin}`).then(r => r.json());
         if (res.status === "SUCCESS") {
           const list = document.getElementById("chatThreadsList");
+          let unreadTotal = 0;
+
           if (res.threads.length === 0) {
             list.innerHTML = `<p class="text-stone-400 text-xs">No active chat threads.</p>`;
             return;
           }
 
           res.threads.forEach(t => {
+            unreadTotal += Number(t.unreadCount || 0);
             const lastMsgKey = `${t.customerId}_${t.lastTimestamp}`;
             if (!seenChatIds.has(lastMsgKey) && t.sender === "CUSTOMER" && !isInitialSync) {
               seenChatIds.add(lastMsgKey);
               playAdminChime("SUPPORT_CHAT");
-              showToast(`💬 New message from ${t.customerName}: "${t.lastMessage}"`, "info", "Reply", () => {
+              showToast(`💬 ${t.customerName}: "${t.lastMessage}"`, "info", "Reply", () => {
                 switchAdminTab('chat');
                 selectChatThread(t.customerId, t.customerName);
               });
@@ -1005,13 +1011,23 @@
             seenChatIds.add(lastMsgKey);
           });
 
+          const chatBadge = document.getElementById("badgeTabChat");
+          if (chatBadge) {
+            if (unreadTotal > 0) {
+              chatBadge.innerText = unreadTotal;
+              chatBadge.classList.remove("hidden");
+            } else {
+              chatBadge.classList.add("hidden");
+            }
+          }
+
           list.innerHTML = res.threads.map(t => `
-            <div onclick="selectChatThread('${t.customerId}', '${t.customerName}')" class="p-3 rounded-xl cursor-pointer transition ${activeChatCustomerId === t.customerId ? 'bg-amber-50 border border-amber-200' : 'bg-stone-50 hover:bg-stone-100'} min-h-[48px]">
+            <div onclick="selectChatThread('${t.customerId}', '${t.customerName}')" class="p-2.5 rounded-xl cursor-pointer transition ${activeChatCustomerId === t.customerId ? 'bg-amber-50 border border-amber-200' : 'bg-stone-50 hover:bg-stone-100'} min-h-[44px] w-full">
               <div class="flex justify-between items-center">
-                <span class="font-black text-xs md:text-sm text-forest-900">${t.customerName}</span>
-                ${t.unreadCount > 0 ? `<span class="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-black rounded-full">${t.unreadCount}</span>` : ''}
+                <span class="font-black text-xs text-forest-900">${t.customerName}</span>
+                ${t.unreadCount > 0 ? `<span class="px-1.5 py-0.5 bg-amber-500 text-white text-[9px] font-black rounded-full">${t.unreadCount}</span>` : ''}
               </div>
-              <p class="text-xs text-stone-500 truncate mt-1">${t.lastMessage}</p>
+              <p class="text-[11px] text-stone-500 truncate mt-0.5">${t.lastMessage}</p>
             </div>
           `).join("");
         }
@@ -1033,13 +1049,13 @@
           const box = document.getElementById("adminChatMessagesBox");
           box.innerHTML = res.messages.map(m => {
             const isAdmin = m.sender === "ADMIN";
-            const istTime = new Date(m.timestamp).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
+            const cleanTime = new Date(m.timestamp).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
             return `
-              <div class="flex flex-col ${isAdmin ? 'items-end' : 'items-start'}">
-                <div class="max-w-[75%] px-4 py-2.5 rounded-xl ${isAdmin ? 'bg-forest-800 text-white font-bold' : 'bg-white border border-stone-200 text-stone-800 shadow-xs'}">
+              <div class="flex flex-col ${isAdmin ? 'items-end' : 'items-start'} w-full">
+                <div class="max-w-[80%] px-3 py-2 rounded-xl text-xs sm:text-sm ${isAdmin ? 'bg-forest-800 text-white font-bold' : 'bg-white border border-stone-200 text-stone-800 shadow-xs'}">
                   ${m.text}
                 </div>
-                <span class="text-[10px] text-stone-400 mt-1">${istTime} IST</span>
+                <span class="text-[10px] text-stone-400 mt-0.5">${cleanTime}</span>
               </div>
             `;
           }).join("");
@@ -1066,7 +1082,7 @@
     }
 
     // -------------------------------------------------------------
-    // MENU ITEM MASTER
+    // MENU MASTER
     // -------------------------------------------------------------
     async function renderMenuList() {
       const container = document.getElementById("adminMenuContainer");
@@ -1074,24 +1090,24 @@
         const res = await fetch(`${SCRIPT_URL}?action=getMenu`).then(r => r.json());
         if (res.status === "SUCCESS") {
           container.innerHTML = res.menu.map(item => `
-            <div class="p-5 bg-white border border-stone-200 rounded-3xl space-y-3.5 shadow-sm">
-              <div class="flex items-center gap-3.5">
-                <img src="${item.image}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600';" class="w-16 h-16 rounded-2xl object-cover" />
-                <div class="flex-1">
-                  <h5 class="font-black text-forest-900 text-base">${item.name}</h5>
-                  <p class="text-xs text-stone-500 font-medium">Price: ₹${item.price} • ${item.milletType} • ${item.prepTimeMins || 15}m prep</p>
+            <div class="p-3.5 bg-white border border-stone-200 rounded-2xl space-y-2.5 shadow-xs w-full">
+              <div class="flex items-center gap-3 w-full">
+                <img src="${item.image}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600';" class="w-14 h-14 rounded-xl object-cover shrink-0" />
+                <div class="flex-1 min-w-0">
+                  <h5 class="font-black text-forest-900 text-sm truncate">${item.name}</h5>
+                  <p class="text-[11px] text-stone-500 font-medium">₹${item.price} • ${item.milletType} • ${item.prepTimeMins || 15}m prep</p>
                 </div>
-                <button onclick="toggleMenuStock('${item.id}', ${!item.available})" class="px-3.5 py-2 rounded-xl font-black text-xs ${item.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} min-h-[40px]">
+                <button onclick="toggleMenuStock('${item.id}', ${!item.available})" class="px-2.5 py-1.5 rounded-xl font-black text-xs ${item.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} min-h-[36px] shrink-0">
                   ${item.available ? 'In Stock' : 'Sold Out'}
                 </button>
               </div>
 
-              <div class="flex items-center justify-between pt-2 border-t border-stone-100 text-xs">
-                <div class="flex items-center gap-2">
-                  <input type="number" id="price_${item.id}" value="${item.price}" class="w-20 px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 font-black outline-none min-h-[40px]" />
-                  <button onclick="updateItemPrice('${item.id}')" class="px-3.5 py-1.5 bg-forest-800 hover:bg-forest-900 rounded-xl font-black text-white transition min-h-[40px]">Save</button>
+              <div class="flex items-center justify-between pt-1 border-t border-stone-100 text-xs w-full">
+                <div class="flex items-center gap-1.5">
+                  <input type="number" id="price_${item.id}" value="${item.price}" class="w-16 px-2 py-1 bg-stone-50 border border-stone-300 rounded-lg text-stone-900 font-black outline-none min-h-[36px]" />
+                  <button onclick="updateItemPrice('${item.id}')" class="px-2.5 py-1 bg-forest-800 hover:bg-forest-900 rounded-lg font-black text-white transition min-h-[36px]">Save</button>
                 </div>
-                <button onclick="deleteMenuItem('${item.id}', '${item.name}')" class="px-3.5 py-1.5 text-red-600 hover:text-red-800 font-bold transition min-h-[40px]">Remove</button>
+                <button onclick="deleteMenuItem('${item.id}', '${item.name}')" class="px-2.5 py-1 text-red-600 hover:text-red-800 font-bold transition min-h-[36px]">Remove</button>
               </div>
             </div>
           `).join("");
@@ -1120,7 +1136,7 @@
 
       const btn = document.getElementById("btnSubmitNewMeal");
       btn.disabled = true;
-      btn.innerText = "Saving to Database...";
+      btn.innerText = "Saving...";
 
       try {
         const res = await callBackendApi("ADMIN_ADD_MENU_ITEM", {
@@ -1136,7 +1152,7 @@
         });
 
         if (res.status === "SUCCESS") {
-          showToast("New meal added successfully!", "success");
+          showToast("New meal published!", "success");
           closeAddMealModal();
           renderMenuList();
         } else {
@@ -1146,12 +1162,12 @@
         showToast("Error adding meal item.", "error");
       } finally {
         btn.disabled = false;
-        btn.innerText = "Save & Publish to Active Menu";
+        btn.innerText = "Save & Publish";
       }
     }
 
     async function deleteMenuItem(itemId, itemName) {
-      if (!confirm(`Are you sure you want to permanently remove "${itemName}" from the menu?`)) return;
+      if (!confirm(`Remove "${itemName}" permanently?`)) return;
       try {
         const res = await callBackendApi("ADMIN_DELETE_MENU_ITEM", { pin: currentAdminPin, itemId: itemId });
         showToast(res.message, "success");
@@ -1182,19 +1198,19 @@
       try {
         const res = await fetch(`${SCRIPT_URL}?action=GET_ONLINE_USERS&pin=${currentAdminPin}`).then(r => r.json());
         if (res.status === "SUCCESS") {
-          document.getElementById("onlineUsersCountPill").innerText = `🟢 Online: ${res.count}`;
+          document.getElementById("onlineUsersCountPill").innerText = res.count;
           const list = document.getElementById("onlineUsersList");
           if (res.activeUsers.length === 0) {
-            list.innerHTML = `<p class="text-stone-400 py-4 text-center">No active users online right now.</p>`;
+            list.innerHTML = `<p class="text-stone-400 py-3 text-center">No active users online.</p>`;
             return;
           }
           list.innerHTML = res.activeUsers.map(u => `
-            <div class="py-3 flex justify-between items-center">
+            <div class="py-2.5 flex justify-between items-center w-full">
               <div>
                 <p class="font-black text-forest-900">${u.customerName}</p>
-                <p class="text-xs text-stone-500 font-mono">+91 ${u.phone} (${u.customerId})</p>
+                <p class="text-[11px] text-stone-500 font-mono">+91 ${u.phone}</p>
               </div>
-              <span class="text-xs font-black text-green-700">Active Now</span>
+              <span class="text-xs font-black text-green-700">Active</span>
             </div>
           `).join("");
         }
@@ -1209,16 +1225,16 @@
 
       const cContainer = document.getElementById("adminClaimsContainer");
       if (adminDataCache.pendingClaims.length === 0) {
-        cContainer.innerHTML = `<p class="text-stone-400 text-sm">No pending balance refund claims.</p>`;
+        cContainer.innerHTML = `<p class="text-stone-400 text-xs py-2">No pending balance claims.</p>`;
       } else {
         cContainer.innerHTML = adminDataCache.pendingClaims.map(c => `
-          <div class="p-5 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-between">
+          <div class="p-3.5 bg-stone-50 border border-stone-200 rounded-xl flex items-center justify-between gap-2 w-full">
             <div>
-              <p class="font-black text-forest-900 text-base">₹${c.amount} • <span class="font-mono text-amberBrand-600">${c.payoutUpi}</span></p>
+              <p class="font-black text-forest-900 text-sm">₹${c.amount} • <span class="font-mono text-amberBrand-600">${c.payoutUpi}</span></p>
               <p class="text-xs text-stone-500">Cust: ${c.customerId} • Reason: ${c.reason}</p>
             </div>
-            <button onclick="openClaimModal('${c.claimId}', '${c.payoutUpi}', ${c.amount}, ${c.rowIndex})" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-forest-900 rounded-xl font-black text-xs md:text-sm transition shadow-sm min-h-[44px]">
-              Disburse & Issue PDF
+            <button onclick="openClaimModal('${c.claimId}', '${c.payoutUpi}', ${c.amount}, ${c.rowIndex})" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-forest-900 rounded-xl font-black text-xs transition shadow-xs min-h-[38px] shrink-0">
+              Disburse
             </button>
           </div>
         `).join("");
@@ -1226,17 +1242,16 @@
 
       const rContainer = document.getElementById("adminRechargesContainer");
       if (adminDataCache.pendingRecharges.length === 0) {
-        rContainer.innerHTML = `<p class="text-stone-400 text-sm">No pending wallet top-ups.</p>`;
+        rContainer.innerHTML = `<p class="text-stone-400 text-xs py-2">No pending wallet top-ups.</p>`;
       } else {
         rContainer.innerHTML = adminDataCache.pendingRecharges.map(r => `
-          <div class="p-5 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-between">
+          <div class="p-3.5 bg-stone-50 border border-stone-200 rounded-xl flex items-center justify-between gap-2 w-full">
             <div>
-              <p class="font-black text-forest-900 text-base">₹${r.amount} • <span class="font-mono text-stone-600">UTR: ${r.utr}</span></p>
+              <p class="font-black text-forest-900 text-sm">₹${r.amount} • <span class="font-mono text-stone-600">UTR: ${r.utr}</span></p>
               <p class="text-xs text-amberBrand-600 font-mono font-bold">Token: ${r.txnId}</p>
-              <p class="text-xs text-stone-500">Cust: ${r.customerId}</p>
             </div>
-            <button onclick="approveWalletRecharge(${r.rowIndex})" class="px-5 py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl font-black text-xs md:text-sm transition shadow-sm min-h-[44px]">
-              Confirm Credit
+            <button onclick="approveWalletRecharge(${r.rowIndex})" class="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-xl font-black text-xs transition shadow-xs min-h-[38px] shrink-0">
+              Verify
             </button>
           </div>
         `).join("");
@@ -1257,13 +1272,13 @@
     async function confirmClaimDisbursement() {
       const utr = document.getElementById("modalTransferUtr").value.trim();
       if (!/^\d{12}$/.test(utr)) {
-        showToast("Enter a valid 12-digit bank transfer UTR.", "error");
+        showToast("Enter a valid 12-digit UTR.", "error");
         return;
       }
 
       const btn = document.getElementById("btnConfirmClaimDisburse");
       btn.disabled = true;
-      btn.innerText = "Compiling PDF...";
+      btn.innerText = "Processing...";
 
       try {
         const res = await callBackendApi("ADMIN_APPROVE_CLAIM", {
@@ -1273,7 +1288,7 @@
         });
 
         if (res.status === "SUCCESS") {
-          showToast("Disbursed! Vector PDF saved to Drive.", "success");
+          showToast("Disbursed! PDF saved to Drive.", "success");
           closeClaimModal();
           refreshAdminData();
         } else {
@@ -1283,7 +1298,7 @@
         showToast("Claim disbursement failed.", "error");
       } finally {
         btn.disabled = false;
-        btn.innerText = "Disburse & Issue PDF";
+        btn.innerText = "Disburse";
       }
     }
 
@@ -1318,8 +1333,8 @@
         const btn = document.getElementById(`tabBtn${capitalize(tab)}`);
         if (btn) {
           btn.className = (t === tab)
-            ? "px-5 py-2.5 rounded-2xl bg-forest-800 text-white font-black text-xs md:text-sm whitespace-nowrap shadow-sm transition min-h-[44px]"
-            : "px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]";
+            ? "px-4 py-2.5 rounded-xl sm:rounded-2xl bg-forest-800 text-white font-black text-xs whitespace-nowrap shadow-xs transition flex items-center shrink-0"
+            : "px-4 py-2.5 rounded-xl sm:rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs whitespace-nowrap hover:bg-stone-50 transition flex items-center shrink-0";
         }
       });
       if (t === "traffic") fetchHourlyTrafficReport();

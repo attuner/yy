@@ -5,8 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Yaady's Millet Roti Meals | Traditional Millet Kitchen</title>
   
-  <link rel="manifest" href='data:application/manifest+json,{"name":"Yaady&#39;s Millet Roti Meals","short_name":"Yaady&#39;s","start_url":".","display":"standalone","background_color":"#FAF7F2","theme_color":"#1C3D2B","icons":[{"src":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=192&h=192&fit=crop","sizes":"192x192","type":"image/png"}]}' />
+  <!-- PWA & Mobile Web App Meta Tags -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Yaady&#39;s Millet Roti Meals","short_name":"Yaady&#39;s","start_url":".","display":"standalone","background_color":"#FAF7F2","theme_color":"#1C3D2B","icons":[{"src":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=192&h=192&fit=crop","sizes":"192x192","type":"image/png"},{"src":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=512&h=512&fit=crop","sizes":"512x512","type":"image/png"}]}' />
   <meta name="theme-color" content="#1C3D2B" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Yaady's" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -43,12 +47,12 @@
       padding-right: env(safe-area-inset-right, 0px);
     }
     .min-h-dvh { min-height: 100dvh; }
-    .max-h-sheet { max-height: 88dvh; }
+    .max-h-sheet { max-height: 90dvh; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="text-stone-800 antialiased font-sans pb-28 lg:pb-8 lg:pl-72 text-base md:text-lg select-none">
+<body class="text-stone-800 antialiased font-sans pb-28 lg:pb-8 lg:pl-72 text-base md:text-lg select-none w-full min-w-0">
 
   <!-- HIGHEST PRIORITY TOAST CONTAINER -->
   <div id="toastContainer" class="fixed top-4 right-4 z-[9999] flex flex-col gap-2.5 pointer-events-none max-w-sm w-full px-4"></div>
@@ -78,8 +82,14 @@
       </div>
 
       <nav class="space-y-2">
-        <button onclick="scrollToTop()" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl bg-amber-500 text-forest-900 font-black text-base transition shadow-sm min-h-[48px]">
-          <i data-lucide="utensils" class="w-5 h-5"></i>
+        <!-- PWA DESKTOP INSTALL BUTTON -->
+        <button id="btnInstallAppDesktop" onclick="triggerPwaInstall()" class="hidden w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-forest-900 font-black text-base transition shadow-sm min-h-[48px]">
+          <i data-lucide="download" class="w-5 h-5"></i>
+          <span>Install App</span>
+        </button>
+
+        <button onclick="scrollToTop()" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl bg-stone-100 hover:bg-white text-forest-900 font-black text-base transition shadow-sm min-h-[48px]">
+          <i data-lucide="utensils" class="w-5 h-5 text-amberBrand-600"></i>
           <span>Order Menu</span>
         </button>
         <button onclick="openOrdersModal()" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-stone-200 hover:bg-forest-800 font-extrabold text-base transition relative min-h-[48px]">
@@ -108,16 +118,16 @@
     </div>
 
     <div class="pt-4 border-t border-forest-800/80 text-xs text-stone-400 space-y-1">
-      <p class="font-bold text-stone-300">Pickup Counter Hub (IST)</p>
+      <p class="font-bold text-stone-300">Pickup Counter Hub</p>
       <p>Neknampur, Manikonda, Hyderabad</p>
       <p class="font-bold text-amber-400 pt-1">+91 9000001690</p>
     </div>
   </aside>
 
   <!-- STICKY TOP BAR -->
-  <header class="sticky top-0 z-40 bg-linen/95 backdrop-blur-md border-b border-stone-200">
+  <header class="sticky top-0 z-40 bg-linen/95 backdrop-blur-md border-b border-stone-200 w-full">
     <!-- MOBILE REFACTORED HEADER (< lg) -->
-    <div class="lg:hidden h-16 px-3.5 flex items-center justify-between">
+    <div class="lg:hidden h-16 px-3.5 flex items-center justify-between w-full">
       <div onclick="openAboutModal()" class="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition min-w-0">
         <div class="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl bg-forest-800 text-amber-400 font-black text-xl flex items-center justify-center shrink-0 shadow-xs">
           Y
@@ -129,6 +139,12 @@
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
+        <!-- PWA MOBILE INSTALL HEADER PILL -->
+        <button id="btnInstallAppMobile" onclick="triggerPwaInstall()" class="hidden px-2.5 py-1.5 rounded-full bg-amber-500 text-forest-900 text-xs font-black items-center gap-1 shadow-xs transition hover:scale-105 active:scale-95 shrink-0">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Install</span>
+        </button>
+
         <span id="kitchenOpenBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-green-100 text-green-800 border border-green-200 shrink-0">
           <span class="w-2 h-2 rounded-full bg-green-600 animate-ping"></span>
           <span>Open</span>
@@ -160,15 +176,15 @@
       </div>
     </div>
 
-    <!-- ANNOUNCEMENT BANNER (TEXT ONLY BROADCAST) -->
-    <div id="announcementBanner" class="bg-forest-900 text-amber-300 px-4 py-2 text-xs md:text-sm text-center font-black tracking-wide">
+    <!-- ANNOUNCEMENT BANNER (TEXT ONLY BROADCAST, NO MAPS LINK) -->
+    <div id="announcementBanner" class="bg-forest-900 text-amber-300 px-4 py-2 text-xs md:text-sm text-center font-black tracking-wide w-full">
       <span id="announcementBannerText">Fresh Harvest Specials: Hot Jowar & Ragi Rotis made live upon pickup!</span>
     </div>
   </header>
 
   <!-- MAIN VIEWPORT -->
-  <main class="max-w-7xl mx-auto px-4 py-5 md:py-7">
-    <div id="discountBanner" class="mb-6 p-5 rounded-3xl bg-gradient-to-r from-forest-800 to-forest-900 text-white flex items-center justify-between shadow-md">
+  <main class="max-w-7xl mx-auto px-4 py-5 md:py-7 w-full">
+    <div id="discountBanner" class="mb-6 p-5 rounded-3xl bg-gradient-to-r from-forest-800 to-forest-900 text-white flex items-center justify-between shadow-md w-full">
       <div class="flex items-center gap-3.5">
         <div class="p-3 rounded-2xl bg-amber-500/20 text-amber-300">
           <i data-lucide="sparkles" class="w-7 h-7"></i>
@@ -183,17 +199,17 @@
       </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 xl:gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 xl:gap-8 w-full">
       <!-- LEFT / MAIN COLUMN: Menu & Items -->
-      <section class="md:col-span-7 xl:col-span-8 space-y-6">
-        <div class="flex flex-col sm:flex-row gap-3.5">
-          <div class="relative flex-1">
+      <section class="md:col-span-7 xl:col-span-8 space-y-6 w-full min-w-0">
+        <div class="flex flex-col sm:flex-row gap-3.5 w-full">
+          <div class="relative flex-1 w-full">
             <i data-lucide="search" class="w-5 h-5 text-stone-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
             <input id="searchInput" oninput="renderMenu()" type="text" placeholder="Search Jowar Roti, Thali, Curries..." class="w-full pl-12 pr-4 py-3.5 text-base md:text-lg bg-white border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-forest-800 shadow-sm font-medium min-h-[48px]" />
           </div>
 
           <!-- CATEGORY PILLS -->
-          <div id="categoryPills" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
+          <div id="categoryPills" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1 w-full sm:w-auto">
             <button onclick="filterCategory('ALL')" class="category-pill active px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-forest-800 text-white border border-transparent font-black shadow-sm transition min-h-[48px]">All Items</button>
             <button onclick="filterCategory('Millet Rotis')" class="category-pill px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-white text-stone-700 border border-stone-200 font-extrabold hover:bg-stone-50 transition min-h-[48px]">Millet Rotis</button>
             <button onclick="filterCategory('Combo Meals')" class="category-pill px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-white text-stone-700 border border-stone-200 font-extrabold hover:bg-stone-50 transition min-h-[48px]">Combo Meals</button>
@@ -202,15 +218,15 @@
           </div>
         </div>
 
-        <div id="menuContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div id="menuContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
           <div class="h-64 bg-stone-200/70 rounded-3xl animate-pulse"></div>
           <div class="h-64 bg-stone-200/70 rounded-3xl animate-pulse"></div>
         </div>
       </section>
 
       <!-- RIGHT COLUMN: Adaptive Interactive Cart Sidebar on Tablets & Desktops -->
-      <section class="hidden md:block md:col-span-5 xl:col-span-4 space-y-4">
-        <div class="bg-white rounded-3xl border border-stone-200 p-6 shadow-sm sticky top-24">
+      <section class="hidden md:block md:col-span-5 xl:col-span-4 space-y-4 w-full">
+        <div class="bg-white rounded-3xl border border-stone-200 p-6 shadow-sm sticky top-24 w-full">
           <div class="flex items-center justify-between border-b border-stone-100 pb-3.5">
             <h3 class="font-black text-forest-900 text-xl flex items-center gap-2">
               <i data-lucide="shopping-bag" class="w-5 h-5 text-amberBrand-500"></i> Pickup Cart
@@ -218,11 +234,11 @@
             <span id="desktopCartBadge" class="text-xs font-black bg-stone-100 text-stone-600 px-3.5 py-1 rounded-full">0 items</span>
           </div>
 
-          <div id="desktopCartItems" class="py-3.5 max-h-72 overflow-y-auto divide-y divide-stone-100 text-sm md:text-base">
+          <div id="desktopCartItems" class="py-3.5 max-h-72 overflow-y-auto divide-y divide-stone-100 text-sm md:text-base w-full">
             <div class="text-center py-10 text-stone-400 text-base">Your basket is empty.</div>
           </div>
 
-          <div id="desktopCartBilling" class="border-t border-stone-100 pt-3.5 space-y-2 text-sm md:text-base text-stone-600"></div>
+          <div id="desktopCartBilling" class="border-t border-stone-100 pt-3.5 space-y-2 text-sm md:text-base text-stone-600 w-full"></div>
 
           <button id="desktopCheckoutBtn" onclick="sanitizeAndProceedToCheckout()" disabled class="w-full mt-5 py-4 bg-forest-800 disabled:bg-stone-300 text-white font-black rounded-2xl text-base md:text-lg transition shadow flex items-center justify-center gap-2 min-h-[48px]">
             <span>Proceed to Pickup Time</span>
@@ -234,7 +250,7 @@
   </main>
 
   <!-- MOBILE BOTTOM NAVIGATION (< lg) -->
-  <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 px-3 py-2 flex items-center justify-around shadow-lg">
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 px-3 py-2 flex items-center justify-around shadow-lg w-full">
     <button onclick="scrollToTop()" class="flex flex-col items-center justify-center gap-1 text-forest-800 min-h-[48px] min-w-[48px]">
       <i data-lucide="utensils" class="w-6 h-6"></i>
       <span class="text-xs font-black">Menu</span>
@@ -266,7 +282,7 @@
     </button>
   </nav>
 
-  <!-- ==================== MODALS / DRAWERS ==================== -->
+  <!-- ==================== BOTTOM SHEET MODALS / DRAWERS ==================== -->
 
   <!-- BRAND ABOUT KITCHEN MODAL -->
   <div id="aboutModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -336,9 +352,9 @@
     </div>
   </div>
 
-  <!-- CHECKOUT MODAL / DRAWER -->
+  <!-- CHECKOUT MODAL / DRAWER (FULL-WIDTH STRETCH FIXED) -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-3">
-    <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl max-h-sheet overflow-y-auto relative">
+    <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl max-h-sheet overflow-y-auto relative min-w-0">
       <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
 
       <button onclick="closeCheckoutModal()" class="absolute top-5 right-5 p-2 text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">
@@ -346,37 +362,38 @@
       </button>
 
       <h3 class="text-2xl font-black text-forest-900 mb-1">Select Pickup Time & Pay</h3>
-      <p class="text-sm text-stone-500 mb-4 font-medium">All timings in Indian Standard Time (IST). Lead time is dynamically calculated based on your selected cart items.</p>
+      <p class="text-sm text-stone-500 mb-4 font-medium">Lead time is dynamically calculated based on your selected cart items.</p>
 
-      <div id="prepTimeIndicatorPill" class="mb-4 text-xs md:text-sm font-extrabold text-forest-800 bg-amber-50 border border-amber-200 p-3 rounded-2xl flex items-center justify-between shadow-xs">
+      <!-- DYNAMIC PREP TIME INDICATOR PILL -->
+      <div id="prepTimeIndicatorPill" class="mb-4 text-xs md:text-sm font-extrabold text-forest-800 bg-amber-50 border border-amber-200 p-3 rounded-2xl flex items-center justify-between shadow-xs w-full">
         <span class="flex items-center gap-1.5">
           <i data-lucide="clock" class="w-4 h-4 text-amberBrand-600"></i>
-          <span>Estimated Kitchen Preparation Time:</span>
+          <span>Estimated Preparation Time:</span>
         </span>
         <span class="font-black text-amberBrand-600 text-sm md:text-base" id="requiredPrepMinutesDisplay">15 mins</span>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-5">
-        <div>
-          <label class="block text-sm font-extrabold text-stone-700 mb-1.5">Pickup Date (IST)</label>
-          <input type="date" id="pickupDate" onchange="updatePickupTimeConstraints()" class="w-full p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-bold outline-none min-h-[48px]" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-5 w-full">
+        <div class="w-full block min-w-0">
+          <label class="block text-sm font-extrabold text-stone-700 mb-1.5">Pickup Date</label>
+          <input type="date" id="pickupDate" onchange="updatePickupTimeConstraints()" class="w-full block min-w-0 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-bold outline-none min-h-[48px]" />
         </div>
-        <div>
-          <label class="block text-sm font-extrabold text-stone-700 mb-1.5">Pickup Time (IST)</label>
-          <input type="time" id="pickupTime" onchange="validatePickupTime()" class="w-full p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-bold outline-none min-h-[48px]" />
+        <div class="w-full block min-w-0">
+          <label class="block text-sm font-extrabold text-stone-700 mb-1.5">Pickup Time</label>
+          <input type="time" id="pickupTime" onchange="validatePickupTime()" class="w-full block min-w-0 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-bold outline-none min-h-[48px]" />
         </div>
       </div>
 
-      <div class="border-t border-stone-100 pt-4 mb-4">
+      <div class="border-t border-stone-100 pt-4 mb-4 w-full">
         <label class="block text-sm font-extrabold text-stone-700 mb-2">Select Payment Mode</label>
-        <div class="grid grid-cols-2 gap-3">
-          <label id="walletPayOptionLabel" class="border border-stone-200 rounded-2xl p-4 flex flex-col gap-1 cursor-pointer has-[:checked]:border-forest-800 has-[:checked]:bg-forest-800/5 min-h-[48px]">
+        <div class="grid grid-cols-2 gap-3 w-full">
+          <label id="walletPayOptionLabel" class="border border-stone-200 rounded-2xl p-4 flex flex-col gap-1 cursor-pointer has-[:checked]:border-forest-800 has-[:checked]:bg-forest-800/5 min-h-[48px] w-full">
             <input type="radio" name="paymentOption" value="Wallet" checked onchange="togglePaymentUi()" class="text-forest-800" />
             <span class="text-base font-black text-forest-900">Yaady Wallet</span>
             <span class="text-xs text-stone-500 font-semibold" id="checkoutWalletBalText">Bal: ₹0.00</span>
           </label>
 
-          <label class="border border-stone-200 rounded-2xl p-4 flex flex-col gap-1 cursor-pointer has-[:checked]:border-forest-800 has-[:checked]:bg-forest-800/5 min-h-[48px]">
+          <label class="border border-stone-200 rounded-2xl p-4 flex flex-col gap-1 cursor-pointer has-[:checked]:border-forest-800 has-[:checked]:bg-forest-800/5 min-h-[48px] w-full">
             <input type="radio" name="paymentOption" value="Direct_UPI" onchange="togglePaymentUi()" class="text-forest-800" />
             <span class="text-base font-black text-forest-900">Direct UPI</span>
             <span class="text-xs text-stone-500 font-semibold">Auto Order-ID QR</span>
@@ -384,27 +401,27 @@
         </div>
       </div>
 
-      <div id="upiPaymentBox" class="hidden bg-stone-50 border border-stone-200 rounded-3xl p-5 mb-5 space-y-4">
-        <div class="text-center">
+      <div id="upiPaymentBox" class="hidden bg-stone-50 border border-stone-200 rounded-3xl p-5 mb-5 space-y-4 w-full">
+        <div class="text-center w-full">
           <p class="text-sm font-extrabold text-stone-600 mb-1.5">Tap or Scan QR (Pre-filled Order ID)</p>
           <div id="orderUpiQr" onclick="launchUpiDirectIntent()" class="mx-auto w-40 h-40 bg-white p-2 border-2 border-forest-800/30 rounded-2xl flex items-center justify-center shadow-md cursor-pointer hover:border-forest-800 transition" title="Click to open default UPI App"></div>
           <p class="text-sm font-mono text-stone-700 mt-2 font-bold" id="upiVpaDisplay">yaadyskitchen@upi</p>
           <p class="text-xs text-amber-700 font-black mt-1">Order Token automatically pre-filled in payment note!</p>
         </div>
 
-        <div class="grid grid-cols-3 gap-2.5 pt-1">
+        <div class="grid grid-cols-3 gap-2.5 pt-1 w-full">
           <a id="gpayBtn" href="#" class="py-3 text-center text-xs md:text-sm font-bold bg-white border border-stone-200 rounded-xl hover:bg-stone-100 min-h-[48px] flex items-center justify-center">GPay</a>
           <a id="phonepeBtn" href="#" class="py-3 text-center text-xs md:text-sm font-bold bg-white border border-stone-200 rounded-xl hover:bg-stone-100 min-h-[48px] flex items-center justify-center">PhonePe</a>
           <a id="paytmBtn" href="#" class="py-3 text-center text-xs md:text-sm font-bold bg-white border border-stone-200 rounded-xl hover:bg-stone-100 min-h-[48px] flex items-center justify-center">Paytm</a>
         </div>
 
-        <div>
+        <div class="w-full">
           <label class="block text-sm font-extrabold text-stone-700 mb-1">12-Digit Bank UTR / Reference <span class="text-red-500">*</span></label>
           <input type="text" id="orderUtrInput" maxlength="12" placeholder="e.g. 423512349876" class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-base font-mono font-bold outline-none min-h-[48px]" />
         </div>
       </div>
 
-      <div class="flex items-center justify-between pt-4 border-t border-stone-100">
+      <div class="flex items-center justify-between pt-4 border-t border-stone-100 w-full">
         <div>
           <p class="text-xs text-stone-400 font-bold uppercase tracking-wider">Total Payable</p>
           <p class="text-2xl md:text-3xl font-black text-forest-900" id="checkoutFinalAmount">₹0.00</p>
@@ -523,7 +540,7 @@
           <div class="w-3 h-3 rounded-full bg-green-400 animate-pulse"></div>
           <div>
             <h4 class="font-black text-base leading-tight">Yaady's Kitchen Desk Chat</h4>
-            <p class="text-xs text-stone-300 font-medium">Live operational assistance (IST)</p>
+            <p class="text-xs text-stone-300 font-medium">Live operational assistance</p>
           </div>
         </div>
         <button onclick="closeLiveChat()" class="text-stone-300 hover:text-white p-1 min-h-[44px] min-w-[44px] flex items-center justify-center">
@@ -544,9 +561,9 @@
     </div>
   </div>
 
-  <!-- CUSTOMER ORDER HISTORY DRAWER -->
+  <!-- CUSTOMER ORDER HISTORY DRAWER (FULL-WIDTH STRETCH FIXED) -->
   <div id="ordersModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl relative max-h-sheet overflow-y-auto">
+    <div class="bg-white w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl relative max-h-sheet overflow-y-auto min-w-0">
       <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
 
       <button onclick="closeOrdersModal()" class="absolute top-5 right-5 p-2 text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">
@@ -556,7 +573,7 @@
       <h3 class="text-2xl font-black text-forest-900 mb-1">Your Order History</h3>
       <p class="text-sm text-stone-500 mb-5 font-medium">Review real-time preparation states, pickup times, and tokens.</p>
 
-      <div id="ordersListContainer" class="space-y-4">
+      <div id="ordersListContainer" class="space-y-4 w-full">
         <p class="text-center text-stone-400 py-8 text-sm">Loading orders...</p>
       </div>
     </div>
@@ -683,10 +700,10 @@
 
   <!-- MOBILE CART SUMMARY DRAWER -->
   <div id="mobileCartModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex flex-col justify-end">
-    <div class="bg-white rounded-t-3xl p-6 max-h-sheet overflow-y-auto flex flex-col">
+    <div class="bg-white rounded-t-3xl p-6 max-h-sheet overflow-y-auto flex flex-col w-full">
       <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
 
-      <div class="flex items-center justify-between border-b border-stone-100 pb-3.5">
+      <div class="flex items-center justify-between border-b border-stone-100 pb-3.5 w-full">
         <h3 class="font-black text-forest-900 text-xl flex items-center gap-2">
           <i data-lucide="shopping-bag" class="w-5 h-5 text-amberBrand-500"></i> Cart Review
         </h3>
@@ -694,8 +711,8 @@
           <i data-lucide="x" class="w-6 h-6"></i>
         </button>
       </div>
-      <div id="mobileCartItems" class="divide-y divide-stone-100 py-3.5 text-base"></div>
-      <div id="mobileCartBilling" class="border-t border-stone-100 pt-3.5 space-y-2 text-base text-stone-600"></div>
+      <div id="mobileCartItems" class="divide-y divide-stone-100 py-3.5 text-base w-full"></div>
+      <div id="mobileCartBilling" class="border-t border-stone-100 pt-3.5 space-y-2 text-base text-stone-600 w-full"></div>
       <button onclick="sanitizeAndProceedToCheckout()" class="w-full mt-5 py-4 bg-forest-800 text-white font-black rounded-2xl text-lg transition min-h-[48px]">
         Select Pickup Time & Pay
       </button>
@@ -737,9 +754,61 @@
     let lastSeenWalletBalance = null;
     let audioCtxCustomer = null;
 
+    // PWA Prompt Storage
+    let deferredPrompt = null;
+
     window.chatPollInterval = null;
     window.syncPollInterval = null;
     window.heartbeatInterval = null;
+
+    // -------------------------------------------------------------
+    // PWA INSTALLATION ENGINE & SERVICE WORKER INJECTION
+    // -------------------------------------------------------------
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btnDesk = document.getElementById("btnInstallAppDesktop");
+      const btnMob = document.getElementById("btnInstallAppMobile");
+      if (btnDesk) btnDesk.classList.remove("hidden");
+      if (btnMob) btnMob.classList.remove("hidden");
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      const btnDesk = document.getElementById("btnInstallAppDesktop");
+      const btnMob = document.getElementById("btnInstallAppMobile");
+      if (btnDesk) btnDesk.classList.add("hidden");
+      if (btnMob) btnMob.classList.add("hidden");
+      showToast("App installed successfully! Welcome to Yaady's.", "success");
+    });
+
+    async function triggerPwaInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          deferredPrompt = null;
+        }
+      } else {
+        const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIos) {
+          showToast("To install: Tap the Share button below, then select 'Add to Home Screen'.", "info");
+        } else {
+          showToast("App is ready. If installed, launch it from your home screen or browser menu.", "info");
+        }
+      }
+    }
+
+    // Inline lightweight Service Worker registration for PWA installability
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        self.addEventListener('install', (e) => self.skipWaiting());
+        self.addEventListener('activate', (e) => clients.claim());
+        self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => new Response('Offline'))); });
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+    }
 
     function initCustomerAudio() {
       if (!audioCtxCustomer) {
@@ -985,7 +1054,7 @@
           const earliestStr = `${earliestH}:${earliestM}`;
           const formattedEarliest = formatTime12Hour(earliestStr);
 
-          showToast(`Kitchen requires ${requiredLeadMinutes} mins preparation time for your cart. Earliest pickup is at ${formattedEarliest} IST.`, "error");
+          showToast(`Kitchen requires ${requiredLeadMinutes} mins preparation time for your cart. Earliest pickup is at ${formattedEarliest}.`, "error");
           timeEl.value = earliestStr;
         }
       }
@@ -1187,13 +1256,13 @@
           list.innerHTML = res.transactions.map(t => {
             const isApproved = t.status === "Approved";
             const isClaim = t.type === "Debit_Claim";
-            const istDate = new Date(t.timestamp).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
+            const cleanDate = new Date(t.timestamp).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
             return `
-              <div class="py-3 flex flex-col gap-1">
-                <div class="flex items-center justify-between">
+              <div class="py-3 flex flex-col gap-1 w-full">
+                <div class="flex items-center justify-between w-full">
                   <div>
                     <p class="font-black text-stone-800 text-sm md:text-base">${String(t.type).replace('_', ' ')}</p>
-                    <p class="text-xs text-stone-400 font-mono">${istDate} (IST) • Ref: ${t.utrRef || 'N/A'}</p>
+                    <p class="text-xs text-stone-400 font-mono">${cleanDate} • Ref: ${t.utrRef || 'N/A'}</p>
                   </div>
                   <div class="text-right">
                     <span class="font-black text-base ${String(t.type).includes('Credit') ? 'text-green-700' : 'text-stone-800'}">₹${Number(t.amount) || 0}</span>
@@ -1216,6 +1285,9 @@
       } catch (e) {}
     }
 
+    // -------------------------------------------------------------
+    // SANITIZATION & FINAL ORDER SUBMISSION
+    // -------------------------------------------------------------
     async function sanitizeAndProceedToCheckout() {
       if (!currentUser) {
         showToast("Please log in or register before scheduling pickup.", "info");
@@ -1354,7 +1426,7 @@
           cart = {};
           updateCartUi();
           closeCheckoutModal();
-          showToast(`Order Token #${preAllocatedOrderId.slice(-4)} Placed for ${formatted12HrPickupTime} IST!`, "success");
+          showToast(`Order Token #${preAllocatedOrderId.slice(-4)} Placed for ${formatted12HrPickupTime}!`, "success");
           knownOrderStatusMap[preAllocatedOrderId] = res.orderStatus;
           openOrdersModal();
           refreshProfileFromBackend();
@@ -1370,6 +1442,9 @@
       }
     }
 
+    // -------------------------------------------------------------
+    // CHAT & SUPPORT
+    // -------------------------------------------------------------
     function openLiveChat() {
       if (!currentUser) {
         showToast("Please log in to chat with the kitchen operator.", "info");
@@ -1409,13 +1484,13 @@
 
       container.innerHTML = messages.map(m => {
         const isMe = m.sender === "CUSTOMER";
-        const istTime = new Date(m.timestamp).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
+        const cleanTime = new Date(m.timestamp).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
         return `
           <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
             <div class="max-w-[80%] rounded-2xl px-4 py-3 text-sm md:text-base ${isMe ? 'bg-forest-800 text-white rounded-br-xs' : 'bg-white border border-stone-200 text-stone-800 rounded-bl-xs shadow-xs'}">
               <p>${m.text}</p>
             </div>
-            <span class="text-[10px] text-stone-400 mt-1 px-1">${istTime} IST</span>
+            <span class="text-[10px] text-stone-400 mt-1 px-1">${cleanTime}</span>
           </div>
         `;
       }).join("");
@@ -1442,6 +1517,9 @@
       }
     }
 
+    // -------------------------------------------------------------
+    // SANITIZED ORDER HISTORY (FULL WIDTH STRETCH & NO "IST")
+    // -------------------------------------------------------------
     function openOrdersModal() {
       if (!currentUser) {
         showToast("Please log in to review orders.", "info");
@@ -1481,21 +1559,21 @@
             }
             const cleanTime = order.pickupTime ? String(order.pickupTime).trim() : "Flexible";
             
-            const istPlacedTime = order.timestamp
+            const cleanPlacedTime = order.timestamp
               ? new Date(order.timestamp).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true })
               : "N/A";
 
-            const waTextUrl = `https://wa.me/919000001690?text=${encodeURIComponent("Hello Yaady's Kitchen! Inquiring regarding Order Token #" + token + " (" + order.orderId + ") placed for " + cleanDate + " at " + cleanTime + " IST (Total: ₹" + order.finalPayable + "). Status: " + order.orderStatus + ". Please assist.")}`;
+            const waTextUrl = `https://wa.me/919000001690?text=${encodeURIComponent("Hello Yaady's Kitchen! Inquiring regarding Order Token #" + token + " (" + order.orderId + ") placed for " + cleanDate + " at " + cleanTime + " (Total: ₹" + order.finalPayable + "). Status: " + order.orderStatus + ". Please assist.")}`;
 
             return `
-              <div class="bg-stone-50 border border-stone-200 rounded-3xl p-5 space-y-3.5">
-                <div class="flex justify-between items-start gap-2">
+              <div class="bg-stone-50 border border-stone-200 rounded-3xl p-4 sm:p-5 space-y-3.5 w-full block shadow-xs">
+                <div class="flex flex-col sm:flex-row justify-between items-start gap-2 w-full">
                   <div>
                     <span class="text-xs font-mono font-black text-forest-800">TOKEN #${token}</span>
-                    <h4 class="font-black text-stone-900 text-lg">${cleanDate} • Pickup: ${cleanTime} (IST)</h4>
-                    <p class="text-xs text-stone-400 font-semibold">Placed at ${istPlacedTime} IST</p>
+                    <h4 class="font-black text-stone-900 text-lg">${cleanDate} • Pickup: ${cleanTime}</h4>
+                    <p class="text-xs text-stone-400 font-semibold">Placed at ${cleanPlacedTime}</p>
                   </div>
-                  <div class="flex items-center gap-2 shrink-0">
+                  <div class="flex items-center gap-2 shrink-0 self-end sm:self-start">
                     <a href="${waTextUrl}" target="_blank" rel="noopener noreferrer" class="w-11 h-11 bg-green-600 hover:bg-green-700 text-white rounded-2xl flex items-center justify-center shadow-sm transition hover:scale-105 active:scale-95 shrink-0" title="WhatsApp Kitchen regarding this order">
                       <i data-lucide="message-circle" class="w-5 h-5"></i>
                     </a>
@@ -1508,16 +1586,16 @@
                   </div>
                 </div>
 
-                <div class="text-sm text-stone-600 border-t border-b border-stone-200/60 py-2.5 space-y-1">
-                  ${(order.items || []).map(i => `<div class="flex justify-between"><span>${i.quantity}x ${i.name}</span><span class="font-bold">₹${Number(i.lineTotal) || (Number(i.price) * Number(i.quantity))}</span></div>`).join("")}
-                  <div class="flex justify-between font-black text-stone-900 text-base pt-1.5 border-t border-stone-100">
+                <div class="text-sm text-stone-600 border-t border-b border-stone-200/60 py-2.5 space-y-1 w-full">
+                  ${(order.items || []).map(i => `<div class="flex justify-between w-full"><span>${i.quantity}x ${i.name}</span><span class="font-bold">₹${Number(i.lineTotal) || (Number(i.price) * Number(i.quantity))}</span></div>`).join("")}
+                  <div class="flex justify-between font-black text-stone-900 text-base pt-1.5 border-t border-stone-100 w-full">
                     <span>Total Paid (${order.paymentMode})</span>
                     <span>₹${Number(order.finalPayable) || 0}</span>
                   </div>
                 </div>
 
-                <!-- DEDICATED PICKUP POINT & GOOGLE MAPS DIRECTIONS BAR -->
-                <div class="p-3.5 bg-white border border-stone-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs">
+                <!-- DEDICATED FULL-WIDTH PICKUP POINT & GOOGLE MAPS DIRECTIONS BAR -->
+                <div class="p-3.5 bg-white border border-stone-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs w-full">
                   <div class="flex items-start gap-2">
                     <i data-lucide="map-pin" class="w-4 h-4 text-forest-800 shrink-0 mt-0.5"></i>
                     <div>
@@ -1525,7 +1603,7 @@
                       <p class="text-xs text-stone-600 font-medium">Yaady's Kitchen, Neknampur, Manikonda, Hyderabad</p>
                     </div>
                   </div>
-                  <a href="https://www.google.com/maps/dir/?api=1&destination=17.387140,78.375860" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 bg-forest-800 hover:bg-forest-900 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition hover:scale-102 shrink-0 min-h-[38px]">
+                  <a href="https://www.google.com/maps/dir/?api=1&destination=17.387140,78.375860" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 bg-forest-800 hover:bg-forest-900 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition hover:scale-102 shrink-0 min-h-[38px] w-full sm:w-auto">
                     <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
                     <span>Get Directions</span>
                   </a>
@@ -1614,7 +1692,7 @@
         const displayDesc = isLongDesc && !isExpanded ? item.description.substring(0, 75) + "..." : item.description;
 
         return `
-          <div class="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm flex flex-col justify-between hover:shadow-md transition ${isSoldOut ? 'opacity-60' : ''}">
+          <div class="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm flex flex-col justify-between hover:shadow-md transition w-full ${isSoldOut ? 'opacity-60' : ''}">
             <div class="relative h-48 w-full bg-stone-100 overflow-hidden">
               <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600';" class="w-full h-full object-cover" />
               <span class="absolute top-3.5 left-3.5 px-3.5 py-1 bg-forest-900/85 backdrop-blur-md text-amber-300 font-black text-xs rounded-xl uppercase tracking-wider">
@@ -1627,7 +1705,7 @@
               ` : ''}
             </div>
             
-            <div class="p-5 flex-1 flex flex-col justify-between">
+            <div class="p-5 flex-1 flex flex-col justify-between w-full">
               <div>
                 <div class="flex justify-between items-start gap-2">
                   <h4 class="font-black text-forest-900 text-lg md:text-xl leading-snug">${item.name}</h4>
@@ -1647,7 +1725,7 @@
                 </div>
               </div>
 
-              <div class="mt-5 pt-3.5 border-t border-stone-100 flex items-center justify-between">
+              <div class="mt-5 pt-3.5 border-t border-stone-100 flex items-center justify-between w-full">
                 <span class="text-xs md:text-sm font-extrabold text-green-700 bg-green-50 px-3 py-1 rounded-xl">Millet Certified</span>
                 
                 ${isSoldOut ? `
@@ -1742,7 +1820,7 @@
           return;
         }
         el.innerHTML = bill.itemsDetail.map(i => `
-          <div class="py-3 flex items-center justify-between">
+          <div class="py-3 flex items-center justify-between w-full">
             <div>
               <p class="font-black text-stone-800 text-base">${i.name}</p>
               <p class="text-xs text-stone-400">₹${i.price} × ${i.quantity}</p>
@@ -1766,17 +1844,17 @@
           return;
         }
         el.innerHTML = `
-          <div class="flex justify-between">
+          <div class="flex justify-between w-full">
             <span>Item Subtotal</span>
             <span class="font-bold text-stone-800">₹${bill.subtotal}</span>
           </div>
           ${bill.discRate > 0 ? `
-            <div class="flex justify-between text-green-700 font-black">
+            <div class="flex justify-between text-green-700 font-black w-full">
               <span>Wallet Discount (${bill.discRate * 100}%)</span>
               <span>-₹${bill.discountAmount}</span>
             </div>
           ` : ''}
-          <div class="flex justify-between border-t border-stone-100 pt-3 text-lg md:text-xl font-black text-forest-900">
+          <div class="flex justify-between border-t border-stone-100 pt-3 text-lg md:text-xl font-black text-forest-900 w-full">
             <span>Payable Total</span>
             <span>₹${bill.finalPayable}</span>
           </div>

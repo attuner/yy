@@ -1,7 +1,7 @@
 /**
  * YAADY'S MILLET ROTI MEALS - MASTER SERVERLESS BACKEND
  * File: Code.gs
- * Version: 8.5.0 (Strict IST, Dynamic Prep Lead Times, Announcement Controls & Concurrency Hardened)
+ * Version: 9.0.0 (Clean String Formatting, Suppressed "IST" Labels, Strict Timezone Math)
  */
 
 const RECEIPTS_FOLDER_NAME = "Yaadys_Order_Receipts";
@@ -10,7 +10,7 @@ const MENU_IMAGES_FOLDER_NAME = "Yaadys_Menu_Images";
 const TIMEZONE_IST = "Asia/Kolkata";
 
 // --------------------------------------------------------------------------
-// TIME & DATE SANITIZATION HELPERS (PREVENTS 1899 EPOCH BUG)
+// TIME & DATE SANITIZATION HELPERS (PREVENTS 1899 EPOCH BUG & STRIPS "IST")
 // --------------------------------------------------------------------------
 function cleanSheetDateString(val) {
   if (!val) return Utilities.formatDate(new Date(), TIMEZONE_IST, "yyyy-MM-dd");
@@ -32,7 +32,7 @@ function cleanSheetTimeString(val) {
       return Utilities.formatDate(d, TIMEZONE_IST, "hh:mm a");
     }
   }
-  return str;
+  return str.replace(/\s*\(?IST\)?/gi, "").trim();
 }
 
 // --------------------------------------------------------------------------
@@ -75,7 +75,7 @@ function doGet(e) {
       default:
         return sendJsonResponse({
           status: "SUCCESS",
-          message: "Yaady's Master API Online (Strict IST Mode)",
+          message: "Yaady's Master API Online",
           timestamp: Utilities.formatDate(new Date(), TIMEZONE_IST, "yyyy-MM-dd'T'HH:mm:ssXXX")
         });
     }
@@ -239,8 +239,8 @@ function setupDatabase() {
       ["KITCHEN_OPEN", "TRUE", "Kitchen order acceptance master toggle"],
       ["AUTO_REFRESH_INTERVAL_SEC", "10", "Client polling interval"],
       ["ADMIN_PIN", "1234", "Master Partner Portal Access PIN"],
-      ["KITCHEN_OPEN_HOUR_IST", "10:00", "Kitchen opening time in IST (HH:mm)"],
-      ["KITCHEN_CLOSE_HOUR_IST", "22:00", "Kitchen closing time in IST (HH:mm)"],
+      ["KITCHEN_OPEN_HOUR_IST", "10:00", "Kitchen opening time (HH:mm)"],
+      ["KITCHEN_CLOSE_HOUR_IST", "22:00", "Kitchen closing time (HH:mm)"],
       ["ANNOUNCEMENT_BANNER", "Fresh Harvest Specials: Hot Jowar & Ragi Rotis made live upon pickup!", "Broadcast Banner"]
     ];
     defaultConfigs.forEach(function(c) { configSheet.appendRow(c); });
@@ -285,7 +285,7 @@ function hashString(str) {
 }
 
 // -------------------------------------------------------------
-// ORDERS & WALLET ENGINE (STRICT IST & ATOMIC WRITES)
+// ORDERS & WALLET ENGINE
 // -------------------------------------------------------------
 function submitOrder(payload) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -367,7 +367,7 @@ function submitOrder(payload) {
   customersSheet.getRange(custRowIndex, 8).setValue(currentOrders + 1);
 
   const cleanPickupDate = String(payload.pickupDate || "").split("T")[0].trim();
-  const cleanPickupTime = String(payload.pickupTime || "").trim();
+  const cleanPickupTime = String(payload.pickupTime || "").replace(/\s*\(?IST\)?/gi, "").trim();
   const storedPickupTimeString = cleanPickupTime ? "'" + cleanPickupTime : "'Flexible";
 
   ordersSheet.appendRow([
@@ -506,7 +506,7 @@ function sendAdminNotificationEmail(type, details) {
         <div style="padding:24px;">
           <div style="background:#FAF7F2;padding:16px;border-radius:8px;margin-bottom:20px;">
             <p style="margin:0;font-size:20px;font-weight:bold;color:#1C3D2B;">Pickup Token: #${token} (${details.orderId})</p>
-            <p style="margin:6px 0 0;font-size:14px;color:#555;">Scheduled Pickup: <strong>${details.pickupDate} at ${details.pickupTime} (IST)</strong></p>
+            <p style="margin:6px 0 0;font-size:14px;color:#555;">Scheduled Pickup: <strong>${details.pickupDate} at ${details.pickupTime}</strong></p>
           </div>
           <table style="width:100%;font-size:14px;margin-bottom:20px;">
             <tr><td style="color:#666;">Customer Name:</td><td><strong>${details.customerName}</strong></td></tr>
@@ -676,7 +676,6 @@ function getHourlyTrafficReport(pin, targetDateStr) {
   return {
     status: "SUCCESS",
     date: queryDate,
-    timezone: TIMEZONE_IST,
     hourlyData: Object.values(hourlyMap)
   };
 }
@@ -1237,11 +1236,11 @@ function generateRefundPdf(data) {
     </style></head><body>
       <div class="header">
         <div class="title">YAADY'S MILLET ROTI MEALS</div>
-        <div style="font-size:13px;color:#666;margin-top:4px;">Official Balance Refund Settlement Acknowledgment (Strict IST)</div>
+        <div style="font-size:13px;color:#666;margin-top:4px;">Official Balance Refund Settlement Acknowledgment</div>
       </div>
       <table class="grid">
         <tr><td class="lbl">Claim ID</td><td><strong>${data.claimId}</strong></td></tr>
-        <tr><td class="lbl">Disbursement Time</td><td>${formattedDate} (IST)</td></tr>
+        <tr><td class="lbl">Disbursement Time</td><td>${formattedDate}</td></tr>
         <tr><td class="lbl">Beneficiary Name</td><td>${data.customerName}</td></tr>
         <tr><td class="lbl">Customer Phone</td><td>+91 ${data.customerPhone}</td></tr>
         <tr><td class="lbl">Settlement UPI ID</td><td><strong>${data.payoutUpi}</strong></td></tr>
