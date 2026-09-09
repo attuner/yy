@@ -1,0 +1,2170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Yaady's Millet Roti Meals | Traditional Millet Kitchen</title>
+  
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Yaady&#39;s Millet Roti Meals","short_name":"Yaady&#39;s","start_url":".","display":"standalone","background_color":"#FAF7F2","theme_color":"#1C3D2B","icons":[{"src":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=192&h=192&fit=crop","sizes":"192x192","type":"image/png"}]}' />
+  <meta name="theme-color" content="#1C3D2B" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            linen: '#FAF7F2',
+            forest: { 800: '#1C3D2B', 900: '#12291C' },
+            amberBrand: { 500: '#D97706', 600: '#B45309' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #FAF7F2;
+      font-size: 17px;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: contain;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 16px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+    }
+    .min-h-dvh { min-height: 100dvh; }
+    .max-h-sheet { max-height: 88dvh; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="text-stone-800 antialiased font-sans pb-28 lg:pb-8 lg:pl-72 text-base md:text-lg select-none">
+
+  <!-- HIGHEST PRIORITY TOAST CONTAINER -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[9999] flex flex-col gap-2.5 pointer-events-none max-w-sm w-full px-4"></div>
+
+  <!-- DESKTOP LEFT NAVIGATION SIDEBAR (>= lg) -->
+  <aside class="hidden lg:flex fixed top-0 left-0 bottom-0 w-72 bg-forest-900 text-white flex-col justify-between p-6 border-r border-forest-800 z-30 shadow-2xl">
+    <div class="space-y-6">
+      <div onclick="openAboutModal()" class="flex items-center gap-3.5 cursor-pointer hover:opacity-90 transition group">
+        <div class="w-14 h-14 rounded-2xl bg-amber-500 text-forest-900 flex items-center justify-center font-black text-3xl shadow-md group-hover:scale-105 transition-transform">
+          Y
+        </div>
+        <div>
+          <h2 class="text-xl font-black tracking-tight leading-tight text-white group-hover:text-amber-400 transition-colors">Yaady's</h2>
+          <p class="text-xs text-amber-300 font-extrabold flex items-center gap-1">
+            <span>Millet Kitchen</span>
+            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+          </p>
+        </div>
+      </div>
+
+      <div id="sidebarUserCard" class="p-4 rounded-2xl bg-forest-800/80 border border-forest-700/50 space-y-1.5">
+        <p class="text-sm text-stone-300 font-bold" id="sidebarUserName">Welcome, Guest</p>
+        <div class="flex items-center justify-between pt-1">
+          <span class="text-sm text-stone-300">Wallet:</span>
+          <span class="text-lg font-black text-amber-400" id="sidebarWalletBal">₹0.00</span>
+        </div>
+      </div>
+
+      <nav class="space-y-2">
+        <button onclick="scrollToTop()" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl bg-amber-500 text-forest-900 font-black text-base transition shadow-sm min-h-[48px]">
+          <i data-lucide="utensils" class="w-5 h-5"></i>
+          <span>Order Menu</span>
+        </button>
+        <button onclick="openOrdersModal()" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-stone-200 hover:bg-forest-800 font-extrabold text-base transition relative min-h-[48px]">
+          <i data-lucide="receipt-text" class="w-5 h-5"></i>
+          <span>My Orders</span>
+          <span id="sidebarOrderBadge" class="hidden w-2.5 h-2.5 rounded-full bg-amber-400 absolute right-4"></span>
+        </button>
+        <button onclick="openWallet()" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-stone-200 hover:bg-forest-800 font-extrabold text-base transition min-h-[48px]">
+          <i data-lucide="wallet" class="w-5 h-5"></i>
+          <span>Prepaid Wallet</span>
+        </button>
+        <button onclick="openLiveChat()" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-stone-200 hover:bg-forest-800 font-extrabold text-base transition relative min-h-[48px]">
+          <i data-lucide="message-square" class="w-5 h-5"></i>
+          <span>Kitchen Desk Chat</span>
+          <span id="chatUnreadDot" class="hidden w-2.5 h-2.5 rounded-full bg-amber-400 absolute right-4"></span>
+        </button>
+        <button onclick="openAuthModal()" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-stone-200 hover:bg-forest-800 font-extrabold text-base transition min-h-[48px]">
+          <i data-lucide="user" class="w-5 h-5"></i>
+          <span>Account Profile</span>
+        </button>
+        <button onclick="openAboutModal()" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-stone-200 hover:bg-forest-800 font-extrabold text-base transition min-h-[48px]">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+          <span>About Kitchen</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="pt-4 border-t border-forest-800/80 text-xs text-stone-400 space-y-1">
+      <p class="font-bold text-stone-300">Pickup Counter Hub (IST)</p>
+      <p>Neknampur, Manikonda, Hyderabad</p>
+      <p class="font-bold text-amber-400 pt-1">+91 9000001690</p>
+    </div>
+  </aside>
+
+  <!-- STICKY TOP BAR -->
+  <header class="sticky top-0 z-40 bg-linen/95 backdrop-blur-md border-b border-stone-200">
+    <!-- MOBILE REFACTORED HEADER (< lg) -->
+    <div class="lg:hidden h-16 px-3.5 flex items-center justify-between">
+      <div onclick="openAboutModal()" class="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition min-w-0">
+        <div class="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl bg-forest-800 text-amber-400 font-black text-xl flex items-center justify-center shrink-0 shadow-xs">
+          Y
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-lg font-black leading-none text-forest-900">Yaady's</h1>
+          <p class="text-[11px] font-bold text-stone-500 mt-0.5 tracking-tight truncate">Millet Meals • Pickup Only</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <span id="kitchenOpenBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-green-100 text-green-800 border border-green-200 shrink-0">
+          <span class="w-2 h-2 rounded-full bg-green-600 animate-ping"></span>
+          <span>Open</span>
+        </span>
+
+        <button onclick="openWallet()" class="px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amberBrand-600 text-xs font-black flex items-center gap-1.5 shrink-0 shadow-xs hover:bg-amber-100 transition min-h-[36px]">
+          <i data-lucide="wallet" class="w-4 h-4 shrink-0"></i>
+          <span id="headerWalletBal">₹0.00</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- DESKTOP TOP BAR (>= lg) -->
+    <div class="hidden lg:flex max-w-7xl mx-auto px-6 py-4 items-center justify-between">
+      <div onclick="openAboutModal()" class="flex items-center gap-2 cursor-pointer hover:opacity-90 transition">
+        <h2 class="text-2xl font-black text-forest-900">Traditional Millet Kitchen Counter</h2>
+        <span class="text-xs font-bold text-forest-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">About Us</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span id="kitchenOpenBadgeDesktop" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-extrabold bg-green-100 text-green-800 border border-green-200">
+          <span class="w-2.5 h-2.5 rounded-full bg-green-600 animate-ping"></span> Open Now
+        </span>
+
+        <button onclick="openWallet()" class="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-200 text-amberBrand-600 hover:bg-amber-100 transition shadow-sm min-h-[48px]">
+          <i data-lucide="wallet" class="w-5 h-5"></i>
+          <span class="text-base font-black" id="headerWalletBalDesktop">₹0.00</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ANNOUNCEMENT BANNER (TEXT ONLY BROADCAST) -->
+    <div id="announcementBanner" class="bg-forest-900 text-amber-300 px-4 py-2 text-xs md:text-sm text-center font-black tracking-wide">
+      <span id="announcementBannerText">Fresh Harvest Specials: Hot Jowar & Ragi Rotis made live upon pickup!</span>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="max-w-7xl mx-auto px-4 py-5 md:py-7">
+    <div id="discountBanner" class="mb-6 p-5 rounded-3xl bg-gradient-to-r from-forest-800 to-forest-900 text-white flex items-center justify-between shadow-md">
+      <div class="flex items-center gap-3.5">
+        <div class="p-3 rounded-2xl bg-amber-500/20 text-amber-300">
+          <i data-lucide="sparkles" class="w-7 h-7"></i>
+        </div>
+        <div>
+          <h4 class="text-base md:text-lg font-black" id="discountBannerTitle">Prepay & Save up to 20%</h4>
+          <p class="text-xs md:text-sm text-stone-300 font-medium" id="discountBannerSub">Maintain ₹500+ wallet balance for instant automatic discounts.</p>
+        </div>
+      </div>
+      <button onclick="openWallet()" class="px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-forest-900 text-sm md:text-base font-black transition shadow min-h-[48px]">
+        Top-Up
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 xl:gap-8">
+      <!-- LEFT / MAIN COLUMN: Menu & Items -->
+      <section class="md:col-span-7 xl:col-span-8 space-y-6">
+        <div class="flex flex-col sm:flex-row gap-3.5">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-5 h-5 text-stone-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+            <input id="searchInput" oninput="renderMenu()" type="text" placeholder="Search Jowar Roti, Thali, Curries..." class="w-full pl-12 pr-4 py-3.5 text-base md:text-lg bg-white border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-forest-800 shadow-sm font-medium min-h-[48px]" />
+          </div>
+
+          <!-- CATEGORY PILLS -->
+          <div id="categoryPills" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
+            <button onclick="filterCategory('ALL')" class="category-pill active px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-forest-800 text-white border border-transparent font-black shadow-sm transition min-h-[48px]">All Items</button>
+            <button onclick="filterCategory('Millet Rotis')" class="category-pill px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-white text-stone-700 border border-stone-200 font-extrabold hover:bg-stone-50 transition min-h-[48px]">Millet Rotis</button>
+            <button onclick="filterCategory('Combo Meals')" class="category-pill px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-white text-stone-700 border border-stone-200 font-extrabold hover:bg-stone-50 transition min-h-[48px]">Combo Meals</button>
+            <button onclick="filterCategory('Curries & Sides')" class="category-pill px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-white text-stone-700 border border-stone-200 font-extrabold hover:bg-stone-50 transition min-h-[48px]">Curries</button>
+            <button onclick="filterCategory('Healthy Beverages')" class="category-pill px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-white text-stone-700 border border-stone-200 font-extrabold hover:bg-stone-50 transition min-h-[48px]">Beverages</button>
+          </div>
+        </div>
+
+        <div id="menuContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="h-64 bg-stone-200/70 rounded-3xl animate-pulse"></div>
+          <div class="h-64 bg-stone-200/70 rounded-3xl animate-pulse"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Adaptive Interactive Cart Sidebar on Tablets & Desktops -->
+      <section class="hidden md:block md:col-span-5 xl:col-span-4 space-y-4">
+        <div class="bg-white rounded-3xl border border-stone-200 p-6 shadow-sm sticky top-24">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3.5">
+            <h3 class="font-black text-forest-900 text-xl flex items-center gap-2">
+              <i data-lucide="shopping-bag" class="w-5 h-5 text-amberBrand-500"></i> Pickup Cart
+            </h3>
+            <span id="desktopCartBadge" class="text-xs font-black bg-stone-100 text-stone-600 px-3.5 py-1 rounded-full">0 items</span>
+          </div>
+
+          <div id="desktopCartItems" class="py-3.5 max-h-72 overflow-y-auto divide-y divide-stone-100 text-sm md:text-base">
+            <div class="text-center py-10 text-stone-400 text-base">Your basket is empty.</div>
+          </div>
+
+          <div id="desktopCartBilling" class="border-t border-stone-100 pt-3.5 space-y-2 text-sm md:text-base text-stone-600"></div>
+
+          <button id="desktopCheckoutBtn" onclick="sanitizeAndProceedToCheckout()" disabled class="w-full mt-5 py-4 bg-forest-800 disabled:bg-stone-300 text-white font-black rounded-2xl text-base md:text-lg transition shadow flex items-center justify-center gap-2 min-h-[48px]">
+            <span>Proceed to Pickup Time</span>
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- MOBILE BOTTOM NAVIGATION (< lg) -->
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 px-3 py-2 flex items-center justify-around shadow-lg">
+    <button onclick="scrollToTop()" class="flex flex-col items-center justify-center gap-1 text-forest-800 min-h-[48px] min-w-[48px]">
+      <i data-lucide="utensils" class="w-6 h-6"></i>
+      <span class="text-xs font-black">Menu</span>
+    </button>
+    <button onclick="openOrdersModal()" class="flex flex-col items-center justify-center gap-1 text-stone-500 hover:text-forest-800 relative min-h-[48px] min-w-[48px]">
+      <i data-lucide="receipt-text" class="w-6 h-6"></i>
+      <span class="text-xs font-extrabold">Orders</span>
+      <span id="mobileOrderBadge" class="hidden w-2.5 h-2.5 rounded-full bg-amber-500 absolute top-1 right-2"></span>
+    </button>
+    <button onclick="openMobileCartDrawer()" class="relative flex flex-col items-center justify-center gap-1 text-stone-500 hover:text-forest-800 min-h-[48px] min-w-[48px]">
+      <div class="relative">
+        <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+        <span id="mobileCartCounter" class="hidden absolute -top-1.5 -right-2 bg-amberBrand-500 text-white font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
+      </div>
+      <span class="text-xs font-extrabold">Cart</span>
+    </button>
+    <button onclick="openWallet()" class="flex flex-col items-center justify-center gap-1 text-stone-500 hover:text-forest-800 min-h-[48px] min-w-[48px]">
+      <i data-lucide="wallet" class="w-6 h-6"></i>
+      <span class="text-xs font-extrabold">Wallet</span>
+    </button>
+    <button onclick="openLiveChat()" class="flex flex-col items-center justify-center gap-1 text-stone-500 hover:text-forest-800 relative min-h-[48px] min-w-[48px]">
+      <i data-lucide="help-circle" class="w-6 h-6"></i>
+      <span class="text-xs font-extrabold">Help</span>
+      <span id="mobileChatBadge" class="hidden w-2.5 h-2.5 rounded-full bg-amber-500 absolute top-1 right-2"></span>
+    </button>
+    <button onclick="openAuthModal()" class="flex flex-col items-center justify-center gap-1 text-stone-500 hover:text-forest-800 min-h-[48px] min-w-[48px]">
+      <i data-lucide="user" class="w-6 h-6"></i>
+      <span class="text-xs font-extrabold">Profile</span>
+    </button>
+  </nav>
+
+  <!-- ==================== MODALS / DRAWERS ==================== -->
+
+  <!-- BRAND ABOUT KITCHEN MODAL -->
+  <div id="aboutModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl relative max-h-sheet overflow-y-auto space-y-5">
+      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
+      
+      <button onclick="closeAboutModal()" class="absolute top-5 right-5 p-2 text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-2xl bg-forest-800 text-amber-400 flex items-center justify-center font-black text-3xl shadow-md">
+          Y
+        </div>
+        <div>
+          <h3 class="text-2xl font-black text-forest-900 leading-tight">Yaady's Millet Roti Meals</h3>
+          <p class="text-xs md:text-sm text-stone-500 font-bold">Traditional, Hand-Patted, 100% Grain-Pure Cloud Kitchen</p>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-sm text-stone-700 leading-relaxed space-y-2">
+        <h4 class="font-black text-forest-900 text-base">Our Grain Philosophy</h4>
+        <p>Dedicated to reviving India's ancient super-grains: Sorghum (Jowar), Finger Millet (Ragi), Pearl Millet (Bajra), and Foxtail Millet. We strictly avoid wheat flour, Maida, adulterants, and artificial preservatives.</p>
+        <p>Every roti is hand-patted live, roasted on cast iron tawas, and served fresh at our pickup counter.</p>
+      </div>
+
+      <div class="space-y-2.5 text-sm text-stone-700">
+        <div class="flex items-start gap-3">
+          <i data-lucide="shield-check" class="w-5 h-5 text-green-700 shrink-0 mt-0.5"></i>
+          <div><strong class="text-forest-900">100% Gluten-Free Millets:</strong> Pure stone-ground millet flour prepared under clean hygienic protocols.</div>
+        </div>
+        <div class="flex items-start gap-3">
+          <i data-lucide="flame" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+          <div><strong class="text-forest-900">Iron Tawa Roasting:</strong> Baked on cast iron for authentic rustic aroma and mineral retention.</div>
+        </div>
+        <div class="flex items-start gap-3">
+          <i data-lucide="heart-pulse" class="w-5 h-5 text-red-600 shrink-0 mt-0.5"></i>
+          <div><strong class="text-forest-900">Cold-Pressed Oils & Cultured Curd:</strong> No refined palm oils or artificial fats. Fresh probiotic earthen buttermilk.</div>
+        </div>
+        <div class="flex items-start gap-3">
+          <i data-lucide="store" class="w-5 h-5 text-forest-800 shrink-0 mt-0.5"></i>
+          <div><strong class="text-forest-900">Direct Pickup Model:</strong> Zero third-party aggregator markups, passing savings to you through prepaid wallet discounts.</div>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs md:text-sm space-y-1.5">
+        <p class="font-bold text-stone-800 flex items-center gap-1.5">
+          <i data-lucide="map-pin" class="w-4 h-4 text-forest-800"></i>
+          <span>Counter Hub: Neknampur, Manikonda, Hyderabad, Telangana</span>
+        </p>
+        <p class="text-stone-600 flex items-center gap-1.5">
+          <i data-lucide="phone" class="w-4 h-4 text-forest-800"></i>
+          <span>Direct Phone: <a href="tel:+919000001690" class="text-forest-900 font-bold hover:underline">+91 9000001690</a></span>
+        </p>
+        <p class="text-stone-600 flex items-center gap-1.5">
+          <i data-lucide="wallet" class="w-4 h-4 text-forest-800"></i>
+          <span>UPI Address: yaadyskitchen@upi</span>
+        </p>
+      </div>
+
+      <div class="pt-2">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=17.387140,78.375860" target="_blank" rel="noopener noreferrer" class="w-full py-4 bg-forest-800 hover:bg-forest-900 text-white font-black text-sm md:text-base rounded-2xl flex items-center justify-center gap-2 shadow transition min-h-[48px]">
+          <i data-lucide="navigation" class="w-5 h-5"></i>
+          <span>Get Directions to Counter on Google Maps</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT MODAL / DRAWER -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-3">
+    <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl max-h-sheet overflow-y-auto relative">
+      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
+
+      <button onclick="closeCheckoutModal()" class="absolute top-5 right-5 p-2 text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <h3 class="text-2xl font-black text-forest-900 mb-1">Select Pickup Time & Pay</h3>
+      <p class="text-sm text-stone-500 mb-4 font-medium">All timings in Indian Standard Time (IST). Lead time is dynamically calculated based on your selected cart items.</p>
+
+      <div id="prepTimeIndicatorPill" class="mb-4 text-xs md:text-sm font-extrabold text-forest-800 bg-amber-50 border border-amber-200 p-3 rounded-2xl flex items-center justify-between shadow-xs">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="clock" class="w-4 h-4 text-amberBrand-600"></i>
+          <span>Estimated Kitchen Preparation Time:</span>
+        </span>
+        <span class="font-black text-amberBrand-600 text-sm md:text-base" id="requiredPrepMinutesDisplay">15 mins</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-5">
+        <div>
+          <label class="block text-sm font-extrabold text-stone-700 mb-1.5">Pickup Date (IST)</label>
+          <input type="date" id="pickupDate" onchange="updatePickupTimeConstraints()" class="w-full p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-bold outline-none min-h-[48px]" />
+        </div>
+        <div>
+          <label class="block text-sm font-extrabold text-stone-700 mb-1.5">Pickup Time (IST)</label>
+          <input type="time" id="pickupTime" onchange="validatePickupTime()" class="w-full p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-bold outline-none min-h-[48px]" />
+        </div>
+      </div>
+
+      <div class="border-t border-stone-100 pt-4 mb-4">
+        <label class="block text-sm font-extrabold text-stone-700 mb-2">Select Payment Mode</label>
+        <div class="grid grid-cols-2 gap-3">
+          <label id="walletPayOptionLabel" class="border border-stone-200 rounded-2xl p-4 flex flex-col gap-1 cursor-pointer has-[:checked]:border-forest-800 has-[:checked]:bg-forest-800/5 min-h-[48px]">
+            <input type="radio" name="paymentOption" value="Wallet" checked onchange="togglePaymentUi()" class="text-forest-800" />
+            <span class="text-base font-black text-forest-900">Yaady Wallet</span>
+            <span class="text-xs text-stone-500 font-semibold" id="checkoutWalletBalText">Bal: ₹0.00</span>
+          </label>
+
+          <label class="border border-stone-200 rounded-2xl p-4 flex flex-col gap-1 cursor-pointer has-[:checked]:border-forest-800 has-[:checked]:bg-forest-800/5 min-h-[48px]">
+            <input type="radio" name="paymentOption" value="Direct_UPI" onchange="togglePaymentUi()" class="text-forest-800" />
+            <span class="text-base font-black text-forest-900">Direct UPI</span>
+            <span class="text-xs text-stone-500 font-semibold">Auto Order-ID QR</span>
+          </label>
+        </div>
+      </div>
+
+      <div id="upiPaymentBox" class="hidden bg-stone-50 border border-stone-200 rounded-3xl p-5 mb-5 space-y-4">
+        <div class="text-center">
+          <p class="text-sm font-extrabold text-stone-600 mb-1.5">Tap or Scan QR (Pre-filled Order ID)</p>
+          <div id="orderUpiQr" onclick="launchUpiDirectIntent()" class="mx-auto w-40 h-40 bg-white p-2 border-2 border-forest-800/30 rounded-2xl flex items-center justify-center shadow-md cursor-pointer hover:border-forest-800 transition" title="Click to open default UPI App"></div>
+          <p class="text-sm font-mono text-stone-700 mt-2 font-bold" id="upiVpaDisplay">yaadyskitchen@upi</p>
+          <p class="text-xs text-amber-700 font-black mt-1">Order Token automatically pre-filled in payment note!</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5 pt-1">
+          <a id="gpayBtn" href="#" class="py-3 text-center text-xs md:text-sm font-bold bg-white border border-stone-200 rounded-xl hover:bg-stone-100 min-h-[48px] flex items-center justify-center">GPay</a>
+          <a id="phonepeBtn" href="#" class="py-3 text-center text-xs md:text-sm font-bold bg-white border border-stone-200 rounded-xl hover:bg-stone-100 min-h-[48px] flex items-center justify-center">PhonePe</a>
+          <a id="paytmBtn" href="#" class="py-3 text-center text-xs md:text-sm font-bold bg-white border border-stone-200 rounded-xl hover:bg-stone-100 min-h-[48px] flex items-center justify-center">Paytm</a>
+        </div>
+
+        <div>
+          <label class="block text-sm font-extrabold text-stone-700 mb-1">12-Digit Bank UTR / Reference <span class="text-red-500">*</span></label>
+          <input type="text" id="orderUtrInput" maxlength="12" placeholder="e.g. 423512349876" class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-base font-mono font-bold outline-none min-h-[48px]" />
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-4 border-t border-stone-100">
+        <div>
+          <p class="text-xs text-stone-400 font-bold uppercase tracking-wider">Total Payable</p>
+          <p class="text-2xl md:text-3xl font-black text-forest-900" id="checkoutFinalAmount">₹0.00</p>
+        </div>
+        <button id="placeOrderBtn" onclick="submitFinalOrder()" class="px-7 py-4 bg-forest-800 hover:bg-forest-900 text-white text-base font-black rounded-2xl transition shadow-md flex items-center gap-2 min-h-[48px]">
+          <span>Confirm & Place Order</span>
+          <i data-lucide="check-circle" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WALLET MODAL / DRAWER -->
+  <div id="walletModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl relative max-h-sheet overflow-y-auto">
+      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
+
+      <button onclick="closeWallet()" class="absolute top-5 right-5 p-2 text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <h3 class="text-2xl font-black text-forest-900">Prepaid Wallet Hub</h3>
+      <p class="text-sm text-stone-500 mb-5 font-medium">Instant savings, automatic discounts, zero payment failures.</p>
+
+      <div class="bg-gradient-to-br from-forest-800 to-forest-900 text-white rounded-3xl p-6 shadow-lg mb-5">
+        <p class="text-xs text-stone-300 uppercase tracking-widest font-bold">Available Wallet Balance</p>
+        <h2 class="text-4xl md:text-5xl font-black text-amber-400 mt-1" id="walletModalBal">₹0.00</h2>
+        <div class="mt-3 flex items-center gap-2">
+          <span class="text-xs md:text-sm bg-white/20 px-3.5 py-1 rounded-full font-bold" id="currentPerkPill">Standard Price (0% Discount)</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <button onclick="showWalletSection('recharge')" id="btnShowRecharge" class="py-3.5 px-4 rounded-2xl bg-forest-800 text-white font-extrabold text-sm md:text-base flex items-center justify-center gap-2 transition min-h-[48px]">
+          <i data-lucide="plus-circle" class="w-5 h-5"></i>
+          <span>+ Top-Up Balance</span>
+        </button>
+        <button onclick="showWalletSection('claim')" id="btnShowClaim" class="py-3.5 px-4 rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-extrabold text-sm md:text-base flex items-center justify-center gap-2 transition min-h-[48px]">
+          <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
+          <span>⇄ Claim / Refund</span>
+        </button>
+      </div>
+
+      <div id="walletRechargeSection" class="p-5 bg-stone-50 border border-stone-200 rounded-3xl space-y-4 mb-5">
+        <label class="block text-xs font-black uppercase tracking-wider text-stone-700">Select Top-Up Recharge Pack</label>
+        
+        <div class="grid grid-cols-3 gap-3">
+          <button type="button" onclick="selectRechargePack(500)" id="packBtn500" class="recharge-pack-card border-2 border-forest-800 bg-forest-800/10 ring-2 ring-forest-800 rounded-2xl p-3 text-center transition min-h-[48px]">
+            <p class="text-lg font-black text-stone-900">₹500</p>
+            <span class="text-[11px] font-black text-green-800 bg-green-100 px-2 py-0.5 rounded-full">+10% Off</span>
+          </button>
+
+          <button type="button" onclick="selectRechargePack(1000)" id="packBtn1000" class="recharge-pack-card border-2 border-stone-200 bg-white rounded-2xl p-3 text-center transition hover:border-forest-800/50 min-h-[48px]">
+            <p class="text-lg font-black text-stone-900">₹1,000</p>
+            <span class="text-[11px] font-black text-green-800 bg-green-100 px-2 py-0.5 rounded-full">+15% Off</span>
+          </button>
+
+          <button type="button" onclick="selectRechargePack(2000)" id="packBtn2000" class="recharge-pack-card border-2 border-stone-200 bg-white rounded-2xl p-3 text-center transition hover:border-forest-800/50 min-h-[48px]">
+            <p class="text-lg font-black text-stone-900">₹2,000</p>
+            <span class="text-[11px] font-black text-green-800 bg-green-100 px-2 py-0.5 rounded-full">+20% Off</span>
+          </button>
+        </div>
+
+        <div class="text-center py-3 bg-white rounded-2xl border border-stone-200 p-4 space-y-2">
+          <p class="text-xs font-extrabold text-stone-500">Scan or Tap QR to Launch UPI App</p>
+          
+          <div id="walletDynamicQr" onclick="launchWalletRechargeIntent()" class="mx-auto w-[160px] h-[160px] min-w-[160px] min-h-[160px] bg-white p-2 border-2 border-forest-800/30 rounded-2xl flex items-center justify-center shadow-md cursor-pointer hover:border-forest-800 transition" title="Tap to open default UPI App"></div>
+          
+          <div class="pt-1">
+            <p class="text-lg font-black text-forest-900" id="walletQrAmountDisplay">Amount: ₹500</p>
+            <p class="text-xs font-mono font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full inline-block mt-1" id="walletQrTokenDisplay">Token: #WLT-XXXX</p>
+          </div>
+          <p class="text-[11px] text-stone-400 font-semibold">Note is pre-filled automatically in your payment app.</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-extrabold text-stone-700 mb-1">12-Digit Bank UTR / Reference <span class="text-red-500">*</span></label>
+          <input type="text" id="rechargeUtrInput" maxlength="12" placeholder="e.g. 423512349876" class="w-full px-4 py-3.5 bg-white border border-stone-300 rounded-2xl text-base font-mono font-bold outline-none min-h-[48px]" />
+        </div>
+
+        <button onclick="submitWalletRecharge()" id="rechargeSubmitBtn" class="w-full py-4 bg-forest-800 hover:bg-forest-900 text-white text-base font-black rounded-2xl transition shadow min-h-[48px]">
+          Submit Top-Up Verification
+        </button>
+      </div>
+
+      <div id="walletClaimSection" class="hidden p-5 bg-stone-50 border border-stone-200 rounded-3xl space-y-4 mb-5">
+        <h4 class="text-base font-black text-forest-900">Request Balance Withdrawal</h4>
+        <p class="text-xs text-stone-500">Refunds are settled directly via UPI with an official PDF acknowledgment.</p>
+        <input type="number" id="claimAmountInput" placeholder="Amount to withdraw (₹)" class="w-full px-4 py-3.5 bg-white border border-stone-300 rounded-2xl text-base font-bold outline-none min-h-[48px]" />
+        <input type="text" id="claimUpiInput" placeholder="Recipient UPI ID (e.g. name@bank)" class="w-full px-4 py-3.5 bg-white border border-stone-300 rounded-2xl text-base font-medium outline-none min-h-[48px]" />
+        <input type="text" id="claimReasonInput" placeholder="Reason for refund request" class="w-full px-4 py-3.5 bg-white border border-stone-300 rounded-2xl text-base font-medium outline-none min-h-[48px]" />
+        <button onclick="submitWalletClaim()" id="claimSubmitBtn" class="w-full py-4 bg-amberBrand-500 hover:bg-amberBrand-600 text-white text-base font-black rounded-2xl transition shadow min-h-[48px]">
+          Submit Balance Claim
+        </button>
+      </div>
+
+      <div class="border-t border-stone-200 pt-4">
+        <h4 class="text-base font-black text-stone-800 mb-3 flex items-center justify-between">
+          <span>Transaction Activity</span>
+          <button onclick="fetchWalletLedger()" class="text-xs text-forest-800 font-bold underline">Refresh</button>
+        </h4>
+        <div id="walletLedgerList" class="divide-y divide-stone-100 max-h-56 overflow-y-auto text-sm">
+          <p class="text-center text-stone-400 py-4 text-xs">Loading ledger entries...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE 2-WAY SUPPORT CHAT DRAWER -->
+  <div id="liveChatModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-3">
+    <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col h-[85dvh] overflow-hidden relative">
+      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mt-2 sm:hidden"></div>
+
+      <div class="bg-forest-900 text-white p-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-3 h-3 rounded-full bg-green-400 animate-pulse"></div>
+          <div>
+            <h4 class="font-black text-base leading-tight">Yaady's Kitchen Desk Chat</h4>
+            <p class="text-xs text-stone-300 font-medium">Live operational assistance (IST)</p>
+          </div>
+        </div>
+        <button onclick="closeLiveChat()" class="text-stone-300 hover:text-white p-1 min-h-[44px] min-w-[44px] flex items-center justify-center">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <div id="chatMessagesContainer" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm bg-stone-50">
+        <div class="text-center text-stone-400 text-xs py-4">Start a conversation with our kitchen desk operator.</div>
+      </div>
+
+      <div class="p-3.5 bg-white border-t border-stone-200 flex items-center gap-2">
+        <input type="text" id="chatMessageInput" onkeydown="if(event.key==='Enter') sendChatMessageCustomer()" placeholder="Type message to the kitchen..." class="flex-1 px-4 py-3 bg-stone-100 border border-stone-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-forest-800 min-h-[48px]" />
+        <button onclick="sendChatMessageCustomer()" class="p-3 bg-forest-800 hover:bg-forest-900 text-white rounded-2xl transition min-h-[48px] min-w-[48px] flex items-center justify-center">
+          <i data-lucide="send" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER ORDER HISTORY DRAWER -->
+  <div id="ordersModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl relative max-h-sheet overflow-y-auto">
+      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
+
+      <button onclick="closeOrdersModal()" class="absolute top-5 right-5 p-2 text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <h3 class="text-2xl font-black text-forest-900 mb-1">Your Order History</h3>
+      <p class="text-sm text-stone-500 mb-5 font-medium">Review real-time preparation states, pickup times, and tokens.</p>
+
+      <div id="ordersListContainer" class="space-y-4">
+        <p class="text-center text-stone-400 py-8 text-sm">Loading orders...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATION & PASSWORD RECOVERY DRAWER -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl relative max-h-sheet overflow-y-auto">
+      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
+
+      <button onclick="closeAuthModal()" class="absolute top-5 right-5 p-2 text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <div class="text-center mb-5">
+        <div class="w-14 h-14 bg-amber-100 text-amberBrand-600 rounded-3xl flex items-center justify-center mx-auto mb-2 font-black text-2xl">
+          Y
+        </div>
+        <h3 class="text-2xl font-black text-forest-900" id="authTitle">Welcome to Yaady's</h3>
+        <p class="text-sm text-stone-500 mt-1 font-medium" id="authSubtitle">Please enter your credentials to proceed.</p>
+        
+        <div id="authTabSwitcher" class="mt-4 flex bg-stone-100 p-1.5 rounded-2xl">
+          <button type="button" onclick="setAuthTab('login')" id="tabBtnLogin" class="flex-1 py-2.5 text-sm font-black rounded-xl bg-white shadow-sm text-forest-900 min-h-[44px]">Sign In</button>
+          <button type="button" onclick="setAuthTab('register')" id="tabBtnRegister" class="flex-1 py-2.5 text-sm font-extrabold rounded-xl text-stone-600 min-h-[44px]">Register</button>
+        </div>
+      </div>
+
+      <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div id="regNameField" class="hidden">
+          <label class="block text-xs font-black uppercase tracking-wider text-stone-700 mb-1">Full Name</label>
+          <input id="authName" type="text" placeholder="e.g. Anand Varma" class="w-full px-4 py-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-medium focus:ring-2 focus:ring-forest-800 outline-none min-h-[48px]" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-black uppercase tracking-wider text-stone-700 mb-1">Mobile Number (10-digits)</label>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-base font-extrabold text-stone-400">+91</span>
+            <input id="authPhone" type="tel" pattern="[6-9][0-9]{9}" required placeholder="9876543210" class="w-full pl-14 pr-4 py-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-black focus:ring-2 focus:ring-forest-800 outline-none min-h-[48px]" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black uppercase tracking-wider text-stone-700 mb-1">Password</label>
+          <input id="authPassword" type="password" required placeholder="Enter your password" class="w-full px-4 py-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-medium focus:ring-2 focus:ring-forest-800 outline-none min-h-[48px]" />
+        </div>
+
+        <div id="regEmailField" class="hidden">
+          <label class="block text-xs font-black uppercase tracking-wider text-stone-700 mb-1">Email Address (Optional)</label>
+          <input id="authEmail" type="email" placeholder="anand@example.com" class="w-full px-4 py-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-medium focus:ring-2 focus:ring-forest-800 outline-none min-h-[48px]" />
+        </div>
+
+        <button type="submit" id="authSubmitBtn" class="w-full mt-2 py-4 bg-forest-800 text-white rounded-2xl font-black text-base hover:bg-forest-900 transition flex items-center justify-center gap-2 shadow min-h-[48px]">
+          <span>Sign In</span>
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </button>
+
+        <div id="forgotPasswordLinkBox" class="text-center pt-2">
+          <button type="button" onclick="showForgotPasswordView()" class="text-sm font-bold text-amberBrand-600 hover:underline min-h-[44px]">
+            Forgot Password?
+          </button>
+        </div>
+      </form>
+
+      <div id="forgotPasswordContainer" class="hidden space-y-4">
+        <div class="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-3">
+          <h4 class="font-black text-base text-forest-900">Password Recovery</h4>
+          <p class="text-xs text-stone-500">Enter your registered Mobile Number and Email to receive a 6-character recovery code.</p>
+          <input type="tel" id="forgotPhoneInput" placeholder="Registered 10-digit Phone" class="w-full px-4 py-3 bg-white border border-stone-200 rounded-xl text-sm font-bold outline-none min-h-[48px]" />
+          <input type="email" id="forgotEmailInput" placeholder="Registered Email" class="w-full px-4 py-3 bg-white border border-stone-200 rounded-xl text-sm font-medium outline-none min-h-[48px]" />
+          <button onclick="requestPasswordResetCode()" id="btnRequestResetCode" class="w-full py-3 bg-amberBrand-500 text-white font-black text-sm rounded-xl transition min-h-[48px]">
+            Send Reset Code
+          </button>
+        </div>
+
+        <div id="resetCodeSection" class="hidden p-4 bg-amber-50 rounded-2xl border border-amber-200 space-y-3">
+          <p class="text-xs text-amber-900 font-bold">Check your email for the 6-character reset code:</p>
+          <input type="text" id="resetCodeInput" maxlength="6" placeholder="6-character Code" class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-center text-lg font-mono font-black uppercase outline-none min-h-[48px]" />
+          <input type="password" id="resetNewPasswordInput" placeholder="Enter New Password" class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-sm font-medium outline-none min-h-[48px]" />
+          <button onclick="submitNewPasswordReset()" id="btnSubmitResetPassword" class="w-full py-3 bg-forest-800 text-white font-black text-sm rounded-xl transition min-h-[48px]">
+            Save New Password
+          </button>
+        </div>
+
+        <button type="button" onclick="hideForgotPasswordView()" class="w-full py-2 text-xs font-bold text-stone-500 hover:text-stone-800 min-h-[44px]">
+          ← Back to Login
+        </button>
+      </div>
+
+      <div id="profileDetails" class="hidden space-y-4 pt-2">
+        <div class="p-5 rounded-3xl bg-stone-50 border border-stone-200 text-sm md:text-base space-y-2">
+          <p class="text-stone-500">Account ID: <span id="profCustId" class="font-bold text-forest-800"></span></p>
+          <p class="text-stone-500">Customer Name: <span id="profName" class="font-black text-stone-800"></span></p>
+          <p class="text-stone-500">Mobile: <span id="profPhone" class="font-bold text-stone-800"></span></p>
+          <p class="text-stone-500">Wallet Balance: <span id="profWallet" class="font-black text-amber-600"></span></p>
+        </div>
+
+        <button onclick="closeAuthModal(); openOrdersModal();" class="w-full py-4 bg-forest-800 text-white font-black text-base rounded-2xl flex items-center justify-center gap-2 shadow transition hover:bg-forest-900 min-h-[48px]">
+          <i data-lucide="receipt-text" class="w-5 h-5"></i>
+          <span>View My Orders</span>
+        </button>
+
+        <div class="border border-stone-200 rounded-2xl p-4 space-y-3">
+          <button type="button" onclick="toggleChangePasswordView()" class="w-full flex justify-between items-center text-sm font-black text-forest-900 min-h-[44px]">
+            <span>Change Account Password</span>
+            <i data-lucide="chevron-down" id="changePassChevron" class="w-4 h-4 transition-transform"></i>
+          </button>
+
+          <div id="changePasswordBox" class="hidden space-y-2.5 pt-2 border-t border-stone-100">
+            <input type="password" id="currPassInput" placeholder="Current Password" class="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none min-h-[48px]" />
+            <input type="password" id="newPassInput" placeholder="New Password (min 4 chars)" class="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none min-h-[48px]" />
+            <input type="password" id="confirmNewPassInput" placeholder="Confirm New Password" class="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none min-h-[48px]" />
+            <button onclick="submitChangePassword()" id="btnChangePassword" class="w-full py-3 bg-stone-800 text-white font-black text-xs rounded-xl transition min-h-[48px]">
+              Update Password
+            </button>
+          </div>
+        </div>
+
+        <button onclick="handleLogout()" class="w-full py-3.5 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-2xl transition min-h-[48px]">
+          Sign Out of Account
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE CART SUMMARY DRAWER -->
+  <div id="mobileCartModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex flex-col justify-end">
+    <div class="bg-white rounded-t-3xl p-6 max-h-sheet overflow-y-auto flex flex-col">
+      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
+
+      <div class="flex items-center justify-between border-b border-stone-100 pb-3.5">
+        <h3 class="font-black text-forest-900 text-xl flex items-center gap-2">
+          <i data-lucide="shopping-bag" class="w-5 h-5 text-amberBrand-500"></i> Cart Review
+        </h3>
+        <button onclick="closeMobileCartDrawer()" class="p-2 text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+      <div id="mobileCartItems" class="divide-y divide-stone-100 py-3.5 text-base"></div>
+      <div id="mobileCartBilling" class="border-t border-stone-100 pt-3.5 space-y-2 text-base text-stone-600"></div>
+      <button onclick="sanitizeAndProceedToCheckout()" class="w-full mt-5 py-4 bg-forest-800 text-white font-black rounded-2xl text-lg transition min-h-[48px]">
+        Select Pickup Time & Pay
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT CLIENT ENGINE ==================== -->
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHZH9L_yzEOJLEHABSyVxZJfIV5nsQ02pxpCBV_X8Wl_LWD1QBoIw30vD7jgwdPGBg/exec";
+
+    let appConfig = {
+      KITCHEN_UPI_ID: "yaadyskitchen@upi",
+      KITCHEN_NAME: "Yaady's Millet Roti Meals",
+      KITCHEN_PHONE: "+919000001690",
+      WALLET_SYSTEM_ENABLED: "TRUE",
+      WALLET_SLAB_1_MIN: 500,
+      WALLET_SLAB_1_DISC: 0.10,
+      WALLET_SLAB_2_MIN: 1000,
+      WALLET_SLAB_2_DISC: 0.15,
+      WALLET_SLAB_3_MIN: 1999,
+      WALLET_SLAB_3_DISC: 0.20,
+      KITCHEN_OPEN: "TRUE",
+      ANNOUNCEMENT_BANNER: "Fresh Harvest Specials: Hot Jowar & Ragi Rotis made live upon pickup!"
+    };
+
+    let currentUser = null;
+    let menuItems = [];
+    let cart = {};
+    let currentAuthTab = "login";
+    let expandedDescriptions = {};
+
+    let selectedRechargeAmount = 500;
+    let preAllocatedOrderId = "";
+    let preAllocatedTxnId = "";
+    let currentOrderUpiUri = "";
+    let currentWalletUpiUri = "";
+
+    let knownOrderStatusMap = {};
+    let lastSeenWalletBalance = null;
+    let audioCtxCustomer = null;
+
+    window.chatPollInterval = null;
+    window.syncPollInterval = null;
+    window.heartbeatInterval = null;
+
+    function initCustomerAudio() {
+      if (!audioCtxCustomer) {
+        audioCtxCustomer = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtxCustomer.state === 'suspended') {
+        audioCtxCustomer.resume();
+      }
+    }
+    window.addEventListener('click', initCustomerAudio, { once: true });
+    window.addEventListener('touchstart', initCustomerAudio, { once: true });
+
+    function playCustomerChime() {
+      try {
+        initCustomerAudio();
+        if (!audioCtxCustomer) return;
+        const now = audioCtxCustomer.currentTime;
+        const osc1 = audioCtxCustomer.createOscillator();
+        const osc2 = audioCtxCustomer.createOscillator();
+        const gain = audioCtxCustomer.createGain();
+
+        osc1.type = 'sine';
+        osc2.type = 'sine';
+        osc1.frequency.setValueAtTime(1046.50, now);
+        osc2.frequency.setValueAtTime(1567.98, now + 0.12);
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(audioCtxCustomer.destination);
+
+        osc1.start(now);
+        osc2.start(now + 0.12);
+        osc1.stop(now + 0.6);
+        osc2.stop(now + 0.6);
+
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+      } catch (e) {}
+    }
+
+    function getNowIst() {
+      const now = new Date();
+      return new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+    }
+
+    function getIstTodayDateString() {
+      return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+    }
+
+    function formatTime12Hour(time24) {
+      if (!time24) return "";
+      const [h, m] = time24.split(":").map(Number);
+      const period = h >= 12 ? "PM" : "AM";
+      const h12 = h % 12 === 0 ? 12 : h % 12;
+      return `${String(h12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${period}`;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      loadUserSession();
+      fetchConfig();
+      fetchMenu();
+      initDefaultPickupDate();
+      trackVisitorSession();
+
+      if (window.heartbeatInterval) clearInterval(window.heartbeatInterval);
+      window.heartbeatInterval = setInterval(() => {
+        if (currentUser) {
+          callBackendApi("HEARTBEAT", {
+            customerId: currentUser.customerId,
+            fullName: currentUser.fullName,
+            phone: currentUser.phone
+          });
+        }
+      }, 25000);
+
+      if (window.syncPollInterval) clearInterval(window.syncPollInterval);
+      window.syncPollInterval = setInterval(() => {
+        fetchConfig();
+        if (currentUser) {
+          refreshProfileFromBackend();
+          pollCustomerOrderProgress();
+        }
+      }, 10000);
+    });
+
+    function showToast(msg, type = "info") {
+      const c = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      const bg = type === "error" ? "bg-red-800 text-white" : type === "success" ? "bg-forest-800 text-white" : "bg-stone-800 text-white";
+      toast.className = `${bg} p-4 rounded-2xl text-sm md:text-base font-bold shadow-2xl pointer-events-auto flex items-center justify-between gap-3 border border-white/20`;
+      toast.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100 text-xl">&times;</button>`;
+      c.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+      }, 4500);
+    }
+
+    async function trackVisitorSession() {
+      const hasVisited = localStorage.getItem("yaady_has_visited");
+      const isRepeat = hasVisited === "true";
+      try {
+        fetch(`${SCRIPT_URL}?action=trackVisit&isRepeat=${isRepeat}`);
+      } catch (e) {}
+      localStorage.setItem("yaady_has_visited", "true");
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getCartRequiredPrepTime() {
+      let maxItemPrep = 15;
+      for (const [id, qty] of Object.entries(cart)) {
+        const item = menuItems.find(m => m.id === id);
+        if (item && item.prepTimeMins) {
+          const itemPrep = Number(item.prepTimeMins);
+          if (itemPrep > maxItemPrep) {
+            maxItemPrep = itemPrep;
+          }
+        }
+      }
+      const bill = calculateBill();
+      if (bill.totalCount > 4) {
+        maxItemPrep += 10;
+      }
+      return maxItemPrep;
+    }
+
+    async function pollCustomerOrderProgress() {
+      if (!currentUser || !currentUser.phone) return;
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getCustomerOrders&phone=${currentUser.phone}`).then(r => r.json());
+        if (res.status === "SUCCESS" && res.orders) {
+          res.orders.forEach(order => {
+            const oId = String(order.orderId);
+            const token = oId.slice(-4);
+            const prevStatus = knownOrderStatusMap[oId];
+            const newStatus = order.orderStatus;
+
+            if (prevStatus && prevStatus !== newStatus) {
+              playCustomerChime();
+
+              if (newStatus === "Kitchen_Accepted") {
+                showToast(`✅ Payment Verified! Kitchen accepted Order #${token}.`, "success");
+              } else if (newStatus === "Preparing") {
+                showToast(`🍳 Order #${token} is now on the millet stove!`, "info");
+              } else if (newStatus === "Ready_For_Pickup") {
+                showToast(`🔥 Order #${token} is HOT & READY for counter pickup at Neknampur!`, "success");
+              }
+
+              const mBadge = document.getElementById("mobileOrderBadge");
+              const sBadge = document.getElementById("sidebarOrderBadge");
+              if (mBadge) mBadge.classList.remove("hidden");
+              if (sBadge) sBadge.classList.remove("hidden");
+            }
+            knownOrderStatusMap[oId] = newStatus;
+          });
+        }
+      } catch (e) {}
+    }
+
+    function openAboutModal() {
+      document.getElementById("aboutModal").classList.remove("hidden");
+    }
+
+    function closeAboutModal() {
+      document.getElementById("aboutModal").classList.add("hidden");
+    }
+
+    function initDefaultPickupDate() {
+      const istToday = getIstTodayDateString();
+      const dateEl = document.getElementById("pickupDate");
+      if (dateEl && !dateEl.value) {
+        dateEl.value = istToday;
+        dateEl.min = istToday;
+      }
+      updatePickupTimeConstraints();
+    }
+
+    function updatePickupTimeConstraints() {
+      const dateEl = document.getElementById("pickupDate");
+      const timeEl = document.getElementById("pickupTime");
+      const prepDisplay = document.getElementById("requiredPrepMinutesDisplay");
+      if (!dateEl || !timeEl) return;
+
+      const istToday = getIstTodayDateString();
+      const selectedDate = dateEl.value;
+
+      if (!selectedDate || selectedDate < istToday) {
+        dateEl.value = istToday;
+      }
+
+      const istNow = getNowIst();
+      const requiredLeadMinutes = getCartRequiredPrepTime();
+      if (prepDisplay) {
+        prepDisplay.innerText = `${requiredLeadMinutes} mins`;
+      }
+
+      if (dateEl.value === istToday) {
+        const leadTime = new Date(istNow.getTime() + requiredLeadMinutes * 60 * 1000);
+        const minH = String(leadTime.getHours()).padStart(2, '0');
+        const minM = String(leadTime.getMinutes()).padStart(2, '0');
+        const minTimeStr = `${minH}:${minM}`;
+
+        timeEl.min = minTimeStr;
+        timeEl.max = "22:00";
+
+        if (!timeEl.value || timeEl.value < minTimeStr) {
+          timeEl.value = minTimeStr;
+        }
+      } else {
+        timeEl.min = "10:00";
+        timeEl.max = "22:00";
+        if (!timeEl.value) {
+          timeEl.value = "12:30";
+        }
+      }
+    }
+
+    function validatePickupTime() {
+      const dateEl = document.getElementById("pickupDate");
+      const timeEl = document.getElementById("pickupTime");
+      if (!dateEl || !timeEl || !timeEl.value) return;
+
+      const istToday = getIstTodayDateString();
+      const istNow = getNowIst();
+      const requiredLeadMinutes = getCartRequiredPrepTime();
+
+      if (dateEl.value === istToday) {
+        const [selH, selM] = timeEl.value.split(":").map(Number);
+        const selDate = new Date(istNow);
+        selDate.setHours(selH, selM, 0, 0);
+
+        const minValidTime = new Date(istNow.getTime() + requiredLeadMinutes * 60 * 1000);
+
+        if (selDate.getTime() < minValidTime.getTime()) {
+          const earliestH = String(minValidTime.getHours()).padStart(2, '0');
+          const earliestM = String(minValidTime.getMinutes()).padStart(2, '0');
+          const earliestStr = `${earliestH}:${earliestM}`;
+          const formattedEarliest = formatTime12Hour(earliestStr);
+
+          showToast(`Kitchen requires ${requiredLeadMinutes} mins preparation time for your cart. Earliest pickup is at ${formattedEarliest} IST.`, "error");
+          timeEl.value = earliestStr;
+        }
+      }
+    }
+
+    function openWallet() {
+      if (!currentUser) {
+        showToast("Please sign in to access your wallet.", "info");
+        openAuthModal();
+        return;
+      }
+      const modal = document.getElementById("walletModal");
+      modal.classList.remove("hidden");
+      showWalletSection("recharge");
+      fetchWalletLedger();
+
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          selectRechargePack(selectedRechargeAmount || 500);
+        }, 50);
+      });
+    }
+
+    function closeWallet() {
+      document.getElementById("walletModal").classList.add("hidden");
+    }
+
+    function showWalletSection(type) {
+      const rSec = document.getElementById("walletRechargeSection");
+      const cSec = document.getElementById("walletClaimSection");
+      const rBtn = document.getElementById("btnShowRecharge");
+      const cBtn = document.getElementById("btnShowClaim");
+
+      if (type === "recharge") {
+        rSec.classList.remove("hidden");
+        cSec.classList.add("hidden");
+        rBtn.className = "py-3.5 px-4 rounded-2xl bg-forest-800 text-white font-extrabold text-sm md:text-base flex items-center justify-center gap-2 transition min-h-[48px]";
+        cBtn.className = "py-3.5 px-4 rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-extrabold text-sm md:text-base flex items-center justify-center gap-2 transition min-h-[48px]";
+
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            selectRechargePack(selectedRechargeAmount || 500);
+          }, 50);
+        });
+      } else {
+        rSec.classList.add("hidden");
+        cSec.classList.remove("hidden");
+        cBtn.className = "py-3.5 px-4 rounded-2xl bg-forest-800 text-white font-extrabold text-sm md:text-base flex items-center justify-center gap-2 transition min-h-[48px]";
+        rBtn.className = "py-3.5 px-4 rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-extrabold text-sm md:text-base flex items-center justify-center gap-2 transition min-h-[48px]";
+      }
+    }
+
+    function selectRechargePack(amount) {
+      selectedRechargeAmount = Number(amount) || 500;
+
+      [500, 1000, 2000].forEach(val => {
+        const btn = document.getElementById(`packBtn${val}`);
+        if (btn) {
+          if (val === selectedRechargeAmount) {
+            btn.className = "recharge-pack-card border-2 border-forest-800 bg-forest-800/10 ring-2 ring-forest-800 rounded-2xl p-3 text-center transition min-h-[48px]";
+          } else {
+            btn.className = "recharge-pack-card border-2 border-stone-200 bg-white rounded-2xl p-3 text-center transition hover:border-forest-800/50 min-h-[48px]";
+          }
+        }
+      });
+
+      const phoneTag = (currentUser && currentUser.phone) ? String(currentUser.phone).slice(-4) : "TOPUP";
+      const hexTag = Date.now().toString(16).slice(-4).toUpperCase();
+      preAllocatedTxnId = `WLT-${phoneTag}-${hexTag}`;
+
+      currentWalletUpiUri = `upi://pay?pa=${encodeURIComponent(appConfig.KITCHEN_UPI_ID)}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${selectedRechargeAmount}&cu=INR&tn=${encodeURIComponent(preAllocatedTxnId)}`;
+
+      const qrContainer = document.getElementById("walletDynamicQr");
+      if (qrContainer) {
+        qrContainer.innerHTML = "";
+        try {
+          new QRCode(qrContainer, {
+            text: currentWalletUpiUri,
+            width: 160,
+            height: 160,
+            colorDark: "#1C3D2B",
+            colorLight: "#FFFFFF",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        } catch (err) {
+          setTimeout(() => {
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
+              text: currentWalletUpiUri,
+              width: 160,
+              height: 160,
+              colorDark: "#1C3D2B",
+              colorLight: "#FFFFFF",
+              correctLevel: QRCode.CorrectLevel.M
+            });
+          }, 80);
+        }
+      }
+
+      const amtDisplay = document.getElementById("walletQrAmountDisplay");
+      const tokenDisplay = document.getElementById("walletQrTokenDisplay");
+      if (amtDisplay) amtDisplay.innerText = `Amount: ₹${selectedRechargeAmount.toLocaleString('en-IN')}`;
+      if (tokenDisplay) tokenDisplay.innerText = `Token: #${preAllocatedTxnId}`;
+    }
+
+    function launchWalletRechargeIntent() {
+      if (currentWalletUpiUri) {
+        window.location.href = currentWalletUpiUri;
+      }
+    }
+
+    async function submitWalletRecharge() {
+      const utr = document.getElementById("rechargeUtrInput").value.trim();
+
+      if (!/^\d{12}$/.test(utr)) {
+        showToast("Enter a valid 12-digit UTR from your payment app.", "error");
+        return;
+      }
+
+      const btn = document.getElementById("rechargeSubmitBtn");
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin inline-block mr-1">◌</span> Verifying...`;
+
+      try {
+        const res = await callBackendApi("SUBMIT_WALLET_RECHARGE", {
+          preAllocatedTxnId: preAllocatedTxnId,
+          phone: currentUser.phone,
+          amount: selectedRechargeAmount,
+          utrNumber: utr
+        });
+
+        if (res.status === "SUCCESS") {
+          showToast(res.message, "success");
+          document.getElementById("rechargeUtrInput").value = "";
+          fetchWalletLedger();
+          selectRechargePack(selectedRechargeAmount);
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (e) {
+        showToast("Recharge submission failed.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Submit Top-Up Verification";
+      }
+    }
+
+    async function submitWalletClaim() {
+      const amt = Number(document.getElementById("claimAmountInput").value) || 0;
+      const upi = document.getElementById("claimUpiInput").value.trim();
+      const reason = document.getElementById("claimReasonInput").value.trim();
+
+      if (!amt || amt <= 0) {
+        showToast("Enter a valid claim amount.", "error");
+        return;
+      }
+      if (!upi.includes("@")) {
+        showToast("Enter a valid UPI ID (e.g. name@bank).", "error");
+        return;
+      }
+
+      const btn = document.getElementById("claimSubmitBtn");
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin inline-block mr-1">◌</span> Logging...`;
+
+      try {
+        const res = await callBackendApi("SUBMIT_WALLET_CLAIM", {
+          phone: currentUser.phone,
+          amount: amt,
+          payoutUpi: upi,
+          reason: reason
+        });
+
+        if (res.status === "SUCCESS") {
+          showToast(res.message, "success");
+          currentUser.walletBalance = Number(res.newBalance) || 0;
+          saveUserSession(currentUser);
+          document.getElementById("claimAmountInput").value = "";
+          document.getElementById("claimUpiInput").value = "";
+          fetchWalletLedger();
+          showWalletSection("recharge");
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (e) {
+        showToast("Claim request failed.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Submit Balance Claim";
+      }
+    }
+
+    async function fetchWalletLedger() {
+      if (!currentUser) return;
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getWalletLedger&customerId=${currentUser.customerId}`).then(r => r.json());
+        const list = document.getElementById("walletLedgerList");
+        if (res.status === "SUCCESS" && res.transactions.length > 0) {
+          list.innerHTML = res.transactions.map(t => {
+            const isApproved = t.status === "Approved";
+            const isClaim = t.type === "Debit_Claim";
+            const istDate = new Date(t.timestamp).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
+            return `
+              <div class="py-3 flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="font-black text-stone-800 text-sm md:text-base">${String(t.type).replace('_', ' ')}</p>
+                    <p class="text-xs text-stone-400 font-mono">${istDate} (IST) • Ref: ${t.utrRef || 'N/A'}</p>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-black text-base ${String(t.type).includes('Credit') ? 'text-green-700' : 'text-stone-800'}">₹${Number(t.amount) || 0}</span>
+                    <p class="text-xs font-bold ${isApproved ? 'text-green-600' : 'text-amber-600'}">${t.status}</p>
+                  </div>
+                </div>
+                ${isClaim && isApproved && t.receiptPdfUrl ? `
+                  <a href="${t.receiptPdfUrl}" target="_blank" rel="noopener noreferrer" class="mt-1 inline-flex items-center gap-1.5 text-xs font-bold text-forest-800 bg-amber-100/60 px-3 py-1.5 rounded-xl self-start hover:bg-amber-100 transition">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                    <span>📄 View Refund Acknowledgment (PDF)</span>
+                  </a>
+                ` : ''}
+              </div>
+            `;
+          }).join("");
+          lucide.createIcons();
+        } else {
+          list.innerHTML = `<p class="text-center text-stone-400 py-4 text-xs">No transactions in ledger.</p>`;
+        }
+      } catch (e) {}
+    }
+
+    async function sanitizeAndProceedToCheckout() {
+      if (!currentUser) {
+        showToast("Please log in or register before scheduling pickup.", "info");
+        openAuthModal();
+        return;
+      }
+
+      const cartArray = Object.entries(cart).map(([id, qty]) => ({ id, quantity: qty }));
+      if (cartArray.length === 0) {
+        showToast("Your cart is empty.", "error");
+        return;
+      }
+
+      showToast("Verifying live kitchen availability...", "info");
+
+      try {
+        const res = await callBackendApi("CHECK_CART_VALIDITY", { cartItems: cartArray });
+
+        if (res.status === "KITCHEN_CLOSED") {
+          showToast("The kitchen is currently closed for pickups. Orders cannot be scheduled.", "error");
+          return;
+        }
+
+        if (res.hasSoldOutItems) {
+          const removedNames = res.unavailableItems.map(i => i.name).join(", ");
+          res.unavailableItems.forEach(i => delete cart[i.id]);
+          updateCartUi();
+          showToast(`Sold out items removed from basket: ${removedNames}`, "error");
+
+          if (Object.keys(cart).length === 0) {
+            closeMobileCartDrawer();
+            return;
+          }
+        }
+
+        triggerCheckoutModal();
+      } catch (err) {
+        triggerCheckoutModal();
+      }
+    }
+
+    function triggerCheckoutModal() {
+      const bill = calculateBill();
+      if (bill.totalCount === 0) return;
+
+      closeMobileCartDrawer();
+      preAllocatedOrderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+      document.getElementById("checkoutFinalAmount").innerText = `₹${bill.finalPayable}`;
+      document.getElementById("checkoutModal").classList.remove("hidden");
+      initDefaultPickupDate();
+      togglePaymentUi();
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById("checkoutModal").classList.add("hidden");
+    }
+
+    function togglePaymentUi() {
+      const mode = document.querySelector('input[name="paymentOption"]:checked').value;
+      const upiBox = document.getElementById("upiPaymentBox");
+      const bill = calculateBill();
+
+      if (mode === "Direct_UPI") {
+        upiBox.classList.remove("hidden");
+        const token = preAllocatedOrderId.slice(-4);
+        const txnNote = `YMR-Token-${token}`;
+        currentOrderUpiUri = `upi://pay?pa=${encodeURIComponent(appConfig.KITCHEN_UPI_ID)}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${encodeURIComponent(txnNote)}`;
+
+        const qrContainer = document.getElementById("orderUpiQr");
+        qrContainer.innerHTML = "";
+        new QRCode(qrContainer, { text: currentOrderUpiUri, width: 150, height: 150 });
+
+        document.getElementById("gpayBtn").href = `gpay://upi/pay?pa=${appConfig.KITCHEN_UPI_ID}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${txnNote}`;
+        document.getElementById("phonepeBtn").href = `phonepe://pay?pa=${appConfig.KITCHEN_UPI_ID}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${txnNote}`;
+        document.getElementById("paytmBtn").href = `paytmmp://pay?pa=${appConfig.KITCHEN_UPI_ID}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${txnNote}`;
+      } else {
+        upiBox.classList.add("hidden");
+      }
+    }
+
+    function launchUpiDirectIntent() {
+      if (currentOrderUpiUri) window.location.href = currentOrderUpiUri;
+    }
+
+    async function submitFinalOrder() {
+      validatePickupTime();
+
+      const timeInputVal = document.getElementById("pickupTime").value;
+      if (!timeInputVal) {
+        showToast("Please choose a pickup time.", "error");
+        return;
+      }
+
+      const formatted12HrPickupTime = formatTime12Hour(timeInputVal);
+      const bill = calculateBill();
+      const mode = document.querySelector('input[name="paymentOption"]:checked').value;
+      let utr = "";
+
+      if (mode === "Wallet") {
+        if (Number(currentUser.walletBalance) < bill.finalPayable) {
+          showToast("Insufficient Wallet Balance. Please top up or pay via Direct UPI.", "error");
+          return;
+        }
+      } else {
+        utr = document.getElementById("orderUtrInput").value.trim();
+        if (!/^\d{12}$/.test(utr)) {
+          showToast("Valid 12-digit UPI UTR is mandatory.", "error");
+          return;
+        }
+      }
+
+      const btn = document.getElementById("placeOrderBtn");
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin inline-block mr-1">◌</span> Placing Order...`;
+
+      const payload = {
+        preAllocatedOrderId: preAllocatedOrderId,
+        customerId: currentUser.customerId,
+        customerName: currentUser.fullName,
+        customerPhone: currentUser.phone,
+        items: bill.itemsDetail,
+        totalItemsCount: bill.totalCount,
+        subtotal: bill.subtotal,
+        discountApplied: bill.discountAmount,
+        discountSlab: `${bill.discRate * 100}%`,
+        finalPayable: bill.finalPayable,
+        paymentMode: mode,
+        utrNumber: utr,
+        pickupDate: document.getElementById("pickupDate").value,
+        pickupTime: formatted12HrPickupTime
+      };
+
+      try {
+        const res = await callBackendApi("SUBMIT_ORDER", payload);
+        if (res.status === "SUCCESS") {
+          cart = {};
+          updateCartUi();
+          closeCheckoutModal();
+          showToast(`Order Token #${preAllocatedOrderId.slice(-4)} Placed for ${formatted12HrPickupTime} IST!`, "success");
+          knownOrderStatusMap[preAllocatedOrderId] = res.orderStatus;
+          openOrdersModal();
+          refreshProfileFromBackend();
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (err) {
+        showToast("Failed to place order. Check connection.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Confirm & Place Order</span><i data-lucide="check-circle" class="w-5 h-5"></i>`;
+        lucide.createIcons();
+      }
+    }
+
+    function openLiveChat() {
+      if (!currentUser) {
+        showToast("Please log in to chat with the kitchen operator.", "info");
+        openAuthModal();
+        return;
+      }
+      document.getElementById("liveChatModal").classList.remove("hidden");
+      const dot = document.getElementById("chatUnreadDot");
+      const mDot = document.getElementById("mobileChatBadge");
+      if (dot) dot.classList.add("hidden");
+      if (mDot) mDot.classList.add("hidden");
+
+      pollChatMessages();
+      if (window.chatPollInterval) clearInterval(window.chatPollInterval);
+      window.chatPollInterval = setInterval(pollChatMessages, 6000);
+    }
+
+    function closeLiveChat() {
+      document.getElementById("liveChatModal").classList.add("hidden");
+      if (window.chatPollInterval) clearInterval(window.chatPollInterval);
+    }
+
+    async function pollChatMessages() {
+      if (!currentUser) return;
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=GET_CHAT_MESSAGES&customerId=${currentUser.customerId}`).then(r => r.json());
+        if (res.status === "SUCCESS") renderChatMessages(res.messages);
+      } catch (e) {}
+    }
+
+    function renderChatMessages(messages) {
+      const container = document.getElementById("chatMessagesContainer");
+      if (messages.length === 0) {
+        container.innerHTML = `<div class="text-center text-stone-400 text-sm py-8">No messages yet. Send a message to the kitchen desk below.</div>`;
+        return;
+      }
+
+      container.innerHTML = messages.map(m => {
+        const isMe = m.sender === "CUSTOMER";
+        const istTime = new Date(m.timestamp).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
+        return `
+          <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+            <div class="max-w-[80%] rounded-2xl px-4 py-3 text-sm md:text-base ${isMe ? 'bg-forest-800 text-white rounded-br-xs' : 'bg-white border border-stone-200 text-stone-800 rounded-bl-xs shadow-xs'}">
+              <p>${m.text}</p>
+            </div>
+            <span class="text-[10px] text-stone-400 mt-1 px-1">${istTime} IST</span>
+          </div>
+        `;
+      }).join("");
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function sendChatMessageCustomer() {
+      const input = document.getElementById("chatMessageInput");
+      const text = input.value.trim();
+      if (!text || !currentUser) return;
+
+      input.value = "";
+      try {
+        await callBackendApi("SEND_CHAT_MESSAGE", {
+          customerId: currentUser.customerId,
+          customerName: currentUser.fullName,
+          sender: "CUSTOMER",
+          messageText: text
+        });
+        pollChatMessages();
+      } catch (e) {
+        showToast("Message send failed.", "error");
+      }
+    }
+
+    function openOrdersModal() {
+      if (!currentUser) {
+        showToast("Please log in to review orders.", "info");
+        openAuthModal();
+        return;
+      }
+      document.getElementById("ordersModal").classList.remove("hidden");
+      const mBadge = document.getElementById("mobileOrderBadge");
+      const sBadge = document.getElementById("sidebarOrderBadge");
+      if (mBadge) mBadge.classList.add("hidden");
+      if (sBadge) sBadge.classList.add("hidden");
+
+      fetchCustomerOrders();
+    }
+
+    function closeOrdersModal() {
+      document.getElementById("ordersModal").classList.add("hidden");
+    }
+
+    async function fetchCustomerOrders() {
+      const container = document.getElementById("ordersListContainer");
+      container.innerHTML = `<p class="text-center text-stone-400 py-8 text-base">Loading orders...</p>`;
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getCustomerOrders&phone=${currentUser.phone}`).then(r => r.json());
+        if (res.status === "SUCCESS" && res.orders.length > 0) {
+          container.innerHTML = res.orders.map(order => {
+            const token = order.orderId ? String(order.orderId).slice(-4) : "0000";
+            
+            let cleanDate = "Today";
+            if (order.pickupDate) {
+              const rawDate = String(order.pickupDate).split("T")[0].trim();
+              const dateObj = new Date(rawDate + "T00:00:00+05:30");
+              cleanDate = !isNaN(dateObj.getTime())
+                ? dateObj.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" })
+                : rawDate;
+            }
+            const cleanTime = order.pickupTime ? String(order.pickupTime).trim() : "Flexible";
+            
+            const istPlacedTime = order.timestamp
+              ? new Date(order.timestamp).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true })
+              : "N/A";
+
+            const waTextUrl = `https://wa.me/919000001690?text=${encodeURIComponent("Hello Yaady's Kitchen! Inquiring regarding Order Token #" + token + " (" + order.orderId + ") placed for " + cleanDate + " at " + cleanTime + " IST (Total: ₹" + order.finalPayable + "). Status: " + order.orderStatus + ". Please assist.")}`;
+
+            return `
+              <div class="bg-stone-50 border border-stone-200 rounded-3xl p-5 space-y-3.5">
+                <div class="flex justify-between items-start gap-2">
+                  <div>
+                    <span class="text-xs font-mono font-black text-forest-800">TOKEN #${token}</span>
+                    <h4 class="font-black text-stone-900 text-lg">${cleanDate} • Pickup: ${cleanTime} (IST)</h4>
+                    <p class="text-xs text-stone-400 font-semibold">Placed at ${istPlacedTime} IST</p>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <a href="${waTextUrl}" target="_blank" rel="noopener noreferrer" class="w-11 h-11 bg-green-600 hover:bg-green-700 text-white rounded-2xl flex items-center justify-center shadow-sm transition hover:scale-105 active:scale-95 shrink-0" title="WhatsApp Kitchen regarding this order">
+                      <i data-lucide="message-circle" class="w-5 h-5"></i>
+                    </a>
+                    <button type="button" onclick="startOrderContextChat('${order.orderId}', '${token}')" class="w-11 h-11 bg-forest-800 hover:bg-forest-900 text-white rounded-2xl flex items-center justify-center shadow-sm transition hover:scale-105 active:scale-95 shrink-0" title="Chat with Kitchen Desk">
+                      <i data-lucide="message-square" class="w-5 h-5"></i>
+                    </button>
+                    <span class="px-3.5 py-1.5 rounded-full text-xs font-black ${order.orderStatus === 'Ready_For_Pickup' ? 'bg-green-100 text-green-800' : order.orderStatus === 'Pending_Verification' ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-700'} shrink-0">
+                      ${String(order.orderStatus).replace('_', ' ')}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="text-sm text-stone-600 border-t border-b border-stone-200/60 py-2.5 space-y-1">
+                  ${(order.items || []).map(i => `<div class="flex justify-between"><span>${i.quantity}x ${i.name}</span><span class="font-bold">₹${Number(i.lineTotal) || (Number(i.price) * Number(i.quantity))}</span></div>`).join("")}
+                  <div class="flex justify-between font-black text-stone-900 text-base pt-1.5 border-t border-stone-100">
+                    <span>Total Paid (${order.paymentMode})</span>
+                    <span>₹${Number(order.finalPayable) || 0}</span>
+                  </div>
+                </div>
+
+                <!-- DEDICATED PICKUP POINT & GOOGLE MAPS DIRECTIONS BAR -->
+                <div class="p-3.5 bg-white border border-stone-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs">
+                  <div class="flex items-start gap-2">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-forest-800 shrink-0 mt-0.5"></i>
+                    <div>
+                      <p class="text-xs font-black text-stone-900">Pickup Counter Location:</p>
+                      <p class="text-xs text-stone-600 font-medium">Yaady's Kitchen, Neknampur, Manikonda, Hyderabad</p>
+                    </div>
+                  </div>
+                  <a href="https://www.google.com/maps/dir/?api=1&destination=17.387140,78.375860" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 bg-forest-800 hover:bg-forest-900 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition hover:scale-102 shrink-0 min-h-[38px]">
+                    <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
+                    <span>Get Directions</span>
+                  </a>
+                </div>
+              </div>
+            `;
+          }).join("");
+          lucide.createIcons();
+        } else {
+          container.innerHTML = `<p class="text-center text-stone-400 py-10 text-base">No orders found.</p>`;
+        }
+      } catch (e) {
+        container.innerHTML = `<p class="text-center text-red-500 py-6 text-base">Failed to load orders.</p>`;
+      }
+    }
+
+    function startOrderContextChat(orderId, token) {
+      closeOrdersModal();
+      openLiveChat();
+      const input = document.getElementById("chatMessageInput");
+      if (input) {
+        const orderToken = token || String(orderId).slice(-4);
+        input.value = `[Inquiry for Order Token #${orderToken}] `;
+        input.focus();
+      }
+    }
+
+    let currentCategory = "ALL";
+    function filterCategory(cat) {
+      currentCategory = cat;
+      const pills = document.querySelectorAll(".category-pill");
+      pills.forEach(el => {
+        const text = el.innerText.trim().toLowerCase();
+        const isMatch = (cat === 'ALL' && text.includes('all')) ||
+                        (cat === 'Millet Rotis' && text.includes('rotis')) ||
+                        (cat === 'Combo Meals' && text.includes('combo')) ||
+                        (cat === 'Curries & Sides' && text.includes('curries')) ||
+                        (cat === 'Healthy Beverages' && text.includes('beverages'));
+
+        if (isMatch) {
+          el.className = "category-pill active px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-forest-800 text-white border border-transparent font-black shadow-sm transition min-h-[48px]";
+        } else {
+          el.className = "category-pill px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-white text-stone-700 border border-stone-200 font-extrabold hover:bg-stone-50 transition min-h-[48px]";
+        }
+      });
+      renderMenu();
+    }
+
+    function toggleDescription(itemId) {
+      expandedDescriptions[itemId] = !expandedDescriptions[itemId];
+      const descEl = document.getElementById(`desc-${itemId}`);
+      const btnEl = document.getElementById(`desc-btn-${itemId}`);
+      const item = menuItems.find(m => m.id === itemId);
+
+      if (descEl && btnEl && item) {
+        if (expandedDescriptions[itemId]) {
+          descEl.innerText = item.description;
+          btnEl.innerText = "Read less";
+        } else {
+          descEl.innerText = item.description.substring(0, 75) + "...";
+          btnEl.innerText = "Read more";
+        }
+      }
+    }
+
+    function renderMenu() {
+      const container = document.getElementById("menuContainer");
+      const search = document.getElementById("searchInput").value.toLowerCase();
+
+      const filtered = menuItems.filter(item => {
+        const matchesCat = currentCategory === "ALL" || item.category === currentCategory;
+        const matchesSearch = String(item.name).toLowerCase().includes(search) || String(item.description).toLowerCase().includes(search) || String(item.milletType).toLowerCase().includes(search);
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-2 text-center py-16 text-stone-400 text-base">No wholesome meals match your search.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(item => {
+        const qty = cart[item.id] || 0;
+        const isSoldOut = !item.available;
+        const isLongDesc = item.description && item.description.length > 75;
+        const isExpanded = !!expandedDescriptions[item.id];
+        const displayDesc = isLongDesc && !isExpanded ? item.description.substring(0, 75) + "..." : item.description;
+
+        return `
+          <div class="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm flex flex-col justify-between hover:shadow-md transition ${isSoldOut ? 'opacity-60' : ''}">
+            <div class="relative h-48 w-full bg-stone-100 overflow-hidden">
+              <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600';" class="w-full h-full object-cover" />
+              <span class="absolute top-3.5 left-3.5 px-3.5 py-1 bg-forest-900/85 backdrop-blur-md text-amber-300 font-black text-xs rounded-xl uppercase tracking-wider">
+                ${item.milletType}
+              </span>
+              ${isSoldOut ? `
+                <div class="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-black text-base tracking-widest uppercase">
+                  Sold Out for Today
+                </div>
+              ` : ''}
+            </div>
+            
+            <div class="p-5 flex-1 flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-start gap-2">
+                  <h4 class="font-black text-forest-900 text-lg md:text-xl leading-snug">${item.name}</h4>
+                  <span class="font-black text-2xl text-stone-900">₹${item.price}</span>
+                </div>
+                <div class="text-sm text-stone-500 mt-2">
+                  <span id="desc-${item.id}">${displayDesc}</span>
+                  ${isLongDesc ? `
+                    <button type="button" id="desc-btn-${item.id}" onclick="toggleDescription('${item.id}')" class="text-amberBrand-600 font-extrabold text-xs ml-1 hover:underline focus:outline-none">
+                      ${isExpanded ? 'Read less' : 'Read more'}
+                    </button>
+                  ` : ''}
+                </div>
+                <div class="mt-3 text-xs md:text-sm text-stone-400 font-extrabold flex items-center justify-between">
+                  <span>${item.nutrition}</span>
+                  <span class="text-forest-800 font-bold">⏱️ ${item.prepTimeMins || 15}m prep</span>
+                </div>
+              </div>
+
+              <div class="mt-5 pt-3.5 border-t border-stone-100 flex items-center justify-between">
+                <span class="text-xs md:text-sm font-extrabold text-green-700 bg-green-50 px-3 py-1 rounded-xl">Millet Certified</span>
+                
+                ${isSoldOut ? `
+                  <button disabled class="px-5 py-2.5 bg-stone-200 text-stone-400 font-black text-sm rounded-2xl cursor-not-allowed min-h-[44px]">Unavailable</button>
+                ` : qty === 0 ? `
+                  <button onclick="addToCart('${item.id}')" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-forest-900 font-black text-base rounded-2xl transition shadow min-h-[48px]">
+                    Add +
+                  </button>
+                ` : `
+                  <div class="flex items-center gap-3 bg-stone-100 rounded-2xl px-3 py-2 min-h-[48px]">
+                    <button onclick="changeQty('${item.id}', -1)" class="w-8 h-8 rounded-xl bg-white flex items-center justify-center font-black text-stone-700 shadow-xs">-</button>
+                    <span class="font-black text-base text-forest-900 px-1.5">${qty}</span>
+                    <button onclick="changeQty('${item.id}', 1)" class="w-8 h-8 rounded-xl bg-white flex items-center justify-center font-black text-stone-700 shadow-xs">+</button>
+                  </div>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function addToCart(itemId) {
+      if (!currentUser) {
+        showToast("Please register or log in before creating an order.", "info");
+        openAuthModal();
+        return;
+      }
+      cart[itemId] = (cart[itemId] || 0) + 1;
+      updateCartUi();
+      updatePickupTimeConstraints();
+    }
+
+    function changeQty(itemId, delta) {
+      if (!cart[itemId]) return;
+      cart[itemId] += delta;
+      if (cart[itemId] <= 0) delete cart[itemId];
+      updateCartUi();
+      updatePickupTimeConstraints();
+    }
+
+    function getDiscountRate() {
+      if (!currentUser || String(appConfig.WALLET_SYSTEM_ENABLED).toUpperCase() !== "TRUE") return 0;
+      const bal = Number(currentUser.walletBalance) || 0;
+      if (bal >= Number(appConfig.WALLET_SLAB_3_MIN)) return Number(appConfig.WALLET_SLAB_3_DISC);
+      if (bal >= Number(appConfig.WALLET_SLAB_2_MIN)) return Number(appConfig.WALLET_SLAB_2_DISC);
+      if (bal >= Number(appConfig.WALLET_SLAB_1_MIN)) return Number(appConfig.WALLET_SLAB_1_DISC);
+      return 0;
+    }
+
+    function calculateBill() {
+      let subtotal = 0;
+      let totalCount = 0;
+      const itemsDetail = [];
+
+      for (const [id, qty] of Object.entries(cart)) {
+        const item = menuItems.find(m => m.id === id);
+        if (item) {
+          const itemPrice = Number(item.price) || 0;
+          subtotal += itemPrice * qty;
+          totalCount += qty;
+          itemsDetail.push({ id: item.id, name: item.name, price: itemPrice, quantity: qty, lineTotal: itemPrice * qty });
+        }
+      }
+
+      const discRate = getDiscountRate();
+      const discountAmount = Math.round(subtotal * discRate);
+      const finalPayable = Math.max(0, subtotal - discountAmount);
+
+      return { subtotal, discountAmount, discRate, finalPayable, totalCount, itemsDetail };
+    }
+
+    function updateCartUi() {
+      renderMenu();
+      const bill = calculateBill();
+
+      document.getElementById("desktopCartBadge").innerText = `${bill.totalCount} items`;
+      const mobBadge = document.getElementById("mobileCartCounter");
+      if (bill.totalCount > 0) {
+        mobBadge.classList.remove("hidden");
+        mobBadge.innerText = bill.totalCount;
+      } else {
+        mobBadge.classList.add("hidden");
+      }
+
+      document.getElementById("desktopCheckoutBtn").disabled = (bill.totalCount === 0);
+
+      const renderItemList = (containerId) => {
+        const el = document.getElementById(containerId);
+        if (bill.totalCount === 0) {
+          el.innerHTML = `<div class="text-center py-10 text-stone-400 text-base">Your basket is empty.</div>`;
+          return;
+        }
+        el.innerHTML = bill.itemsDetail.map(i => `
+          <div class="py-3 flex items-center justify-between">
+            <div>
+              <p class="font-black text-stone-800 text-base">${i.name}</p>
+              <p class="text-xs text-stone-400">₹${i.price} × ${i.quantity}</p>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="font-black text-base text-forest-900 mr-2">₹${i.lineTotal}</span>
+              <button onclick="changeQty('${i.id}', -1)" class="w-7 h-7 bg-stone-100 rounded-lg text-sm font-black text-stone-600 min-h-[36px] min-w-[36px] flex items-center justify-center">-</button>
+              <button onclick="changeQty('${i.id}', 1)" class="w-7 h-7 bg-stone-100 rounded-lg text-sm font-black text-stone-600 min-h-[36px] min-w-[36px] flex items-center justify-center">+</button>
+            </div>
+          </div>
+        `).join("");
+      };
+
+      renderItemList("desktopCartItems");
+      renderItemList("mobileCartItems");
+
+      const renderBilling = (containerId) => {
+        const el = document.getElementById(containerId);
+        if (bill.totalCount === 0) {
+          el.innerHTML = "";
+          return;
+        }
+        el.innerHTML = `
+          <div class="flex justify-between">
+            <span>Item Subtotal</span>
+            <span class="font-bold text-stone-800">₹${bill.subtotal}</span>
+          </div>
+          ${bill.discRate > 0 ? `
+            <div class="flex justify-between text-green-700 font-black">
+              <span>Wallet Discount (${bill.discRate * 100}%)</span>
+              <span>-₹${bill.discountAmount}</span>
+            </div>
+          ` : ''}
+          <div class="flex justify-between border-t border-stone-100 pt-3 text-lg md:text-xl font-black text-forest-900">
+            <span>Payable Total</span>
+            <span>₹${bill.finalPayable}</span>
+          </div>
+        `;
+      };
+
+      renderBilling("desktopCartBilling");
+      renderBilling("mobileCartBilling");
+    }
+
+    function updateDiscountGauge() {
+      const bal = currentUser ? Number(currentUser.walletBalance) || 0 : 0;
+      const banner = document.getElementById("discountBannerTitle");
+      const sub = document.getElementById("discountBannerSub");
+      const perkPill = document.getElementById("currentPerkPill");
+
+      if (bal >= appConfig.WALLET_SLAB_3_MIN) {
+        banner.innerText = "Elite 20% Wallet Perk Active!";
+        sub.innerText = "Maximum tier unlocked. 20% discount on all rotis & meals.";
+        if (perkPill) perkPill.innerText = "20% Top-Tier Discount Active";
+      } else if (bal >= appConfig.WALLET_SLAB_2_MIN) {
+        const diff = appConfig.WALLET_SLAB_3_MIN - bal;
+        banner.innerText = "15% Mid-Tier Discount Active!";
+        sub.innerText = `Add ₹${diff} more to wallet to unlock 20% savings.`;
+        if (perkPill) perkPill.innerText = "15% Mid-Tier Discount Active";
+      } else if (bal >= appConfig.WALLET_SLAB_1_MIN) {
+        const diff = appConfig.WALLET_SLAB_2_MIN - bal;
+        banner.innerText = "10% Starter Discount Active!";
+        sub.innerText = `Add ₹${diff} more to wallet to unlock 15% savings.`;
+        if (perkPill) perkPill.innerText = "10% Starter Discount Active";
+      } else {
+        const diff = appConfig.WALLET_SLAB_1_MIN - bal;
+        banner.innerText = "Prepay & Save up to 20%";
+        sub.innerText = `Recharge ₹${diff > 0 ? diff : 500} to activate instant discounts.`;
+        if (perkPill) perkPill.innerText = "Standard Price (0% Discount)";
+      }
+    }
+
+    function showForgotPasswordView() {
+      document.getElementById("authForm").classList.add("hidden");
+      document.getElementById("authTabSwitcher").classList.add("hidden");
+      document.getElementById("forgotPasswordContainer").classList.remove("hidden");
+      document.getElementById("authTitle").innerText = "Password Help";
+      document.getElementById("authSubtitle").innerText = "Recover access to your account";
+    }
+
+    function hideForgotPasswordView() {
+      document.getElementById("forgotPasswordContainer").classList.add("hidden");
+      document.getElementById("resetCodeSection").classList.add("hidden");
+      document.getElementById("authForm").classList.remove("hidden");
+      document.getElementById("authTabSwitcher").classList.remove("hidden");
+      document.getElementById("authTitle").innerText = "Welcome to Yaady's";
+      document.getElementById("authSubtitle").innerText = "Please enter your credentials to proceed.";
+    }
+
+    async function requestPasswordResetCode() {
+      const phone = document.getElementById("forgotPhoneInput").value.trim();
+      const email = document.getElementById("forgotEmailInput").value.trim();
+
+      if (!phone || !email) {
+        showToast("Please enter both phone and email.", "error");
+        return;
+      }
+
+      const btn = document.getElementById("btnRequestResetCode");
+      btn.disabled = true;
+      btn.innerText = "Dispatching Code...";
+
+      try {
+        const res = await callBackendApi("FORGOT_PASSWORD", { phone, email });
+        if (res.status === "SUCCESS") {
+          showToast(res.message, "success");
+          document.getElementById("resetCodeSection").classList.remove("hidden");
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (err) {
+        showToast("Recovery service error.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Send Reset Code";
+      }
+    }
+
+    async function submitNewPasswordReset() {
+      const phone = document.getElementById("forgotPhoneInput").value.trim();
+      const code = document.getElementById("resetCodeInput").value.trim();
+      const newPass = document.getElementById("resetNewPasswordInput").value.trim();
+
+      if (!code || !newPass) {
+        showToast("Enter reset code and new password.", "error");
+        return;
+      }
+
+      const btn = document.getElementById("btnSubmitResetPassword");
+      btn.disabled = true;
+      btn.innerText = "Saving...";
+
+      try {
+        const res = await callBackendApi("RESET_PASSWORD", { phone, resetCode: code, newPassword: newPass });
+        if (res.status === "SUCCESS") {
+          showToast(res.message, "success");
+          hideForgotPasswordView();
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (e) {
+        showToast("Reset failed.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Save New Password";
+      }
+    }
+
+    function toggleChangePasswordView() {
+      const box = document.getElementById("changePasswordBox");
+      const chevron = document.getElementById("changePassChevron");
+      box.classList.toggle("hidden");
+      if (box.classList.contains("hidden")) {
+        chevron.style.transform = "rotate(0deg)";
+      } else {
+        chevron.style.transform = "rotate(180deg)";
+      }
+    }
+
+    async function submitChangePassword() {
+      const curr = document.getElementById("currPassInput").value.trim();
+      const newP = document.getElementById("newPassInput").value.trim();
+      const confP = document.getElementById("confirmNewPassInput").value.trim();
+
+      if (!curr || !newP || !confP) {
+        showToast("Please fill all password fields.", "error");
+        return;
+      }
+      if (newP !== confP) {
+        showToast("New passwords do not match.", "error");
+        return;
+      }
+
+      const btn = document.getElementById("btnChangePassword");
+      btn.disabled = true;
+      btn.innerText = "Updating...";
+
+      try {
+        const res = await callBackendApi("CHANGE_PASSWORD", {
+          phone: currentUser.phone,
+          currentPassword: curr,
+          newPassword: newP
+        });
+        if (res.status === "SUCCESS") {
+          showToast(res.message, "success");
+          document.getElementById("currPassInput").value = "";
+          document.getElementById("newPassInput").value = "";
+          document.getElementById("confirmNewPassInput").value = "";
+          toggleChangePasswordView();
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (e) {
+        showToast("Failed to update password.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Update Password";
+      }
+    }
+
+    function loadUserSession() {
+      const raw = localStorage.getItem("yaady_user_token");
+      if (raw) {
+        try {
+          currentUser = JSON.parse(atob(raw));
+          updateUserUi();
+          refreshProfileFromBackend();
+        } catch (e) {
+          localStorage.removeItem("yaady_user_token");
+        }
+      }
+    }
+
+    function saveUserSession(user) {
+      currentUser = user;
+      localStorage.setItem("yaady_user_token", btoa(JSON.stringify(user)));
+      updateUserUi();
+    }
+
+    function updateUserUi() {
+      if (currentUser) {
+        const bal = `₹${Number(currentUser.walletBalance || 0).toFixed(2)}`;
+        const headerBal = document.getElementById("headerWalletBal");
+        if (headerBal) headerBal.innerText = bal;
+        const desktopBal = document.getElementById("headerWalletBalDesktop");
+        if (desktopBal) desktopBal.innerText = bal;
+        
+        document.getElementById("sidebarWalletBal").innerText = bal;
+        document.getElementById("sidebarUserName").innerText = currentUser.fullName;
+        document.getElementById("walletModalBal").innerText = bal;
+        document.getElementById("checkoutWalletBalText").innerText = `Bal: ${bal}`;
+
+        document.getElementById("authTitle").innerText = "Customer Profile";
+        document.getElementById("authSubtitle").innerText = "Manage your Yaady's account";
+        document.getElementById("authTabSwitcher").classList.add("hidden");
+        document.getElementById("authForm").classList.add("hidden");
+        document.getElementById("profileDetails").classList.remove("hidden");
+
+        document.getElementById("profCustId").innerText = currentUser.customerId;
+        document.getElementById("profName").innerText = currentUser.fullName;
+        document.getElementById("profPhone").innerText = currentUser.phone;
+        document.getElementById("profWallet").innerText = bal;
+
+        updateDiscountGauge();
+      } else {
+        const headerBal = document.getElementById("headerWalletBal");
+        if (headerBal) headerBal.innerText = "₹0.00";
+        const desktopBal = document.getElementById("headerWalletBalDesktop");
+        if (desktopBal) desktopBal.innerText = "₹0.00";
+
+        document.getElementById("sidebarWalletBal").innerText = "₹0.00";
+        document.getElementById("sidebarUserName").innerText = "Welcome, Guest";
+        document.getElementById("authTitle").innerText = "Welcome to Yaady's";
+        document.getElementById("authSubtitle").innerText = "Please enter your credentials to proceed.";
+        document.getElementById("authTabSwitcher").classList.remove("hidden");
+        document.getElementById("authForm").classList.remove("hidden");
+        document.getElementById("profileDetails").classList.add("hidden");
+      }
+      lucide.createIcons();
+    }
+
+    function setAuthTab(tab) {
+      currentAuthTab = tab;
+      const btnLogin = document.getElementById("tabBtnLogin");
+      const btnReg = document.getElementById("tabBtnRegister");
+      const nameField = document.getElementById("regNameField");
+      const emailField = document.getElementById("regEmailField");
+      const submitBtnSpan = document.querySelector("#authSubmitBtn span");
+
+      if (tab === "login") {
+        btnLogin.className = "flex-1 py-2.5 text-sm font-black rounded-xl bg-white shadow-sm text-forest-900 min-h-[44px]";
+        btnReg.className = "flex-1 py-2.5 text-sm font-extrabold rounded-xl text-stone-600 min-h-[44px]";
+        nameField.classList.add("hidden");
+        emailField.classList.add("hidden");
+        submitBtnSpan.innerText = "Sign In";
+      } else {
+        btnReg.className = "flex-1 py-2.5 text-sm font-black rounded-xl bg-white shadow-sm text-forest-900 min-h-[44px]";
+        btnLogin.className = "flex-1 py-2.5 text-sm font-extrabold rounded-xl text-stone-600 min-h-[44px]";
+        nameField.classList.remove("hidden");
+        emailField.classList.remove("hidden");
+        submitBtnSpan.innerText = "Complete Registration";
+      }
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const phone = document.getElementById("authPhone").value.trim();
+      const password = document.getElementById("authPassword").value.trim();
+      const name = document.getElementById("authName").value.trim();
+      const email = document.getElementById("authEmail").value.trim();
+
+      const btn = document.getElementById("authSubmitBtn");
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin inline-block mr-2">◌</span> Validating...`;
+
+      try {
+        let res;
+        if (currentAuthTab === "login") {
+          res = await callBackendApi("LOGIN", { phone, password });
+        } else {
+          res = await callBackendApi("REGISTER", { fullName: name, phone, password, email });
+        }
+
+        if (res.status === "SUCCESS") {
+          saveUserSession(res.customer);
+          closeAuthModal();
+          showToast(res.message, "success");
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (err) {
+        showToast("Authentication server busy.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>${currentAuthTab === 'login' ? 'Sign In' : 'Complete Registration'}</span><i data-lucide="arrow-right" class="w-5 h-5"></i>`;
+        lucide.createIcons();
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem("yaady_user_token");
+      currentUser = null;
+      updateUserUi();
+      closeAuthModal();
+      showToast("Signed out successfully.", "info");
+    }
+
+    async function refreshProfileFromBackend() {
+      if (!currentUser) return;
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getCustomerProfile&phone=${currentUser.phone}`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          const newBal = Number(res.customer.walletBalance) || 0;
+          if (lastSeenWalletBalance !== null && lastSeenWalletBalance < newBal) {
+            playCustomerChime();
+            showToast(`💰 Wallet Top-Up credited! New Balance: ₹${newBal.toFixed(2)}`, "success");
+          }
+          lastSeenWalletBalance = newBal;
+          saveUserSession(res.customer);
+        }
+      } catch (e) {}
+    }
+
+    async function fetchConfig() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getConfig`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          appConfig = { ...appConfig, ...res.data };
+          applyConfigUi();
+        }
+      } catch (e) {}
+    }
+
+    function applyConfigUi() {
+      document.getElementById("upiVpaDisplay").innerText = appConfig.KITCHEN_UPI_ID;
+
+      const bannerTextEl = document.getElementById("announcementBannerText");
+      if (bannerTextEl && appConfig.ANNOUNCEMENT_BANNER) {
+        bannerTextEl.innerText = appConfig.ANNOUNCEMENT_BANNER;
+      }
+
+      const walletEnabled = String(appConfig.WALLET_SYSTEM_ENABLED).toUpperCase() === "TRUE";
+      const discBanner = document.getElementById("discountBanner");
+      const walletRadioLabel = document.getElementById("walletPayOptionLabel");
+
+      if (!walletEnabled) {
+        discBanner.classList.add("hidden");
+        if (walletRadioLabel) walletRadioLabel.classList.add("opacity-40", "pointer-events-none");
+      } else {
+        discBanner.classList.remove("hidden");
+        if (walletRadioLabel) walletRadioLabel.classList.remove("opacity-40", "pointer-events-none");
+        updateDiscountGauge();
+      }
+
+      const isOpen = String(appConfig.KITCHEN_OPEN).toUpperCase() === "TRUE";
+      const badgeMobile = document.getElementById("kitchenOpenBadge");
+      const badgeDesktop = document.getElementById("kitchenOpenBadgeDesktop");
+
+      if (isOpen) {
+        if (badgeMobile) {
+          badgeMobile.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-600 animate-ping"></span><span>Open</span>`;
+          badgeMobile.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-green-100 text-green-800 border border-green-200 shrink-0";
+        }
+        if (badgeDesktop) {
+          badgeDesktop.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-green-600 animate-ping"></span> Open Now`;
+          badgeDesktop.className = "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-extrabold bg-green-100 text-green-800 border border-green-200";
+        }
+      } else {
+        if (badgeMobile) {
+          badgeMobile.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-600"></span><span>Closed</span>`;
+          badgeMobile.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-red-100 text-red-800 border border-red-200 shrink-0";
+        }
+        if (badgeDesktop) {
+          badgeDesktop.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-red-600"></span> Closed Now`;
+          badgeDesktop.className = "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-extrabold bg-red-100 text-red-800 border border-red-200";
+        }
+      }
+    }
+
+    async function fetchMenu() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getMenu`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          menuItems = res.menu;
+          renderMenu();
+        }
+      } catch (e) {}
+    }
+
+    function openAuthModal() { document.getElementById("authModal").classList.remove("hidden"); }
+    function closeAuthModal() { document.getElementById("authModal").classList.add("hidden"); }
+    function openMobileCartDrawer() { document.getElementById("mobileCartModal").classList.remove("hidden"); }
+    function closeMobileCartDrawer() { document.getElementById("mobileCartModal").classList.add("hidden"); }
+
+    async function callBackendApi(action, payload) {
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action, ...payload })
+      });
+      return await res.json();
+    }
+  </script>
+</body>
+</html>

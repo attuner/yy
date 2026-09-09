@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Yaady's Kitchen Partner | Central Operations Console</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            linen: '#FAF7F2',
+            forest: { 800: '#1C3D2B', 900: '#12291C' },
+            amberBrand: { 500: '#D97706', 600: '#B45309' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #FAF7F2;
+      font-size: 16px;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: contain;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 16px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+    }
+    .min-h-dvh { min-height: 100dvh; }
+    .max-h-sheet { max-height: 88dvh; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-linen text-stone-800 antialiased font-sans pb-16 text-sm md:text-base select-none">
+
+  <!-- HIGHEST PRIORITY TOAST CONTAINER -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[9999] flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none"></div>
+
+  <!-- HEADER -->
+  <header class="bg-forest-800 text-white border-b border-forest-900 sticky top-0 z-40 px-5 py-4 flex items-center justify-between shadow-md">
+    <div class="flex items-center gap-3.5">
+      <div class="w-11 h-11 rounded-2xl bg-amber-500 text-forest-900 flex items-center justify-center font-black text-2xl shadow-sm">
+        Y
+      </div>
+      <div>
+        <h1 class="text-lg font-black text-white leading-tight">Yaady's Kitchen Partner</h1>
+        <p class="text-xs text-amber-300 font-bold">Neknampur Hub • Central Operations (Strict IST)</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button onclick="openOnlineUsersModal()" class="flex items-center gap-2 bg-forest-900/80 hover:bg-forest-900 text-white px-4 py-2 rounded-2xl border border-forest-700 transition shadow-sm min-h-[44px]" title="Click to view online customers">
+        <span class="w-2.5 h-2.5 rounded-full bg-green-400 animate-ping"></span>
+        <span class="text-xs font-black text-white" id="onlineUsersCountPill">🟢 Online: 0</span>
+      </button>
+
+      <button onclick="logoutAdmin()" id="logoutBtn" class="hidden text-xs font-black text-stone-200 hover:text-white px-3.5 py-2 rounded-xl border border-forest-700 hover:bg-forest-900 transition min-h-[44px]">
+        Lock
+      </button>
+    </div>
+  </header>
+
+  <!-- AUTH PIN GATEWAY -->
+  <div id="adminPinAuth" class="max-w-sm mx-auto mt-20 p-7 bg-white border border-stone-200 rounded-3xl text-center space-y-4 shadow-xl">
+    <div class="w-14 h-14 bg-amber-100 text-amberBrand-600 rounded-2xl flex items-center justify-center mx-auto">
+      <i data-lucide="shield-check" class="w-7 h-7"></i>
+    </div>
+    <h3 class="text-xl font-black text-forest-900">Kitchen Console Gateway</h3>
+    <p class="text-xs text-stone-500 font-medium">Enter Admin PIN configured in Google Sheets Config tab.</p>
+    <input type="password" id="adminPinInput" placeholder="Default: 1234" class="w-full px-4 py-3.5 bg-stone-50 border border-stone-300 rounded-2xl text-center text-xl font-mono font-black text-forest-900 outline-none focus:border-forest-800 min-h-[48px]" />
+    <button onclick="unlockConsole()" class="w-full py-4 bg-amber-500 hover:bg-amber-600 text-forest-900 font-black text-base rounded-2xl transition shadow min-h-[48px]">
+      Unlock Operations Console
+    </button>
+  </div>
+
+  <!-- MAIN DASHBOARD -->
+  <main id="adminDashboard" class="hidden max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- MASTER OPERATIONS SWITCHES & ANNOUNCEMENT BANNER CONTROLS -->
+    <section class="bg-white border border-stone-200 p-6 rounded-3xl space-y-5 shadow-sm">
+      <h3 class="text-xs font-black text-stone-400 uppercase tracking-wider flex items-center gap-2">
+        <i data-lucide="sliders" class="w-4 h-4 text-amberBrand-600"></i> Master Kitchen Controls
+      </h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-200">
+          <div>
+            <h4 class="font-black text-base text-forest-900">Kitchen Order Acceptance</h4>
+            <p class="text-xs text-stone-500">Controls whether customers can place pickup orders.</p>
+          </div>
+          <button onclick="toggleKitchenOpen()" id="btnKitchenOpenToggle" class="px-5 py-2.5 rounded-xl font-black text-xs bg-green-600 text-white shadow-sm min-h-[44px]">
+            OPEN
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-200">
+          <div>
+            <h4 class="font-black text-base text-forest-900">Wallet & Prepay System</h4>
+            <p class="text-xs text-stone-500">Disables top-ups & wallet deductions when paused.</p>
+          </div>
+          <button onclick="toggleWalletSystem()" id="btnWalletSystemToggle" class="px-5 py-2.5 rounded-xl font-black text-xs bg-green-600 text-white shadow-sm min-h-[44px]">
+            ENABLED
+          </button>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENT BANNER CONTROLLER -->
+      <div class="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-black text-forest-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="megaphone" class="w-4 h-4 text-amberBrand-600"></i>
+            <span>Customer Announcement Banner</span>
+          </label>
+          <span class="text-[11px] text-stone-400 font-semibold">Broadcasts purely across top bar</span>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2.5">
+          <input type="text" id="adminAnnouncementInput" placeholder="e.g. Fresh Harvest Specials: Hot Jowar & Ragi Rotis made live upon pickup!" class="flex-1 px-4 py-3 bg-white border border-stone-300 rounded-xl text-sm font-semibold text-stone-800 outline-none focus:ring-2 focus:ring-forest-800 min-h-[48px]" />
+          <button onclick="saveAnnouncementBanner()" id="btnSaveAnnouncement" class="px-5 py-3 bg-forest-800 hover:bg-forest-900 text-white font-black text-xs md:text-sm rounded-xl shadow-sm transition min-h-[48px] flex items-center justify-center gap-1.5 whitespace-nowrap">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Update Banner</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- NAVIGATION TABS -->
+    <div class="flex gap-2 border-b border-stone-200 pb-2 overflow-x-auto no-scrollbar">
+      <button onclick="switchAdminTab('orders')" id="tabBtnOrders" class="px-5 py-2.5 rounded-2xl bg-forest-800 text-white font-black text-xs md:text-sm whitespace-nowrap shadow-sm transition min-h-[44px]">
+        Live Orders Cockpit
+      </button>
+      <button onclick="switchAdminTab('reports')" id="tabBtnReports" class="px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]">
+        Business Reports
+      </button>
+      <button onclick="switchAdminTab('traffic')" id="tabBtnTraffic" class="px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]">
+        Hourly Telemetry Radar
+      </button>
+      <button onclick="switchAdminTab('chat')" id="tabBtnChat" class="px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]">
+        Customer Support Chat
+      </button>
+      <button onclick="switchAdminTab('menu')" id="tabBtnMenu" class="px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]">
+        Menu Master & Inventory
+      </button>
+      <button onclick="switchAdminTab('claims')" id="tabBtnClaims" class="px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]">
+        Wallet Claims & Top-Ups
+      </button>
+    </div>
+
+    <!-- COCKPIT 1: LIVE ORDERS WITH DIRECT CALLING ACTIONS -->
+    <section id="cockpitOrders" class="space-y-4">
+      <div class="flex gap-2.5 overflow-x-auto no-scrollbar">
+        <button onclick="filterOrders('ALL')" class="order-filter-btn active px-4 py-2 rounded-xl bg-forest-800 text-xs font-black text-white shadow-sm transition min-h-[40px]">All Orders</button>
+        <button onclick="filterOrders('Pending_Verification')" class="order-filter-btn px-4 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition min-h-[40px]">Pending Verification</button>
+        <button onclick="filterOrders('Kitchen_Accepted')" class="order-filter-btn px-4 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition min-h-[40px]">Accepted</button>
+        <button onclick="filterOrders('Preparing')" class="order-filter-btn px-4 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition min-h-[40px]">Millet Stove</button>
+        <button onclick="filterOrders('Ready_For_Pickup')" class="order-filter-btn px-4 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition min-h-[40px]">Ready for Counter</button>
+      </div>
+
+      <div id="adminOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <p class="text-stone-400 py-10 text-sm col-span-2 text-center">Loading orders queue...</p>
+      </div>
+    </section>
+
+    <!-- COCKPIT 2: DAILY BUSINESS REPORTS -->
+    <section id="cockpitReports" class="hidden space-y-5">
+      <div class="bg-white border border-stone-200 p-6 rounded-3xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 shadow-sm">
+        <div>
+          <h4 class="text-lg font-black text-forest-900">Kitchen Daily Ledger Report (IST)</h4>
+          <p class="text-xs text-stone-500 font-medium">Real-time revenue, conversions, and roti production metrics.</p>
+        </div>
+        <input type="date" id="reportDateInput" onchange="fetchDaywiseReport()" class="bg-stone-50 border border-stone-300 text-forest-900 font-black text-sm p-3 rounded-xl outline-none min-h-[44px]" />
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
+          <p class="text-xs text-stone-500 font-extrabold">Gross Revenue</p>
+          <h3 class="text-2xl md:text-3xl font-black text-amberBrand-600 mt-1" id="repGrossRev">₹0</h3>
+          <p class="text-xs text-stone-400 mt-1 font-semibold" id="repRevSplit">UPI: ₹0 | Wallet: ₹0</p>
+        </div>
+        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
+          <p class="text-xs text-stone-500 font-extrabold">Total Orders</p>
+          <h3 class="text-2xl md:text-3xl font-black text-forest-900 mt-1" id="repTotalOrders">0</h3>
+          <p class="text-xs text-green-700 mt-1 font-bold" id="repCompletedOrders">0 Picked Up</p>
+        </div>
+        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
+          <p class="text-xs text-stone-500 font-extrabold">Rotis Prepped</p>
+          <h3 class="text-2xl md:text-3xl font-black text-green-700 mt-1" id="repRotisCount">0</h3>
+          <p class="text-xs text-stone-400 mt-1 font-medium">Sorghum & Finger Millet</p>
+        </div>
+        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
+          <p class="text-xs text-stone-500 font-extrabold">In-Prep / Queue</p>
+          <h3 class="text-2xl md:text-3xl font-black text-amberBrand-500 mt-1" id="repActiveQueue">0</h3>
+          <p class="text-xs text-red-600 mt-1 font-bold" id="repCancelledCount">0 Rejected</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-stone-200 p-6 rounded-3xl space-y-4 shadow-sm">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-black text-stone-400 uppercase tracking-wider">Itemized Orders Ledger</h4>
+          <div class="flex gap-2 text-xs">
+            <button onclick="sortReportOrders('time')" class="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-stone-700 font-bold transition min-h-[38px]">Sort by Time</button>
+            <button onclick="sortReportOrders('value')" class="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-stone-700 font-bold transition min-h-[38px]">Sort by Amount</button>
+            <button onclick="sortReportOrders('status')" class="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-stone-700 font-bold transition min-h-[38px]">Sort by Status</button>
+          </div>
+        </div>
+
+        <div id="reportOrdersTable" class="overflow-x-auto divide-y divide-stone-100 text-xs md:text-sm text-stone-700">
+          <p class="text-stone-400 py-6 text-center">No orders for selected report date.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- COCKPIT 3: COMPACT HOURLY TELEMETRY RADAR -->
+    <section id="cockpitTraffic" class="hidden space-y-5">
+      <div class="bg-white border border-stone-200 p-6 rounded-3xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 shadow-sm">
+        <div>
+          <h4 class="text-lg font-black text-forest-900">Compact Hourly Telemetry Radar (Strict IST)</h4>
+          <p class="text-xs text-stone-500 font-medium">Inspect active hourly traffic distribution and conversion performance.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="text-xs text-stone-600 font-bold">Select Date:</label>
+          <input type="date" id="trafficDateFilter" onchange="fetchHourlyTrafficReport()" class="bg-stone-50 border border-stone-300 text-forest-900 font-black text-sm p-3 rounded-xl outline-none min-h-[44px]" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
+          <p class="text-xs text-stone-500 font-extrabold">Total Day Visits</p>
+          <h3 class="text-3xl font-black text-green-700 mt-1" id="hourlyTotalVisits">0</h3>
+          <p class="text-xs text-stone-400 mt-1 font-medium">New + Repeat</p>
+        </div>
+        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
+          <p class="text-xs text-stone-500 font-extrabold">New First-Time Visits</p>
+          <h3 class="text-3xl font-black text-forest-900 mt-1" id="hourlyNewVisits">0</h3>
+          <p class="text-xs text-stone-400 mt-1 font-medium">Unique visitors</p>
+        </div>
+        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
+          <p class="text-xs text-stone-500 font-extrabold">Repeat Visits</p>
+          <h3 class="text-3xl font-black text-amberBrand-600 mt-1" id="hourlyRepeatVisits">0</h3>
+          <p class="text-xs text-stone-400 mt-1 font-medium">Returning sessions</p>
+        </div>
+        <div class="bg-white border border-stone-200 p-5 rounded-3xl shadow-sm">
+          <p class="text-xs text-stone-500 font-extrabold">Orders Converted</p>
+          <h3 class="text-3xl font-black text-forest-800 mt-1" id="hourlyOrdersPlaced">0</h3>
+          <p class="text-xs text-stone-400 mt-1 font-medium">Completed orders</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-stone-200 p-6 rounded-3xl space-y-4 shadow-sm">
+        <div class="flex justify-between items-center">
+          <h4 class="text-xs font-black text-stone-400 uppercase tracking-wider" id="hourlyTableHeading">Active Hourly Traffic Strip</h4>
+          <span class="text-xs font-mono text-amberBrand-600 font-bold">Timezone: Asia/Kolkata (IST)</span>
+        </div>
+
+        <div id="hourlyRadarContainer" class="overflow-x-auto text-xs md:text-sm text-stone-700">
+          <p class="text-stone-400 py-6 text-center">Loading hourly telemetry radar...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- COCKPIT 4: 2-WAY SUPPORT CHAT -->
+    <section id="cockpitChat" class="hidden grid grid-cols-1 md:grid-cols-12 gap-4 h-[72dvh]">
+      <div class="md:col-span-4 bg-white border border-stone-200 rounded-3xl p-4 overflow-y-auto space-y-2 shadow-sm">
+        <h4 class="text-xs font-black text-stone-400 uppercase tracking-wider mb-2">Customer Threads</h4>
+        <div id="chatThreadsList" class="space-y-1.5">
+          <p class="text-stone-400 text-xs">No active chat threads.</p>
+        </div>
+      </div>
+
+      <div class="md:col-span-8 bg-white border border-stone-200 rounded-3xl flex flex-col overflow-hidden shadow-sm">
+        <div class="p-4 bg-stone-50 border-b border-stone-200 flex justify-between items-center">
+          <div>
+            <h5 class="text-sm font-black text-forest-900" id="activeChatCustomerName">Select a thread</h5>
+            <p class="text-xs text-stone-500 font-mono" id="activeChatCustomerId">---</p>
+          </div>
+        </div>
+        <div id="adminChatMessagesBox" class="flex-1 p-4 overflow-y-auto space-y-3 bg-stone-50/50 text-sm">
+          <p class="text-stone-400 text-center py-12 text-sm">Select a customer thread on the left to review messages.</p>
+        </div>
+        <div class="p-3.5 bg-white border-t border-stone-200 flex gap-2">
+          <input type="text" id="adminReplyInput" onkeydown="if(event.key==='Enter') sendAdminChatReply()" placeholder="Type reply as Kitchen Desk..." class="flex-1 px-4 py-3 bg-stone-50 border border-stone-300 rounded-xl text-sm text-stone-900 outline-none focus:ring-2 focus:ring-forest-800 min-h-[48px]" />
+          <button onclick="sendAdminChatReply()" class="px-5 py-3 bg-forest-800 hover:bg-forest-900 text-white font-black text-sm rounded-xl transition shadow min-h-[48px]">
+            Reply
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- COCKPIT 5: MENU ITEM MASTER -->
+    <section id="cockpitMenu" class="hidden bg-white border border-stone-200 p-6 rounded-3xl space-y-4 shadow-sm">
+      <div class="flex justify-between items-center">
+        <div>
+          <h4 class="text-base font-black text-forest-900">Menu Item Master & Stock Control</h4>
+          <p class="text-xs text-stone-500 font-medium">Update pricing, toggle stock, or add seasonal preparations.</p>
+        </div>
+        <button onclick="openAddMealModal()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-forest-900 font-black text-xs md:text-sm rounded-xl flex items-center gap-1.5 shadow transition min-h-[44px]">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Add New Meal Item</span>
+        </button>
+      </div>
+
+      <div id="adminMenuContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+        <p class="text-stone-400 text-sm col-span-2">Loading menu items...</p>
+      </div>
+    </section>
+
+    <!-- COCKPIT 6: WALLET CLAIMS & TOP-UPS -->
+    <section id="cockpitClaims" class="hidden space-y-6">
+      <div class="bg-white border border-stone-200 p-6 rounded-3xl space-y-3.5 shadow-sm">
+        <h4 class="text-base font-black text-forest-900 flex items-center gap-2">
+          <i data-lucide="arrow-down-left" class="w-5 h-5 text-amberBrand-600"></i> Balance Refund Claims
+        </h4>
+        <div id="adminClaimsContainer" class="space-y-3">
+          <p class="text-stone-400 text-sm">No pending claims.</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-stone-200 p-6 rounded-3xl space-y-3.5 shadow-sm">
+        <h4 class="text-base font-black text-forest-900 flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5 text-green-700"></i> Pending Wallet Recharges
+        </h4>
+        <div id="adminRechargesContainer" class="space-y-3">
+          <p class="text-stone-400 text-sm">No pending top-ups.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ONLINE CUSTOMERS RADAR MODAL / DRAWER -->
+  <div id="onlineUsersModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white border border-stone-200 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4 max-h-sheet overflow-y-auto">
+      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
+
+      <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+        <h3 class="text-base font-black text-forest-900 flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-green-500 animate-ping"></span>
+          <span>Online Customers (Last 60s)</span>
+        </h3>
+        <button onclick="closeOnlineUsersModal()" class="text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">&times;</button>
+      </div>
+      <div id="onlineUsersList" class="divide-y divide-stone-100 max-h-64 overflow-y-auto text-xs md:text-sm text-stone-700">
+        <p class="text-stone-400 text-center py-4">Checking telemetry sessions...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD NEW MEAL ITEM MODAL / DRAWER -->
+  <div id="addMealModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white border border-stone-200 w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4 max-h-sheet overflow-y-auto">
+      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
+
+      <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+        <h3 class="text-lg font-black text-forest-900">Add New Meal Item to Menu</h3>
+        <button onclick="closeAddMealModal()" class="text-stone-400 hover:text-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center">&times;</button>
+      </div>
+
+      <form id="addMealForm" onsubmit="submitNewMeal(event)" class="space-y-3.5 text-xs md:text-sm">
+        <div>
+          <label class="block text-stone-600 font-extrabold mb-1">Meal Name</label>
+          <input type="text" id="newMealName" required placeholder="e.g. Bajra Masala Roti Plate" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none font-bold min-h-[48px]" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-stone-600 font-extrabold mb-1">Category</label>
+            <select id="newMealCategory" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[48px]">
+              <option value="Millet Rotis">Millet Rotis</option>
+              <option value="Combo Meals">Combo Meals</option>
+              <option value="Curries & Sides">Curries & Sides</option>
+              <option value="Healthy Beverages">Healthy Beverages</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-stone-600 font-extrabold mb-1">Millet Type</label>
+            <input type="text" id="newMealMillet" placeholder="e.g. Bajra / Pearl Millet" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[48px]" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-stone-600 font-extrabold mb-1">Base Price (₹)</label>
+            <input type="number" id="newMealPrice" required min="10" placeholder="140" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 font-black outline-none min-h-[48px]" />
+          </div>
+          <div>
+            <label class="block text-stone-600 font-extrabold mb-1">Prep Time (Mins)</label>
+            <input type="number" id="newMealPrep" value="20" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[48px]" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-stone-600 font-extrabold mb-1">Description</label>
+          <textarea id="newMealDesc" rows="2" placeholder="Ingredients, accompaniment details..." class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-stone-600 font-extrabold mb-1">Nutritional Info String</label>
+          <input type="text" id="newMealNutrition" value="Cal: 340kcal | Protein: 8g | Fiber: 9g" class="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 outline-none min-h-[48px]" />
+        </div>
+        <div>
+          <label class="block text-stone-600 font-extrabold mb-1">Photo Upload (Saved to Drive)</label>
+          <input type="file" id="newMealPhoto" accept="image/*" class="w-full text-stone-600 file:mr-2 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-stone-200 file:text-stone-800" />
+        </div>
+
+        <button type="submit" id="btnSubmitNewMeal" class="w-full py-3.5 bg-forest-800 hover:bg-forest-900 text-white font-black text-sm rounded-xl transition mt-2 shadow min-h-[48px]">
+          Save & Publish to Active Menu
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DISBURSEMENT CLAIM MODAL / DRAWER -->
+  <div id="claimApprovalModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white border border-stone-200 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4 max-h-sheet overflow-y-auto">
+      <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
+
+      <h3 class="text-base font-black text-forest-900">Approve & Issue Claim Acknowledgment</h3>
+      <div class="p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-xs space-y-1">
+        <p class="text-stone-500">Claim ID: <span id="modalClaimId" class="font-bold text-stone-900"></span></p>
+        <p class="text-stone-500">Beneficiary UPI: <span id="modalClaimUpi" class="font-black text-forest-800"></span></p>
+        <p class="text-stone-500">Amount to Disburse: <span id="modalClaimAmount" class="font-black text-green-700 text-sm"></span></p>
+      </div>
+      <div>
+        <label class="block text-xs font-black text-stone-700 mb-1">Bank Transfer 12-Digit UTR <span class="text-red-500">*</span></label>
+        <input type="text" id="modalTransferUtr" maxlength="12" placeholder="e.g. 423512349876" class="w-full px-4 py-3 bg-white border border-stone-300 rounded-2xl text-base font-mono font-black text-stone-900 outline-none focus:ring-2 focus:ring-forest-800 min-h-[48px]" />
+      </div>
+      <div class="flex gap-2">
+        <button onclick="closeClaimModal()" class="flex-1 py-3 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs rounded-2xl transition min-h-[44px]">Cancel</button>
+        <button onclick="confirmClaimDisbursement()" id="btnConfirmClaimDisburse" class="flex-1 py-3 bg-green-700 hover:bg-green-800 text-white font-black text-xs rounded-2xl transition shadow min-h-[44px]">
+          Disburse & Issue PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT CONSOLE ENGINE -->
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHZH9L_yzEOJLEHABSyVxZJfIV5nsQ02pxpCBV_X8Wl_LWD1QBoIw30vD7jgwdPGBg/exec";
+
+    let currentAdminPin = "";
+    let adminDataCache = null;
+    let selectedClaimRow = null;
+    let currentOrderFilter = "ALL";
+    let activeChatCustomerId = null;
+    let daywiseReportOrdersCache = [];
+
+    const seenOrderIds = new Set();
+    const seenRechargeIds = new Set();
+    const seenClaimIds = new Set();
+    const seenChatIds = new Set();
+    let isInitialSync = true;
+
+    let audioCtx = null;
+
+    function initAudioEngine() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    window.addEventListener('click', initAudioEngine, { once: true });
+    window.addEventListener('touchstart', initAudioEngine, { once: true });
+
+    function playAdminChime(eventType) {
+      try {
+        initAudioEngine();
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+
+        if (eventType === "NEW_ORDER") {
+          const osc1 = audioCtx.createOscillator();
+          const osc2 = audioCtx.createOscillator();
+          const gain1 = audioCtx.createGain();
+          const gain2 = audioCtx.createGain();
+
+          osc1.type = 'sine';
+          osc2.type = 'sine';
+          osc1.frequency.setValueAtTime(659.25, now);
+          osc2.frequency.setValueAtTime(880.00, now + 0.15);
+
+          gain1.gain.setValueAtTime(0.3, now);
+          gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+          gain2.gain.setValueAtTime(0.3, now + 0.15);
+          gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+
+          osc1.connect(gain1);
+          gain1.connect(audioCtx.destination);
+          osc2.connect(gain2);
+          gain2.connect(audioCtx.destination);
+
+          osc1.start(now);
+          osc1.stop(now + 0.35);
+          osc2.start(now + 0.15);
+          osc2.stop(now + 0.65);
+
+        } else if (eventType === "WALLET_TOPUP") {
+          const osc1 = audioCtx.createOscillator();
+          const osc2 = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc1.type = 'triangle';
+          osc2.type = 'sine';
+          osc1.frequency.setValueAtTime(987.77, now);
+          osc2.frequency.setValueAtTime(1318.51, now);
+
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 0.5);
+          osc2.stop(now + 0.5);
+
+        } else if (eventType === "WALLET_CLAIM") {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(392.00, now);
+          osc.frequency.linearRampToValueAtTime(261.63, now + 0.4);
+
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.55);
+
+        } else if (eventType === "SUPPORT_CHAT") {
+          const osc1 = audioCtx.createOscillator();
+          const osc2 = audioCtx.createOscillator();
+          const gain1 = audioCtx.createGain();
+          const gain2 = audioCtx.createGain();
+
+          osc1.type = 'sine';
+          osc2.type = 'sine';
+          osc1.frequency.setValueAtTime(523.25, now);
+          osc2.frequency.setValueAtTime(659.25, now + 0.09);
+
+          gain1.gain.setValueAtTime(0.2, now);
+          gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+          gain2.gain.setValueAtTime(0.2, now + 0.09);
+          gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+          osc1.connect(gain1);
+          gain1.connect(audioCtx.destination);
+          osc2.connect(gain2);
+          gain2.connect(audioCtx.destination);
+
+          osc1.start(now);
+          osc1.stop(now + 0.08);
+          osc2.start(now + 0.09);
+          osc2.stop(now + 0.22);
+        }
+      } catch (err) {}
+    }
+
+    function getIstTodayDateString() {
+      return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      const savedPin = localStorage.getItem("yaady_admin_pin");
+      if (savedPin) {
+        currentAdminPin = savedPin;
+        unlockConsole();
+      }
+
+      setInterval(() => {
+        if (currentAdminPin) {
+          refreshAdminData();
+          pollOnlineUsers();
+          pollChatThreads();
+        }
+      }, 10000);
+    });
+
+    function showToast(msg, type = "info", actionText = null, actionCb = null) {
+      const c = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      const bg = type === "error" ? "bg-red-900 text-white" : type === "success" ? "bg-forest-800 text-white" : "bg-stone-800 text-white";
+      toast.className = `${bg} p-4 rounded-2xl text-xs md:text-sm font-bold shadow-2xl flex items-center justify-between gap-3 border border-white/20 pointer-events-auto transition-transform`;
+      
+      let actionBtnHtml = "";
+      if (actionText) {
+        actionBtnHtml = `<button class="toast-action-btn bg-amber-500 hover:bg-amber-600 text-forest-900 px-3 py-1 rounded-xl text-xs font-black shadow-sm">${actionText}</button>`;
+      }
+
+      toast.innerHTML = `<span>${msg}</span><div class="flex items-center gap-2">${actionBtnHtml}<button onclick="this.closest('div.pointer-events-auto').remove()" class="opacity-70 hover:opacity-100 text-lg">&times;</button></div>`;
+      
+      if (actionText && actionCb) {
+        const btn = toast.querySelector(".toast-action-btn");
+        if (btn) btn.onclick = () => { actionCb(); toast.remove(); };
+      }
+
+      c.appendChild(toast);
+      setTimeout(() => toast.remove(), 5500);
+    }
+
+    async function unlockConsole() {
+      const pin = currentAdminPin || document.getElementById("adminPinInput").value.trim();
+      currentAdminPin = pin;
+      initAudioEngine();
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getAdminData&pin=${pin}`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          localStorage.setItem("yaady_admin_pin", pin);
+          document.getElementById("adminPinAuth").classList.add("hidden");
+          document.getElementById("adminDashboard").classList.remove("hidden");
+          document.getElementById("logoutBtn").classList.remove("hidden");
+          renderAdminDashboard(res);
+
+          const istToday = getIstTodayDateString();
+          document.getElementById("reportDateInput").value = istToday;
+          document.getElementById("trafficDateFilter").value = istToday;
+
+          fetchDaywiseReport();
+          fetchHourlyTrafficReport();
+          pollOnlineUsers();
+          pollChatThreads();
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (e) {
+        showToast("Cannot connect to kitchen backend engine.", "error");
+      }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem("yaady_admin_pin");
+      currentAdminPin = "";
+      location.reload();
+    }
+
+    async function refreshAdminData() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getAdminData&pin=${currentAdminPin}`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          if (!isInitialSync) {
+            (res.orders || []).forEach(o => {
+              const oId = String(o.orderId);
+              if (!seenOrderIds.has(oId)) {
+                seenOrderIds.add(oId);
+                playAdminChime("NEW_ORDER");
+                showToast(`🔔 New Order #${oId.slice(-4)} (${o.customerName}) received!`, "success", "View", () => {
+                  switchAdminTab('orders');
+                });
+              }
+            });
+
+            (res.pendingRecharges || []).forEach(r => {
+              const rId = String(r.txnId);
+              if (!seenRechargeIds.has(rId)) {
+                seenRechargeIds.add(rId);
+                playAdminChime("WALLET_TOPUP");
+                showToast(`💰 New Wallet Top-Up (₹${r.amount}) awaiting UTR verification!`, "info", "Review", () => {
+                  switchAdminTab('claims');
+                });
+              }
+            });
+
+            (res.pendingClaims || []).forEach(c => {
+              const cId = String(c.claimId);
+              if (!seenClaimIds.has(cId)) {
+                seenClaimIds.add(cId);
+                playAdminChime("WALLET_CLAIM");
+                showToast(`⚠️ Refund Claim (₹${c.amount}) awaiting UPI disbursement!`, "error", "Process", () => {
+                  switchAdminTab('claims');
+                });
+              }
+            });
+          } else {
+            (res.orders || []).forEach(o => seenOrderIds.add(String(o.orderId)));
+            (res.pendingRecharges || []).forEach(r => seenRechargeIds.add(String(r.txnId)));
+            (res.pendingClaims || []).forEach(c => seenClaimIds.add(String(c.claimId)));
+            isInitialSync = false;
+          }
+
+          renderAdminDashboard(res);
+        }
+      } catch (e) {}
+    }
+
+    function renderAdminDashboard(data) {
+      adminDataCache = data;
+
+      const isKitchenOpen = String(data.config.KITCHEN_OPEN).toUpperCase() === "TRUE";
+      const btnKitchen = document.getElementById("btnKitchenOpenToggle");
+      btnKitchen.innerText = isKitchenOpen ? "OPEN" : "CLOSED";
+      btnKitchen.className = `px-5 py-2.5 rounded-xl font-black text-xs ${isKitchenOpen ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} shadow-sm min-h-[44px]`;
+
+      const isWalletOn = String(data.config.WALLET_SYSTEM_ENABLED).toUpperCase() === "TRUE";
+      const btnWallet = document.getElementById("btnWalletSystemToggle");
+      btnWallet.innerText = isWalletOn ? "ENABLED" : "PAUSED";
+      btnWallet.className = `px-5 py-2.5 rounded-xl font-black text-xs ${isWalletOn ? 'bg-green-600 text-white' : 'bg-amber-600 text-white'} shadow-sm min-h-[44px]`;
+
+      if (data.config && data.config.ANNOUNCEMENT_BANNER) {
+        const inp = document.getElementById("adminAnnouncementInput");
+        if (inp && !inp.value) inp.value = data.config.ANNOUNCEMENT_BANNER;
+      }
+
+      renderOrdersList();
+      renderClaimsList();
+      renderMenuList();
+    }
+
+    async function saveAnnouncementBanner() {
+      const val = document.getElementById("adminAnnouncementInput").value.trim();
+      if (!val) {
+        showToast("Please enter announcement text.", "error");
+        return;
+      }
+
+      const btn = document.getElementById("btnSaveAnnouncement");
+      btn.disabled = true;
+      btn.innerText = "Saving...";
+
+      try {
+        const res = await callBackendApi("ADMIN_UPDATE_CONFIG", {
+          pin: currentAdminPin,
+          key: "ANNOUNCEMENT_BANNER",
+          value: val
+        });
+        if (res.status === "SUCCESS") {
+          showToast("Announcement banner published live!", "success");
+          refreshAdminData();
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (e) {
+        showToast("Banner update failed.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>Update Banner</span>`;
+        lucide.createIcons();
+      }
+    }
+
+    function filterOrders(status) {
+      currentOrderFilter = status;
+      document.querySelectorAll(".order-filter-btn").forEach(b => {
+        b.className = "order-filter-btn px-4 py-2 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50 transition min-h-[40px]";
+      });
+      event.target.className = "order-filter-btn active px-4 py-2 rounded-xl bg-forest-800 text-xs font-black text-white shadow-sm transition min-h-[40px]";
+      renderOrdersList();
+    }
+
+    function renderOrdersList() {
+      if (!adminDataCache) return;
+      const container = document.getElementById("adminOrdersContainer");
+      const filtered = adminDataCache.orders.filter(o => currentOrderFilter === "ALL" || o.orderStatus === currentOrderFilter);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-stone-400 text-sm py-8 col-span-2 text-center">No orders match filter.</p>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(o => {
+        const istPlaced = new Date(o.timestamp).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
+        
+        let cleanDate = "Today";
+        if (o.pickupDate) {
+          const raw = String(o.pickupDate).split("T")[0].trim();
+          const dObj = new Date(raw + "T00:00:00+05:30");
+          cleanDate = !isNaN(dObj.getTime())
+            ? dObj.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" })
+            : raw;
+        }
+        const cleanTime = o.pickupTime ? String(o.pickupTime).trim() : "Flexible";
+        const phoneClean = String(o.customerPhone || "").replace(/\D/g, '').slice(-10);
+
+        return `
+          <div class="p-5 bg-white border border-stone-200 rounded-3xl space-y-3.5 shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-xs font-mono font-black text-amberBrand-600">#${String(o.orderId).slice(-4)}</span>
+                <h4 class="font-black text-forest-900 text-lg">${o.customerName}</h4>
+                <p class="text-xs text-stone-600 font-semibold">+91 ${o.customerPhone} • Scheduled: <strong class="text-forest-800 font-black">${cleanTime} (IST)</strong></p>
+                <p class="text-[11px] text-stone-400">Placed: ${istPlaced} IST (${cleanDate})</p>
+              </div>
+              <span class="px-3 py-1 rounded-xl text-xs font-black ${o.orderStatus === 'Ready_For_Pickup' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}">
+                ${String(o.orderStatus).replace('_', ' ')}
+              </span>
+            </div>
+
+            <!-- DIRECT MOBILE & WHATSAPP VOICE CALLING BAR -->
+            <div class="flex items-center gap-2 pt-1 border-t border-stone-100">
+              <a href="tel:+91${phoneClean}" class="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition min-h-[38px]">
+                <i data-lucide="phone" class="w-3.5 h-3.5 text-forest-800"></i>
+                <span>Call Mobile</span>
+              </a>
+              <a href="https://wa.me/91${phoneClean}?text=${encodeURIComponent(`Hello ${o.customerName}! Contacting from Yaady's Millet Roti Meals regarding Order Token #${String(o.orderId).slice(-4)} scheduled for pickup at ${cleanTime} IST.`)}" target="_blank" rel="noopener noreferrer" class="px-3 py-2 bg-green-700 hover:bg-green-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition min-h-[38px]">
+                <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+                <span>WhatsApp Call</span>
+              </a>
+            </div>
+
+            <div class="text-xs md:text-sm text-stone-600 border-t border-b border-stone-100 py-2.5 space-y-1">
+              ${(o.items || []).map(i => `<div>${i.quantity}x ${i.name}</div>`).join("")}
+              <div class="font-bold text-stone-900 pt-1">Total: ₹${o.finalPayable} via ${o.paymentMode} ${o.utr ? `(UTR: ${o.utr})` : ''}</div>
+              ${o.screenshotUrl && o.screenshotUrl.length > 10 ? `
+                <a href="${o.screenshotUrl}" target="_blank" rel="noopener noreferrer" class="inline-block mt-1 text-xs text-amberBrand-600 underline font-bold">View Screenshot Proof</a>
+              ` : ''}
+            </div>
+
+            <div class="flex flex-wrap gap-2 pt-1">
+              ${o.orderStatus === 'Pending_Verification' ? `
+                <button onclick="approveOrderPayment(${o.rowIndex})" class="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-xl text-xs font-black shadow-sm transition min-h-[40px]">Verify Payment</button>
+              ` : ''}
+              <button onclick="setOrderStatus(${o.rowIndex}, 'Preparing')" class="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-bold transition min-h-[40px]">Millet Stove</button>
+              <button onclick="setOrderStatus(${o.rowIndex}, 'Ready_For_Pickup')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-forest-900 rounded-xl text-xs font-black shadow-sm transition min-h-[40px]">Ready Counter</button>
+              <button onclick="setOrderStatus(${o.rowIndex}, 'Completed')" class="px-4 py-2 bg-forest-800 hover:bg-forest-900 text-white rounded-xl text-xs font-bold shadow-sm transition min-h-[40px]">Picked Up</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+      lucide.createIcons();
+    }
+
+    async function approveOrderPayment(rowIndex) {
+      try {
+        const res = await callBackendApi("ADMIN_CONFIRM_PAYMENT", { pin: currentAdminPin, type: "ORDER", rowIndex: rowIndex });
+        showToast(res.message, "success");
+        refreshAdminData();
+      } catch (e) {
+        showToast("Approval failed.", "error");
+      }
+    }
+
+    async function setOrderStatus(rowIndex, newStatus) {
+      try {
+        const res = await callBackendApi("ADMIN_SET_ORDER_STATUS", { pin: currentAdminPin, rowIndex: rowIndex, newStatus: newStatus });
+        showToast(res.message, "success");
+        refreshAdminData();
+      } catch (e) {
+        showToast("Status change failed.", "error");
+      }
+    }
+
+    // -------------------------------------------------------------
+    // DAILY BUSINESS REPORTS
+    // -------------------------------------------------------------
+    async function fetchDaywiseReport() {
+      const dateVal = document.getElementById("reportDateInput").value;
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=GET_DAYWISE_REPORT&pin=${currentAdminPin}&date=${dateVal}`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          document.getElementById("repGrossRev").innerText = `₹${res.metrics.grossRevenue}`;
+          document.getElementById("repRevSplit").innerText = `UPI: ₹${res.metrics.upiRevenue} | Wallet: ₹${res.metrics.walletRevenue}`;
+          document.getElementById("repTotalOrders").innerText = res.metrics.totalOrders;
+          document.getElementById("repCompletedOrders").innerText = `${res.metrics.completed} Picked Up`;
+          document.getElementById("repRotisCount").innerText = res.metrics.rotisPrepared;
+          document.getElementById("repActiveQueue").innerText = res.metrics.accepted + res.metrics.preparing;
+          document.getElementById("repCancelledCount").innerText = `${res.metrics.cancelled} Rejected`;
+
+          daywiseReportOrdersCache = res.orders;
+          renderReportOrdersTable(daywiseReportOrdersCache);
+        }
+      } catch (e) {}
+    }
+
+    function renderReportOrdersTable(orders) {
+      const container = document.getElementById("reportOrdersTable");
+      if (orders.length === 0) {
+        container.innerHTML = `<p class="text-stone-400 py-6 text-center">No orders for selected report date.</p>`;
+        return;
+      }
+
+      container.innerHTML = orders.map(o => `
+        <div class="py-3.5 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+          <div>
+            <span class="font-mono font-bold text-amberBrand-600">#${String(o.orderId).slice(-4)}</span> • <strong class="text-forest-900">${o.customerName}</strong> (${o.customerPhone})
+            <p class="text-xs text-stone-500">Pickup Time: <strong class="text-forest-800">${o.pickupTime} IST</strong> | ${(o.items || []).map(i => `${i.quantity}x ${i.name}`).join(", ")}</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="font-black text-forest-900">₹${o.finalPayable} (${o.paymentMode})</span>
+            <span class="px-2.5 py-1 rounded-lg text-xs font-black ${o.orderStatus === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-stone-100 text-stone-700'}">${o.orderStatus}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function sortReportOrders(criteria) {
+      if (criteria === "value") {
+        daywiseReportOrdersCache.sort((a, b) => b.finalPayable - a.finalPayable);
+      } else if (criteria === "time") {
+        daywiseReportOrdersCache.sort((a, b) => (a.pickupTime || "").localeCompare(b.pickupTime || ""));
+      } else if (criteria === "status") {
+        daywiseReportOrdersCache.sort((a, b) => a.orderStatus.localeCompare(b.orderStatus));
+      }
+      renderReportOrdersTable(daywiseReportOrdersCache);
+    }
+
+    // -------------------------------------------------------------
+    // COMPACT HOURLY TELEMETRY RADAR
+    // -------------------------------------------------------------
+    async function fetchHourlyTrafficReport() {
+      const dateVal = document.getElementById("trafficDateFilter").value || getIstTodayDateString();
+      const container = document.getElementById("hourlyRadarContainer");
+      container.innerHTML = `<p class="text-stone-400 py-6 text-center">Loading hourly radar for ${dateVal} (IST)...</p>`;
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=GET_HOURLY_TRAFFIC_REPORT&pin=${currentAdminPin}&date=${dateVal}`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          let totV = 0, newV = 0, repV = 0, ords = 0;
+          res.hourlyData.forEach(h => {
+            totV += h.totalVisits;
+            newV += h.newVisits;
+            repV += h.repeatVisits;
+            ords += h.ordersPlaced;
+          });
+
+          document.getElementById("hourlyTotalVisits").innerText = totV;
+          document.getElementById("hourlyNewVisits").innerText = newV;
+          document.getElementById("hourlyRepeatVisits").innerText = repV;
+          document.getElementById("hourlyOrdersPlaced").innerText = ords;
+
+          const activeHours = res.hourlyData.filter(h => h.totalVisits > 0 || h.ordersPlaced > 0);
+
+          if (activeHours.length === 0) {
+            container.innerHTML = `<div class="p-8 text-center text-stone-400 space-y-1">
+              <p class="font-bold text-sm">No customer activity recorded for this date (${dateVal}).</p>
+              <p class="text-xs">Active traffic windows appear here automatically when visits or checkouts occur.</p>
+            </div>`;
+            return;
+          }
+
+          container.innerHTML = `
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-stone-200 text-stone-500 text-xs font-extrabold">
+                  <th class="py-2.5 px-3">Hour Window (IST)</th>
+                  <th class="py-2.5 px-3">Visits (New / Repeat)</th>
+                  <th class="py-2.5 px-3">Total Visits</th>
+                  <th class="py-2.5 px-3">Orders Converted</th>
+                  <th class="py-2.5 px-3">Conversion %</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-100">
+                ${activeHours.map(row => {
+                  const convRate = row.totalVisits > 0 ? ((row.ordersPlaced / row.totalVisits) * 100).toFixed(1) + "%" : "0.0%";
+                  return `
+                    <tr class="hover:bg-stone-50 transition">
+                      <td class="py-2 px-3 font-mono font-bold text-forest-900">${row.label}</td>
+                      <td class="py-2 px-3 text-stone-700 font-semibold">${row.newVisits} new / ${row.repeatVisits} rep</td>
+                      <td class="py-2 px-3 text-green-700 font-black">${row.totalVisits}</td>
+                      <td class="py-2 px-3 text-amberBrand-600 font-black">${row.ordersPlaced}</td>
+                      <td class="py-2 px-3 text-stone-500 font-semibold">${row.ordersPlaced > 0 ? convRate : '—'}</td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
+          `;
+        }
+      } catch (e) {
+        container.innerHTML = `<p class="text-red-600 py-6 text-center">Failed to load hourly traffic radar.</p>`;
+      }
+    }
+
+    // -------------------------------------------------------------
+    // CHAT CENTER
+    // -------------------------------------------------------------
+    async function pollChatThreads() {
+      if (!currentAdminPin) return;
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=GET_ALL_CHAT_THREADS&pin=${currentAdminPin}`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          const list = document.getElementById("chatThreadsList");
+          if (res.threads.length === 0) {
+            list.innerHTML = `<p class="text-stone-400 text-xs">No active chat threads.</p>`;
+            return;
+          }
+
+          res.threads.forEach(t => {
+            const lastMsgKey = `${t.customerId}_${t.lastTimestamp}`;
+            if (!seenChatIds.has(lastMsgKey) && t.sender === "CUSTOMER" && !isInitialSync) {
+              seenChatIds.add(lastMsgKey);
+              playAdminChime("SUPPORT_CHAT");
+              showToast(`💬 New message from ${t.customerName}: "${t.lastMessage}"`, "info", "Reply", () => {
+                switchAdminTab('chat');
+                selectChatThread(t.customerId, t.customerName);
+              });
+            }
+            seenChatIds.add(lastMsgKey);
+          });
+
+          list.innerHTML = res.threads.map(t => `
+            <div onclick="selectChatThread('${t.customerId}', '${t.customerName}')" class="p-3 rounded-xl cursor-pointer transition ${activeChatCustomerId === t.customerId ? 'bg-amber-50 border border-amber-200' : 'bg-stone-50 hover:bg-stone-100'} min-h-[48px]">
+              <div class="flex justify-between items-center">
+                <span class="font-black text-xs md:text-sm text-forest-900">${t.customerName}</span>
+                ${t.unreadCount > 0 ? `<span class="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-black rounded-full">${t.unreadCount}</span>` : ''}
+              </div>
+              <p class="text-xs text-stone-500 truncate mt-1">${t.lastMessage}</p>
+            </div>
+          `).join("");
+        }
+      } catch (e) {}
+    }
+
+    async function selectChatThread(custId, name) {
+      activeChatCustomerId = custId;
+      document.getElementById("activeChatCustomerName").innerText = name;
+      document.getElementById("activeChatCustomerId").innerText = custId;
+      loadActiveChatMessages();
+    }
+
+    async function loadActiveChatMessages() {
+      if (!activeChatCustomerId) return;
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=GET_CHAT_MESSAGES&customerId=${activeChatCustomerId}`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          const box = document.getElementById("adminChatMessagesBox");
+          box.innerHTML = res.messages.map(m => {
+            const isAdmin = m.sender === "ADMIN";
+            const istTime = new Date(m.timestamp).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
+            return `
+              <div class="flex flex-col ${isAdmin ? 'items-end' : 'items-start'}">
+                <div class="max-w-[75%] px-4 py-2.5 rounded-xl ${isAdmin ? 'bg-forest-800 text-white font-bold' : 'bg-white border border-stone-200 text-stone-800 shadow-xs'}">
+                  ${m.text}
+                </div>
+                <span class="text-[10px] text-stone-400 mt-1">${istTime} IST</span>
+              </div>
+            `;
+          }).join("");
+          box.scrollTop = box.scrollHeight;
+        }
+      } catch (e) {}
+    }
+
+    async function sendAdminChatReply() {
+      const input = document.getElementById("adminReplyInput");
+      const text = input.value.trim();
+      if (!text || !activeChatCustomerId) return;
+
+      input.value = "";
+      try {
+        await callBackendApi("SEND_CHAT_MESSAGE", {
+          customerId: activeChatCustomerId,
+          customerName: "Kitchen Desk",
+          sender: "ADMIN",
+          messageText: text
+        });
+        loadActiveChatMessages();
+      } catch (e) {}
+    }
+
+    // -------------------------------------------------------------
+    // MENU ITEM MASTER
+    // -------------------------------------------------------------
+    async function renderMenuList() {
+      const container = document.getElementById("adminMenuContainer");
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getMenu`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          container.innerHTML = res.menu.map(item => `
+            <div class="p-5 bg-white border border-stone-200 rounded-3xl space-y-3.5 shadow-sm">
+              <div class="flex items-center gap-3.5">
+                <img src="${item.image}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600';" class="w-16 h-16 rounded-2xl object-cover" />
+                <div class="flex-1">
+                  <h5 class="font-black text-forest-900 text-base">${item.name}</h5>
+                  <p class="text-xs text-stone-500 font-medium">Price: ₹${item.price} • ${item.milletType} • ${item.prepTimeMins || 15}m prep</p>
+                </div>
+                <button onclick="toggleMenuStock('${item.id}', ${!item.available})" class="px-3.5 py-2 rounded-xl font-black text-xs ${item.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} min-h-[40px]">
+                  ${item.available ? 'In Stock' : 'Sold Out'}
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between pt-2 border-t border-stone-100 text-xs">
+                <div class="flex items-center gap-2">
+                  <input type="number" id="price_${item.id}" value="${item.price}" class="w-20 px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 font-black outline-none min-h-[40px]" />
+                  <button onclick="updateItemPrice('${item.id}')" class="px-3.5 py-1.5 bg-forest-800 hover:bg-forest-900 rounded-xl font-black text-white transition min-h-[40px]">Save</button>
+                </div>
+                <button onclick="deleteMenuItem('${item.id}', '${item.name}')" class="px-3.5 py-1.5 text-red-600 hover:text-red-800 font-bold transition min-h-[40px]">Remove</button>
+              </div>
+            </div>
+          `).join("");
+        }
+      } catch (e) {}
+    }
+
+    function openAddMealModal() { document.getElementById("addMealModal").classList.remove("hidden"); }
+    function closeAddMealModal() { document.getElementById("addMealModal").classList.add("hidden"); }
+
+    async function submitNewMeal(e) {
+      e.preventDefault();
+      const name = document.getElementById("newMealName").value.trim();
+      const cat = document.getElementById("newMealCategory").value;
+      const millet = document.getElementById("newMealMillet").value.trim() || "Traditional";
+      const price = document.getElementById("newMealPrice").value;
+      const prep = document.getElementById("newMealPrep").value;
+      const desc = document.getElementById("newMealDesc").value.trim();
+      const nutrition = document.getElementById("newMealNutrition").value.trim();
+      const fileInput = document.getElementById("newMealPhoto");
+
+      let base64 = "";
+      if (fileInput.files.length > 0) {
+        base64 = await fileToBase64(fileInput.files[0]);
+      }
+
+      const btn = document.getElementById("btnSubmitNewMeal");
+      btn.disabled = true;
+      btn.innerText = "Saving to Database...";
+
+      try {
+        const res = await callBackendApi("ADMIN_ADD_MENU_ITEM", {
+          pin: currentAdminPin,
+          name: name,
+          category: cat,
+          milletType: millet,
+          price: price,
+          prepTimeMins: prep,
+          description: desc,
+          nutrition: nutrition,
+          base64Image: base64
+        });
+
+        if (res.status === "SUCCESS") {
+          showToast("New meal added successfully!", "success");
+          closeAddMealModal();
+          renderMenuList();
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (err) {
+        showToast("Error adding meal item.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Save & Publish to Active Menu";
+      }
+    }
+
+    async function deleteMenuItem(itemId, itemName) {
+      if (!confirm(`Are you sure you want to permanently remove "${itemName}" from the menu?`)) return;
+      try {
+        const res = await callBackendApi("ADMIN_DELETE_MENU_ITEM", { pin: currentAdminPin, itemId: itemId });
+        showToast(res.message, "success");
+        renderMenuList();
+      } catch (e) {
+        showToast("Delete failed.", "error");
+      }
+    }
+
+    async function toggleMenuStock(itemId, newAvailable) {
+      try {
+        await callBackendApi("ADMIN_TOGGLE_MENU_STOCK", { pin: currentAdminPin, itemId: itemId, available: newAvailable });
+        renderMenuList();
+      } catch (e) {}
+    }
+
+    async function updateItemPrice(itemId) {
+      const price = document.getElementById(`price_${itemId}`).value;
+      try {
+        await callBackendApi("ADMIN_UPDATE_MENU_ITEM", { pin: currentAdminPin, itemId: itemId, price: price });
+        showToast("Price updated.", "success");
+        renderMenuList();
+      } catch (e) {}
+    }
+
+    async function pollOnlineUsers() {
+      if (!currentAdminPin) return;
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=GET_ONLINE_USERS&pin=${currentAdminPin}`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          document.getElementById("onlineUsersCountPill").innerText = `🟢 Online: ${res.count}`;
+          const list = document.getElementById("onlineUsersList");
+          if (res.activeUsers.length === 0) {
+            list.innerHTML = `<p class="text-stone-400 py-4 text-center">No active users online right now.</p>`;
+            return;
+          }
+          list.innerHTML = res.activeUsers.map(u => `
+            <div class="py-3 flex justify-between items-center">
+              <div>
+                <p class="font-black text-forest-900">${u.customerName}</p>
+                <p class="text-xs text-stone-500 font-mono">+91 ${u.phone} (${u.customerId})</p>
+              </div>
+              <span class="text-xs font-black text-green-700">Active Now</span>
+            </div>
+          `).join("");
+        }
+      } catch (e) {}
+    }
+
+    function openOnlineUsersModal() { document.getElementById("onlineUsersModal").classList.remove("hidden"); }
+    function closeOnlineUsersModal() { document.getElementById("onlineUsersModal").classList.add("hidden"); }
+
+    function renderClaimsList() {
+      if (!adminDataCache) return;
+
+      const cContainer = document.getElementById("adminClaimsContainer");
+      if (adminDataCache.pendingClaims.length === 0) {
+        cContainer.innerHTML = `<p class="text-stone-400 text-sm">No pending balance refund claims.</p>`;
+      } else {
+        cContainer.innerHTML = adminDataCache.pendingClaims.map(c => `
+          <div class="p-5 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-between">
+            <div>
+              <p class="font-black text-forest-900 text-base">₹${c.amount} • <span class="font-mono text-amberBrand-600">${c.payoutUpi}</span></p>
+              <p class="text-xs text-stone-500">Cust: ${c.customerId} • Reason: ${c.reason}</p>
+            </div>
+            <button onclick="openClaimModal('${c.claimId}', '${c.payoutUpi}', ${c.amount}, ${c.rowIndex})" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-forest-900 rounded-xl font-black text-xs md:text-sm transition shadow-sm min-h-[44px]">
+              Disburse & Issue PDF
+            </button>
+          </div>
+        `).join("");
+      }
+
+      const rContainer = document.getElementById("adminRechargesContainer");
+      if (adminDataCache.pendingRecharges.length === 0) {
+        rContainer.innerHTML = `<p class="text-stone-400 text-sm">No pending wallet top-ups.</p>`;
+      } else {
+        rContainer.innerHTML = adminDataCache.pendingRecharges.map(r => `
+          <div class="p-5 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-between">
+            <div>
+              <p class="font-black text-forest-900 text-base">₹${r.amount} • <span class="font-mono text-stone-600">UTR: ${r.utr}</span></p>
+              <p class="text-xs text-amberBrand-600 font-mono font-bold">Token: ${r.txnId}</p>
+              <p class="text-xs text-stone-500">Cust: ${r.customerId}</p>
+            </div>
+            <button onclick="approveWalletRecharge(${r.rowIndex})" class="px-5 py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl font-black text-xs md:text-sm transition shadow-sm min-h-[44px]">
+              Confirm Credit
+            </button>
+          </div>
+        `).join("");
+      }
+    }
+
+    function openClaimModal(claimId, upi, amount, rowIndex) {
+      selectedClaimRow = rowIndex;
+      document.getElementById("modalClaimId").innerText = claimId;
+      document.getElementById("modalClaimUpi").innerText = upi;
+      document.getElementById("modalClaimAmount").innerText = `₹${amount}`;
+      document.getElementById("modalTransferUtr").value = "";
+      document.getElementById("claimApprovalModal").classList.remove("hidden");
+    }
+
+    function closeClaimModal() { document.getElementById("claimApprovalModal").classList.add("hidden"); }
+
+    async function confirmClaimDisbursement() {
+      const utr = document.getElementById("modalTransferUtr").value.trim();
+      if (!/^\d{12}$/.test(utr)) {
+        showToast("Enter a valid 12-digit bank transfer UTR.", "error");
+        return;
+      }
+
+      const btn = document.getElementById("btnConfirmClaimDisburse");
+      btn.disabled = true;
+      btn.innerText = "Compiling PDF...";
+
+      try {
+        const res = await callBackendApi("ADMIN_APPROVE_CLAIM", {
+          pin: currentAdminPin,
+          rowIndex: selectedClaimRow,
+          transferUtr: utr
+        });
+
+        if (res.status === "SUCCESS") {
+          showToast("Disbursed! Vector PDF saved to Drive.", "success");
+          closeClaimModal();
+          refreshAdminData();
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (e) {
+        showToast("Claim disbursement failed.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Disburse & Issue PDF";
+      }
+    }
+
+    async function approveWalletRecharge(rowIndex) {
+      try {
+        const res = await callBackendApi("ADMIN_CONFIRM_PAYMENT", { pin: currentAdminPin, type: "RECHARGE", rowIndex: rowIndex });
+        showToast(res.message, "success");
+        refreshAdminData();
+      } catch (e) {
+        showToast("Recharge approval failed.", "error");
+      }
+    }
+
+    async function toggleKitchenOpen() {
+      const current = String(adminDataCache.config.KITCHEN_OPEN).toUpperCase() === "TRUE";
+      const newVal = current ? "FALSE" : "TRUE";
+      await callBackendApi("ADMIN_UPDATE_CONFIG", { pin: currentAdminPin, key: "KITCHEN_OPEN", value: newVal });
+      refreshAdminData();
+    }
+
+    async function toggleWalletSystem() {
+      const current = String(adminDataCache.config.WALLET_SYSTEM_ENABLED).toUpperCase() === "TRUE";
+      const newVal = current ? "FALSE" : "TRUE";
+      await callBackendApi("ADMIN_UPDATE_CONFIG", { pin: currentAdminPin, key: "WALLET_SYSTEM_ENABLED", value: newVal });
+      refreshAdminData();
+    }
+
+    function switchAdminTab(t) {
+      const tabs = ['orders', 'reports', 'traffic', 'chat', 'menu', 'claims'];
+      tabs.forEach(tab => {
+        document.getElementById(`cockpit${capitalize(tab)}`).classList.toggle("hidden", t !== tab);
+        const btn = document.getElementById(`tabBtn${capitalize(tab)}`);
+        if (btn) {
+          btn.className = (t === tab)
+            ? "px-5 py-2.5 rounded-2xl bg-forest-800 text-white font-black text-xs md:text-sm whitespace-nowrap shadow-sm transition min-h-[44px]"
+            : "px-5 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-700 font-extrabold text-xs md:text-sm whitespace-nowrap hover:bg-stone-50 transition min-h-[44px]";
+        }
+      });
+      if (t === "traffic") fetchHourlyTrafficReport();
+    }
+
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    async function callBackendApi(action, payload) {
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action, ...payload })
+      });
+      return await res.json();
+    }
+  </script>
+</body>
+</html>
