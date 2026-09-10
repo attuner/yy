@@ -1,0 +1,57 @@
+{
+  "name": "Yaady's Millet Roti Meals",
+  "short_name": "Yaady's",
+  "description": "Traditional hand-patted sorghum and ragi millet meals prepared fresh for pickup.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#FAF7F2",
+  "theme_color": "#1C3D2B",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "categories": ["food", "shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=192&h=192&fit=crop",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=512&h=512&fit=crop",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Order Menu",
+      "short_name": "Menu",
+      "description": "Browse hot millet rotis & meals",
+      "url": "./index.html#menu",
+      "icons": [
+        {
+          "src": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=96&h=96&fit=crop",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "My Orders",
+      "short_name": "Orders",
+      "description": "Track active pickup orders",
+      "url": "./index.html#orders",
+      "icons": [
+        {
+          "src": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=96&h=96&fit=crop",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

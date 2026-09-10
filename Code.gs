@@ -1,7 +1,7 @@
 /**
  * YAADY'S MILLET ROTI MEALS - MASTER SERVERLESS BACKEND
  * File: Code.gs
- * Version: 9.0.0 (Clean String Formatting, Suppressed "IST" Labels, Strict Timezone Math)
+ * Version: 10.0.0 (Direct Vector PDF Download, Real-Time Status Hydration & Strict Pre-Payment Validation)
  */
 
 const RECEIPTS_FOLDER_NAME = "Yaadys_Order_Receipts";
@@ -52,6 +52,10 @@ function doGet(e) {
         return sendJsonResponse(getCustomerOrders(params.phone));
       case "getOrderStatus":
         return sendJsonResponse(getOrderStatus(params.orderId));
+      case "GET_ORDER_RECEIPT":
+        return sendJsonResponse(getOrderReceipt(params.orderId));
+      case "DOWNLOAD_RECEIPT_PDF":
+        return downloadReceiptDirect(params.orderId);
       case "getWalletLedger":
         return sendJsonResponse(getWalletLedger(params.customerId));
       case "getAdminData":
@@ -115,6 +119,10 @@ function doPost(e) {
         return sendJsonResponse(changePassword(payload));
       case "CHECK_CART_VALIDITY":
         return sendJsonResponse(checkCartValidity(payload));
+      case "INITIATE_PRE_ORDER":
+        return sendJsonResponse(initiatePreOrder(payload));
+      case "SUBMIT_FINAL_PAYMENT":
+        return sendJsonResponse(submitFinalPayment(payload));
       case "SUBMIT_ORDER":
         return sendJsonResponse(submitOrder(payload));
       case "SUBMIT_WALLET_RECHARGE":
@@ -175,7 +183,7 @@ function setupDatabase() {
     },
     {
       name: "Orders",
-      headers: ["Order_ID", "Timestamp", "Customer_ID", "Customer_Name", "Customer_Phone", "Items_JSON", "Total_Items_Count", "Subtotal", "Discount_Applied", "Discount_Slab", "Final_Payable", "Payment_Mode", "UTR_Number", "Payment_Screenshot_Drive_URL", "Pickup_Date", "Pickup_Time", "Order_Status", "Admin_Notes"]
+      headers: ["Order_ID", "Timestamp", "Customer_ID", "Customer_Name", "Customer_Phone", "Items_JSON", "Total_Items_Count", "Subtotal", "Discount_Applied", "Discount_Slab", "Final_Payable", "Payment_Mode", "UTR_Number", "Payment_Screenshot_Drive_URL", "Pickup_Date", "Pickup_Time", "Order_Status", "Admin_Notes", "Receipt_Drive_URL"]
     },
     {
       name: "Wallet_Ledger",
@@ -285,7 +293,441 @@ function hashString(str) {
 }
 
 // -------------------------------------------------------------
-// ORDERS & WALLET ENGINE
+// INVENTORY & KITCHEN OPEN/CLOSED STRICT VALIDATION
+// -------------------------------------------------------------
+function checkCartValidity(payload) {
+  const config = getConfigData().data;
+  const isKitchenOpen = (String(config.KITCHEN_OPEN).toUpperCase() === "TRUE");
+
+  if (!isKitchenOpen) {
+    return {
+      status: "KITCHEN_CLOSED",
+      kitchenOpen: false,
+      message: "The kitchen is currently closed for pickups."
+    };
+  }
+
+  const menuSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Menu");
+  const menuData = menuSheet.getDataRange().getValues();
+  const cartItems = payload.cartItems || [];
+
+  const unavailableItems = [];
+  const validItems = [];
+
+  cartItems.forEach(cartItem => {
+    let matched = false;
+    for (let i = 1; i < menuData.length; i++) {
+      if (String(menuData[i][0]).trim() === String(cartItem.id).trim()) {
+        matched = true;
+        const available = (menuData[i][7] === true || String(menuData[i][7]).toUpperCase() === "TRUE");
+        if (available) {
+          validItems.push({
+            id: menuData[i][0],
+            name: menuData[i][2],
+            price: Number(menuData[i][5]) || 0,
+            quantity: cartItem.quantity
+          });
+        } else {
+          unavailableItems.push({ id: menuData[i][0], name: menuData[i][2] });
+        }
+        break;
+      }
+    }
+    if (!matched) {
+      unavailableItems.push({ id: cartItem.id, name: "Discontinued Meal" });
+    }
+  });
+
+  return {
+    status: "SUCCESS",
+    kitchenOpen: true,
+    hasSoldOutItems: unavailableItems.length > 0,
+    unavailableItems: unavailableItems,
+    validItems: validItems
+  };
+}
+
+// -------------------------------------------------------------
+// STEP 1: PRE-ORDER INITIATION (PERSISTENCE BEFORE PAYMENT)
+// -------------------------------------------------------------
+function initiatePreOrder(payload) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ordersSheet = ss.getSheetByName("Orders");
+  const config = getConfigData().data;
+
+  if (String(config.KITCHEN_OPEN).toUpperCase() !== "TRUE") {
+    return { status: "ERROR", message: "Kitchen is currently closed for pickups." };
+  }
+
+  const orderId = String(payload.preAllocatedOrderId || ("ORD-" + Math.floor(100000 + Math.random() * 900000))).trim();
+  const oData = ordersSheet.getDataRange().getValues();
+
+  for (let i = 1; i < oData.length; i++) {
+    if (String(oData[i][0]).trim() === orderId) {
+      return { status: "SUCCESS", message: "Pre-order reservation confirmed.", orderId: orderId };
+    }
+  }
+
+  const nowIst = new Date();
+  const istTimestamp = Utilities.formatDate(nowIst, TIMEZONE_IST, "yyyy-MM-dd HH:mm:ss");
+  const cleanPickupDate = String(payload.pickupDate || "").split("T")[0].trim();
+  const cleanPickupTime = String(payload.pickupTime || "").replace(/\s*\(?IST\)?/gi, "").trim();
+  const storedPickupTimeString = cleanPickupTime ? "'" + cleanPickupTime : "'Flexible";
+
+  const payable = Number(payload.finalPayable) || 0;
+  const subtotal = Number(payload.subtotal) || payable;
+  const discountApplied = Number(payload.discountApplied) || 0;
+  const itemsCount = Number(payload.totalItemsCount) || 1;
+
+  ordersSheet.appendRow([
+    orderId,
+    istTimestamp,
+    String(payload.customerId || "").trim(),
+    String(payload.customerName || "Customer").trim(),
+    String(payload.customerPhone || "").trim(),
+    JSON.stringify(payload.items || []),
+    itemsCount,
+    subtotal,
+    discountApplied,
+    String(payload.discountSlab || "0%"),
+    payable,
+    "Pending_Payment",
+    "Awaiting_Payment",
+    "",
+    cleanPickupDate,
+    storedPickupTimeString,
+    "Payment_Pending",
+    "Early Pre-Order Reservation",
+    ""
+  ]);
+
+  return {
+    status: "SUCCESS",
+    message: "Pre-order reservation recorded.",
+    orderId: orderId
+  };
+}
+
+// -------------------------------------------------------------
+// STEP 2: FINAL PAYMENT SUBMISSION & REAL-TIME RECEIPT CREATION
+// -------------------------------------------------------------
+function submitFinalPayment(payload) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ordersSheet = ss.getSheetByName("Orders");
+  const customersSheet = ss.getSheetByName("Customers");
+  const ledgerSheet = ss.getSheetByName("Wallet_Ledger");
+  const config = getConfigData().data;
+
+  const orderId = String(payload.orderId).trim();
+  const oData = ordersSheet.getDataRange().getValues();
+  let orderRow = -1;
+  let orderRecord = null;
+
+  for (let i = 1; i < oData.length; i++) {
+    if (String(oData[i][0]).trim() === orderId) {
+      orderRow = i + 1;
+      orderRecord = oData[i];
+      break;
+    }
+  }
+
+  if (orderRow === -1) {
+    return submitOrder(payload);
+  }
+
+  const payable = Number(orderRecord[10]) || Number(payload.finalPayable) || 0;
+  const customerId = String(orderRecord[2] || payload.customerId).trim();
+  const customerPhone = String(orderRecord[4]).trim();
+  const mode = String(payload.paymentMode || "Direct_UPI").trim();
+  const utr = String(payload.utrNumber || "").trim();
+
+  let targetStatus = "Pending_Verification";
+
+  if (mode === "Wallet") {
+    if (String(config.WALLET_SYSTEM_ENABLED).toUpperCase() !== "TRUE") {
+      return { status: "ERROR", message: "Wallet payment paused. Please pay via Direct UPI." };
+    }
+
+    const cData = customersSheet.getDataRange().getValues();
+    let custRow = -1;
+    let currentBal = 0;
+
+    for (let c = 1; c < cData.length; c++) {
+      if (String(cData[c][0]).trim() === customerId || String(cData[c][2]).trim() === customerPhone) {
+        custRow = c + 1;
+        currentBal = Number(cData[c][6]) || 0;
+        break;
+      }
+    }
+
+    if (custRow === -1 || currentBal < payable) {
+      return { status: "ERROR", message: "Insufficient wallet balance." };
+    }
+
+    const newBal = currentBal - payable;
+    customersSheet.getRange(custRow, 7).setValue(newBal);
+
+    const nowIst = new Date();
+    const istTimestamp = Utilities.formatDate(nowIst, TIMEZONE_IST, "yyyy-MM-dd HH:mm:ss");
+    const txnId = "TXN-" + Date.now();
+
+    ledgerSheet.appendRow([
+      txnId, istTimestamp, customerId, "Debit_Order", payable,
+      "Order " + orderId, "Approved", newBal, "", "", "Meal Purchase"
+    ]);
+
+    targetStatus = "Kitchen_Accepted";
+  }
+
+  ordersSheet.getRange(orderRow, 12).setValue(mode);
+  ordersSheet.getRange(orderRow, 13).setValue(mode === "Wallet" ? "WALLET_DEDUCT" : utr);
+  ordersSheet.getRange(orderRow, 17).setValue(targetStatus);
+
+  // Generate real-time updated PDF receipt with latest payment status
+  try {
+    const freshPdf = generateOrderReceiptPdf({
+      orderId: orderId,
+      customerName: orderRecord[3],
+      customerPhone: orderRecord[4],
+      items: JSON.parse(orderRecord[5] || "[]"),
+      subtotal: orderRecord[7],
+      discountApplied: orderRecord[8],
+      discountSlab: orderRecord[9],
+      finalPayable: payable,
+      paymentMode: mode,
+      utrNumber: mode === "Wallet" ? "WALLET_DEDUCT" : utr,
+      pickupDate: orderRecord[14],
+      pickupTime: cleanSheetTimeString(orderRecord[15]),
+      orderStatus: targetStatus,
+      timestamp: orderRecord[1]
+    });
+    ordersSheet.getRange(orderRow, 19).setValue(freshPdf.publicUrl);
+  } catch (pdfErr) {
+    console.warn("PDF receipt compilation warning: " + pdfErr.message);
+  }
+
+  recordOrderAnalytics(Number(orderRecord[6]) || 1, payable);
+  recordHourlyOrderPlacement();
+
+  try {
+    sendAdminNotificationEmail("ORDER", {
+      orderId: orderId,
+      customerName: orderRecord[3],
+      customerPhone: orderRecord[4],
+      finalPayable: payable,
+      items: JSON.parse(orderRecord[5] || "[]"),
+      pickupDate: orderRecord[14],
+      pickupTime: cleanSheetTimeString(orderRecord[15]),
+      paymentMode: mode,
+      utrNumber: utr || "N/A"
+    });
+  } catch (emailErr) {}
+
+  return {
+    status: "SUCCESS",
+    message: "Payment submitted successfully!",
+    orderId: orderId,
+    orderStatus: targetStatus
+  };
+}
+
+// -------------------------------------------------------------
+// DYNAMIC VECTOR PDF RECEIPT ENGINE (DIRECT DOWNLOAD & BASE64)
+// -------------------------------------------------------------
+function generateOrderReceiptPdf(orderData) {
+  const folder = getOrCreateFolder(RECEIPTS_FOLDER_NAME);
+  const token = String(orderData.orderId).slice(-4);
+  const formattedDate = cleanSheetDateString(orderData.pickupDate);
+  const formattedTime = cleanSheetTimeString(orderData.pickupTime);
+
+  const itemsRows = (orderData.items || []).map(i => `
+    <tr>
+      <td style="padding:10px 12px;border-bottom:1px solid #e7e5e4;font-weight:bold;color:#1c1917;">
+        ${i.name}
+      </td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e7e5e4;text-align:center;color:#44403c;">
+        ${i.quantity}
+      </td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e7e5e4;text-align:right;color:#44403c;">
+        ₹${Number(i.price).toFixed(2)}
+      </td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e7e5e4;text-align:right;font-weight:bold;color:#1c1917;">
+        ₹${(Number(i.quantity) * Number(i.price)).toFixed(2)}
+      </td>
+    </tr>
+  `).join("");
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1c1917; padding: 36px; margin: 0; background: #fff; }
+        .header { border-bottom: 3px solid #1C3D2B; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start; }
+        .brand-title { font-size: 24px; font-weight: 900; color: #1C3D2B; margin: 0; letter-spacing: -0.5px; }
+        .brand-sub { font-size: 12px; color: #78716c; margin-top: 4px; font-weight: 600; }
+        .token-badge { background: #FAF7F2; border: 2px solid #1C3D2B; padding: 8px 16px; border-radius: 12px; text-align: right; }
+        .token-val { font-size: 20px; font-weight: 900; color: #1C3D2B; font-family: monospace; }
+        .meta-grid { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .meta-grid td { padding: 6px 0; font-size: 13px; }
+        .meta-label { color: #78716c; font-weight: bold; width: 28%; }
+        .meta-val { color: #1c1917; font-weight: 700; }
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .items-table th { background: #FAF7F2; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #78716c; font-weight: 800; border-bottom: 2px solid #e7e5e4; }
+        .summary-box { float: right; width: 45%; margin-bottom: 24px; }
+        .summary-total { border-top: 2px solid #1C3D2B; padding-top: 8px; margin-top: 6px; display: flex; justify-content: space-between; font-size: 18px; font-weight: 900; color: #1C3D2B; }
+        .footer-note { clear: both; margin-top: 36px; padding: 16px; background: #FAF7F2; border-radius: 12px; border: 1px solid #e7e5e4; font-size: 11px; color: #78716c; line-height: 1.6; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div>
+          <h1 class="brand-title">YAADY'S MILLET ROTI MEALS</h1>
+          <div class="brand-sub">Traditional Hand-Patted Sorghum & Ragi Meals • Neknampur Hub, Hyderabad</div>
+          <div class="brand-sub">+91 9000001690 • yaadyskitchen@upi</div>
+        </div>
+        <div class="token-badge">
+          <div style="font-size: 10px; font-weight: 800; color: #78716c; text-transform: uppercase;">Order Token</div>
+          <div class="token-val">#${token}</div>
+        </div>
+      </div>
+
+      <table class="meta-grid">
+        <tr>
+          <td class="meta-label">Order Reference:</td>
+          <td class="meta-val">${orderData.orderId}</td>
+          <td class="meta-label">Scheduled Pickup:</td>
+          <td class="meta-val">${formattedDate} at ${formattedTime}</td>
+        </tr>
+        <tr>
+          <td class="meta-label">Customer Name:</td>
+          <td class="meta-val">${orderData.customerName}</td>
+          <td class="meta-label">Payment Mode:</td>
+          <td class="meta-val">${orderData.paymentMode} (${orderData.utrNumber || 'N/A'})</td>
+        </tr>
+        <tr>
+          <td class="meta-label">Customer Mobile:</td>
+          <td class="meta-val">+91 ${orderData.customerPhone}</td>
+          <td class="meta-label">Order Status:</td>
+          <td class="meta-val">${String(orderData.orderStatus).replace(/_/g, ' ')}</td>
+        </tr>
+      </table>
+
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th style="text-align: left;">Item Description</th>
+            <th style="text-align: center;">Qty</th>
+            <th style="text-align: right;">Unit Price</th>
+            <th style="text-align: right;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsRows}
+        </tbody>
+      </table>
+
+      <div class="summary-box">
+        <table style="width: 100%; font-size: 13px;">
+          <tr>
+            <td style="color: #78716c; padding: 4px 0;">Item Subtotal:</td>
+            <td style="text-align: right; font-weight: bold; padding: 4px 0;">₹${Number(orderData.subtotal).toFixed(2)}</td>
+          </tr>
+          ${Number(orderData.discountApplied) > 0 ? `
+          <tr>
+            <td style="color: #15803d; padding: 4px 0;">Wallet Perk Discount (${orderData.discountSlab || 'Perk'}):</td>
+            <td style="text-align: right; font-weight: bold; color: #15803d; padding: 4px 0;">-₹${Number(orderData.discountApplied).toFixed(2)}</td>
+          </tr>` : ''}
+          <tr style="border-top: 2px solid #1C3D2B;">
+            <td style="font-size: 16px; font-weight: 900; color: #1C3D2B; padding: 8px 0 0;">Final Payable:</td>
+            <td style="font-size: 18px; font-weight: 900; color: #1C3D2B; text-align: right; padding: 8px 0 0;">₹${Number(orderData.finalPayable).toFixed(2)}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="footer-note">
+        <strong>Official Customer Pickup Voucher & Receipt</strong><br>
+        Please show this voucher at the Neknampur pickup counter. Rotis are freshly hand-patted and baked live on traditional cast iron tawas. Thank you for choosing authentic millets!
+      </div>
+    </body>
+    </html>
+  `;
+
+  const fileName = "Yaadys_Receipt_" + orderData.orderId + ".pdf";
+  const blob = Utilities.newBlob(html, "text/html", "Receipt_" + orderData.orderId + ".html")
+    .getAs("application/pdf")
+    .setName(fileName);
+
+  // Overwrite existing file with same name to keep status fresh
+  const existingFiles = folder.getFilesByName(fileName);
+  while (existingFiles.hasNext()) {
+    existingFiles.next().setTrashed(true);
+  }
+
+  const file = folder.createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+  return {
+    publicUrl: file.getUrl(),
+    downloadUrl: file.getDownloadUrl(),
+    base64Pdf: Utilities.base64Encode(blob.getBytes())
+  };
+}
+
+function getOrderReceipt(orderId) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ordersSheet = ss.getSheetByName("Orders");
+  const data = ordersSheet.getDataRange().getValues();
+  const cleanId = String(orderId || "").trim();
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim() === cleanId) {
+      // Always regenerate fresh PDF to reflect real-time order status
+      const freshPdf = generateOrderReceiptPdf({
+        orderId: cleanId,
+        customerName: data[i][3],
+        customerPhone: data[i][4],
+        items: JSON.parse(data[i][5] || "[]"),
+        subtotal: data[i][7],
+        discountApplied: data[i][8],
+        discountSlab: data[i][9],
+        finalPayable: data[i][10],
+        paymentMode: data[i][11],
+        utrNumber: data[i][12],
+        pickupDate: data[i][14],
+        pickupTime: cleanSheetTimeString(data[i][15]),
+        orderStatus: data[i][16],
+        timestamp: data[i][1]
+      });
+
+      ordersSheet.getRange(i + 1, 19).setValue(freshPdf.publicUrl);
+
+      return {
+        status: "SUCCESS",
+        orderId: cleanId,
+        receiptUrl: freshPdf.publicUrl,
+        downloadUrl: freshPdf.downloadUrl,
+        base64Pdf: freshPdf.base64Pdf
+      };
+    }
+  }
+
+  return { status: "ERROR", message: "Order reference not found." };
+}
+
+function downloadReceiptDirect(orderId) {
+  const receiptResult = getOrderReceipt(orderId);
+  if (receiptResult.status === "SUCCESS" && receiptResult.base64Pdf) {
+    const bytes = Utilities.base64Decode(receiptResult.base64Pdf);
+    return ContentService.createTextOutput(Utilities.base64Encode(bytes))
+      .setMimeType(ContentService.MimeType.TEXT);
+  }
+  return sendJsonResponse({ status: "ERROR", message: "Unable to process direct download." });
+}
+
+// -------------------------------------------------------------
+// LEGACY COMPATIBLE SUBMIT ORDER (FALLBACK)
 // -------------------------------------------------------------
 function submitOrder(payload) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -296,10 +738,6 @@ function submitOrder(payload) {
 
   if (String(config.KITCHEN_OPEN).toUpperCase() !== "TRUE") {
     return { status: "ERROR", message: "The kitchen is currently closed for pickups. Orders cannot be scheduled." };
-  }
-
-  if (payload.paymentMode === "Wallet" && String(config.WALLET_SYSTEM_ENABLED).toUpperCase() !== "TRUE") {
-    return { status: "ERROR", message: "Yaady Wallet payment is currently paused by admin. Please pay using Direct UPI." };
   }
 
   const phone = String(payload.customerPhone || "").trim();
@@ -321,22 +759,6 @@ function submitOrder(payload) {
     return { status: "ERROR", message: "Customer account not found. Please log in again." };
   }
 
-  let screenshotUrl = "";
-  if (payload.base64Screenshot && payload.base64Screenshot.length > 50) {
-    try {
-      const folder = getOrCreateFolder(RECEIPTS_FOLDER_NAME);
-      const contentType = payload.base64Screenshot.substring(payload.base64Screenshot.indexOf(":") + 1, payload.base64Screenshot.indexOf(";"));
-      const rawBase64 = payload.base64Screenshot.substring(payload.base64Screenshot.indexOf(",") + 1);
-      const decodedBytes = Utilities.base64Decode(rawBase64);
-      const blob = Utilities.newBlob(decodedBytes, contentType, "Receipt_" + customerId + "_" + Date.now() + ".png");
-      const file = folder.createFile(blob);
-      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-      screenshotUrl = file.getUrl();
-    } catch (e) {
-      screenshotUrl = "Failed upload: " + e.message;
-    }
-  }
-
   const orderId = payload.preAllocatedOrderId || ("ORD-" + Math.floor(100000 + Math.random() * 900000));
   const payable = Number(payload.finalPayable) || 0;
   const subtotal = Number(payload.subtotal) || payable;
@@ -349,7 +771,7 @@ function submitOrder(payload) {
 
   if (payload.paymentMode === "Wallet") {
     if (currentBalance < payable) {
-      return { status: "ERROR", message: "Insufficient wallet balance. Please top up or use Direct UPI." };
+      return { status: "ERROR", message: "Insufficient wallet balance." };
     }
     const newBalance = currentBalance - payable;
     customersSheet.getRange(custRowIndex, 7).setValue(newBalance);
@@ -370,6 +792,27 @@ function submitOrder(payload) {
   const cleanPickupTime = String(payload.pickupTime || "").replace(/\s*\(?IST\)?/gi, "").trim();
   const storedPickupTimeString = cleanPickupTime ? "'" + cleanPickupTime : "'Flexible";
 
+  let receiptUrl = "";
+  try {
+    const pdfRes = generateOrderReceiptPdf({
+      orderId: orderId,
+      customerName: payload.customerName,
+      customerPhone: phone,
+      items: payload.items || [],
+      subtotal: subtotal,
+      discountApplied: discountApplied,
+      discountSlab: payload.discountSlab,
+      finalPayable: payable,
+      paymentMode: payload.paymentMode,
+      utrNumber: payload.utrNumber,
+      pickupDate: cleanPickupDate,
+      pickupTime: cleanPickupTime,
+      orderStatus: orderStatus,
+      timestamp: istFormattedTimestamp
+    });
+    receiptUrl = pdfRes.publicUrl;
+  } catch (err) {}
+
   ordersSheet.appendRow([
     orderId,
     istFormattedTimestamp,
@@ -384,31 +827,16 @@ function submitOrder(payload) {
     payable,
     String(payload.paymentMode || "Direct_UPI"),
     String(payload.utrNumber || (payload.paymentMode === "Wallet" ? "WALLET_DEDUCT" : "")),
-    screenshotUrl,
+    "",
     cleanPickupDate,
     storedPickupTimeString,
     orderStatus,
-    String(payload.adminNotes || "")
+    String(payload.adminNotes || ""),
+    receiptUrl
   ]);
 
   recordOrderAnalytics(itemsCount, payable);
   recordHourlyOrderPlacement();
-
-  try {
-    sendAdminNotificationEmail("ORDER", {
-      orderId: orderId,
-      customerName: payload.customerName,
-      customerPhone: phone,
-      finalPayable: payable,
-      items: payload.items || [],
-      pickupDate: cleanPickupDate,
-      pickupTime: cleanPickupTime,
-      paymentMode: payload.paymentMode,
-      utrNumber: payload.utrNumber || "N/A"
-    });
-  } catch (emailErr) {
-    console.warn("Email alert warning: " + emailErr.message);
-  }
 
   return {
     status: "SUCCESS",
@@ -467,19 +895,9 @@ function submitWalletRecharge(payload) {
     utr, "Pending_Verification", currentBalance, "", "", `Wallet Pack Top-Up (${txnId})`
   ]);
 
-  try {
-    sendAdminNotificationEmail("RECHARGE", {
-      txnId: txnId,
-      customerName: customerName,
-      customerPhone: phone,
-      amount: amount,
-      utrNumber: utr
-    });
-  } catch (emailErr) {}
-
   return {
     status: "SUCCESS",
-    message: `Recharge of ₹${amount} submitted (Token #${txnId}). Funds will reflect once kitchen verifies payment.`,
+    message: `Recharge of ₹${amount} submitted (Token #${txnId}). Funds will reflect once verified.`,
     txnId: txnId
   };
 }
@@ -494,7 +912,7 @@ function sendAdminNotificationEmail(type, details) {
 
   if (type === "ORDER") {
     const token = String(details.orderId).slice(-4);
-    subject = `🔔 New Order [Token #${token}] - ₹${details.finalPayable} - Yaady's Kitchen`;
+    subject = `🔔 Order Placed [Token #${token}] - ₹${details.finalPayable}`;
     const itemsHtml = (details.items || []).map(i => `<tr><td style="padding:8px 12px;border-bottom:1px solid #eee;">${i.name}</td><td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">${i.quantity}</td><td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;">₹${Number(i.lineTotal) || (Number(i.price) * Number(i.quantity))}</td></tr>`).join("");
 
     bodyHtml = `
@@ -527,33 +945,11 @@ function sendAdminNotificationEmail(type, details) {
         </div>
       </div>
     `;
-  } else if (type === "RECHARGE") {
-    subject = `💰 New Wallet Top-Up Request - ₹${details.amount} - Yaady's Kitchen`;
-    bodyHtml = `
-      <div style="font-family:'Segoe UI',sans-serif;max-width:550px;margin:auto;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;">
-        <div style="background:#1C3D2B;color:#fff;padding:18px;text-align:center;">
-          <h3 style="margin:0;color:#F59E0B;">YAADY'S PREPAID WALLET</h3>
-          <p style="margin:4px 0 0;font-size:13px;">Customer Top-Up Awaiting Verification</p>
-        </div>
-        <div style="padding:20px;">
-          <p style="font-size:14px;color:#333;">A customer has submitted a manual UPI top-up for wallet verification:</p>
-          <div style="background:#f9f9f9;padding:14px;border-radius:8px;font-size:14px;line-height:1.8;">
-            <strong>Txn Token:</strong> ${details.txnId}<br>
-            <strong>Customer:</strong> ${details.customerName} (+91 ${details.customerPhone})<br>
-            <strong>Recharge Amount:</strong> <span style="font-size:18px;color:#1C3D2B;font-weight:bold;">₹${details.amount}</span><br>
-            <strong>Submitted 12-Digit UTR:</strong> <span style="font-family:monospace;font-weight:bold;color:#D97706;">${details.utrNumber}</span>
-          </div>
-        </div>
-      </div>
-    `;
   }
 
   GmailApp.sendEmail(adminEmail, subject, "", { htmlBody: bodyHtml });
 }
 
-// -------------------------------------------------------------
-// HOURLY TELEMETRY RADAR ENGINE
-// -------------------------------------------------------------
 function trackVisitor(isRepeat) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const analyticsSheet = ss.getSheetByName("Analytics");
@@ -728,7 +1124,8 @@ function getDaywiseReport(pin, targetDateStr) {
         utr: String(data[i][12] || "").trim(),
         pickupDate: orderDate,
         pickupTime: cleanSheetTimeString(data[i][15]),
-        orderStatus: status
+        orderStatus: status,
+        receiptUrl: String(data[i][18] || "").trim()
       });
     }
   }
@@ -741,9 +1138,6 @@ function getDaywiseReport(pin, targetDateStr) {
   };
 }
 
-// -------------------------------------------------------------
-// CUSTOMER SERVICES
-// -------------------------------------------------------------
 function getCustomerOrders(phone) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Orders");
   const data = sheet.getDataRange().getValues();
@@ -771,7 +1165,8 @@ function getCustomerOrders(phone) {
         utrNumber: String(data[i][12] || ""),
         pickupDate: cleanDate,
         pickupTime: cleanTime,
-        orderStatus: String(data[i][16] || "").trim()
+        orderStatus: String(data[i][16] || "").trim(),
+        receiptUrl: String(data[i][18] || "").trim()
       });
     }
   }
@@ -801,7 +1196,8 @@ function getOrderStatus(orderId) {
           utrNumber: String(data[i][12] || ""),
           pickupDate: cleanDate,
           pickupTime: cleanTime,
-          orderStatus: String(data[i][16] || "").trim()
+          orderStatus: String(data[i][16] || "").trim(),
+          receiptUrl: String(data[i][18] || "").trim()
         }
       };
     }
@@ -818,7 +1214,6 @@ function getAnalyticsReport(pin) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const analyticsSheet = ss.getSheetByName("Analytics");
   const aData = analyticsSheet.getDataRange().getValues();
-
   const customersSheet = ss.getSheetByName("Customers");
   const totalRegisteredUsers = Math.max(0, customersSheet.getLastRow() - 1);
 
@@ -1102,7 +1497,8 @@ function getAdminData(pin) {
       screenshotUrl: String(oData[i][13] || ""),
       pickupDate: cleanDate,
       pickupTime: cleanTime,
-      orderStatus: String(oData[i][16] || "").trim()
+      orderStatus: String(oData[i][16] || "").trim(),
+      receiptUrl: String(oData[i][18] || "").trim()
     });
   }
 
@@ -1260,45 +1656,6 @@ function generateRefundPdf(data) {
   const file = folder.createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   return file.getUrl();
-}
-
-function checkCartValidity(payload) {
-  const config = getConfigData().data;
-  if (String(config.KITCHEN_OPEN).toUpperCase() !== "TRUE") {
-    return { status: "KITCHEN_CLOSED", message: "The kitchen is currently closed for pickups. Please check back later." };
-  }
-
-  const menuSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Menu");
-  const menuData = menuSheet.getDataRange().getValues();
-  const cartItems = payload.cartItems || [];
-
-  const unavailableItems = [];
-  const validItems = [];
-
-  cartItems.forEach(cartItem => {
-    let found = false;
-    for (let i = 1; i < menuData.length; i++) {
-      if (String(menuData[i][0]).trim() === String(cartItem.id).trim()) {
-        found = true;
-        const isAvailable = (menuData[i][7] === true || String(menuData[i][7]).toUpperCase() === "TRUE");
-        if (isAvailable) {
-          validItems.push({ id: menuData[i][0], name: menuData[i][2], price: Number(menuData[i][5]) || 0, quantity: cartItem.quantity });
-        } else {
-          unavailableItems.push({ id: menuData[i][0], name: menuData[i][2] });
-        }
-        break;
-      }
-    }
-    if (!found) unavailableItems.push({ id: cartItem.id, name: "Discontinued Meal" });
-  });
-
-  return {
-    status: "SUCCESS",
-    kitchenOpen: true,
-    hasSoldOutItems: unavailableItems.length > 0,
-    unavailableItems: unavailableItems,
-    validItems: validItems
-  };
 }
 
 function forgotPassword(payload) {

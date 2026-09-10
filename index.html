@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Yaady's Millet Roti Meals | Traditional Millet Kitchen</title>
   
-  <!-- PWA & Mobile Web App Meta Tags -->
-  <link rel="manifest" href='data:application/manifest+json,{"name":"Yaady&#39;s Millet Roti Meals","short_name":"Yaady&#39;s","start_url":".","display":"standalone","background_color":"#FAF7F2","theme_color":"#1C3D2B","icons":[{"src":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=192&h=192&fit=crop","sizes":"192x192","type":"image/png"},{"src":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=512&h=512&fit=crop","sizes":"512x512","type":"image/png"}]}' />
+  <!-- Comprehensive PWA Web App Manifest -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Yaady&#39;s Millet Roti Meals","short_name":"Yaady&#39;s","start_url":"./index.html","display":"standalone","background_color":"#FAF7F2","theme_color":"#1C3D2B","orientation":"portrait","icons":[{"src":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=192&h=192&fit=crop","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=512&h=512&fit=crop","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}' />
   <meta name="theme-color" content="#1C3D2B" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -126,7 +126,7 @@
 
   <!-- STICKY TOP BAR -->
   <header class="sticky top-0 z-40 bg-linen/95 backdrop-blur-md border-b border-stone-200 w-full">
-    <!-- MOBILE REFACTORED HEADER (< lg) -->
+    <!-- MOBILE HEADER (< lg) -->
     <div class="lg:hidden h-16 px-3.5 flex items-center justify-between w-full">
       <div onclick="openAboutModal()" class="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition min-w-0">
         <div class="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl bg-forest-800 text-amber-400 font-black text-xl flex items-center justify-center shrink-0 shadow-xs">
@@ -176,7 +176,7 @@
       </div>
     </div>
 
-    <!-- ANNOUNCEMENT BANNER (TEXT ONLY BROADCAST, NO MAPS LINK) -->
+    <!-- CLEAN BROADCAST ANNOUNCEMENT BANNER (TEXT ONLY, ZERO ICONS) -->
     <div id="announcementBanner" class="bg-forest-900 text-amber-300 px-4 py-2 text-xs md:text-sm text-center font-black tracking-wide w-full">
       <span id="announcementBannerText">Fresh Harvest Specials: Hot Jowar & Ragi Rotis made live upon pickup!</span>
     </div>
@@ -234,14 +234,32 @@
             <span id="desktopCartBadge" class="text-xs font-black bg-stone-100 text-stone-600 px-3.5 py-1 rounded-full">0 items</span>
           </div>
 
-          <div id="desktopCartItems" class="py-3.5 max-h-72 overflow-y-auto divide-y divide-stone-100 text-sm md:text-base w-full">
+          <div id="desktopCartItems" class="py-3.5 max-h-60 overflow-y-auto divide-y divide-stone-100 text-sm md:text-base w-full">
             <div class="text-center py-10 text-stone-400 text-base">Your basket is empty.</div>
+          </div>
+
+          <!-- EMBEDDED PICKUP SCHEDULING CONTROLS FOR DESKTOP/TABLETS -->
+          <div id="desktopSchedulingSection" class="border-t border-stone-100 pt-3.5 my-2 space-y-2.5 w-full">
+            <div class="text-xs font-extrabold text-forest-800 bg-amber-50 border border-amber-200 p-2.5 rounded-xl flex items-center justify-between">
+              <span>Estimated Preparation:</span>
+              <span class="font-black text-amberBrand-600" id="desktopCartPrepDisplay">15 mins</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 w-full">
+              <div>
+                <label class="block text-xs font-extrabold text-stone-700 mb-1">Pickup Date</label>
+                <input type="date" id="desktopPickupDate" onchange="syncScheduling('date', this.value)" class="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs font-bold outline-none min-h-[42px]" />
+              </div>
+              <div>
+                <label class="block text-xs font-extrabold text-stone-700 mb-1">Pickup Time</label>
+                <input type="time" id="desktopPickupTime" onchange="syncScheduling('time', this.value)" class="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs font-bold outline-none min-h-[42px]" />
+              </div>
+            </div>
           </div>
 
           <div id="desktopCartBilling" class="border-t border-stone-100 pt-3.5 space-y-2 text-sm md:text-base text-stone-600 w-full"></div>
 
-          <button id="desktopCheckoutBtn" onclick="sanitizeAndProceedToCheckout()" disabled class="w-full mt-5 py-4 bg-forest-800 disabled:bg-stone-300 text-white font-black rounded-2xl text-base md:text-lg transition shadow flex items-center justify-center gap-2 min-h-[48px]">
-            <span>Proceed to Pickup Time</span>
+          <button id="desktopCheckoutBtn" onclick="initiatePreOrderCheckout()" disabled class="w-full mt-4 py-4 bg-forest-800 disabled:bg-stone-300 text-white font-black rounded-2xl text-base md:text-lg transition shadow flex items-center justify-center gap-2 min-h-[48px]">
+            <span>Proceed to Pay</span>
             <i data-lucide="arrow-right" class="w-5 h-5"></i>
           </button>
         </div>
@@ -352,7 +370,7 @@
     </div>
   </div>
 
-  <!-- CHECKOUT MODAL / DRAWER (FULL-WIDTH STRETCH FIXED) -->
+  <!-- CHECKOUT PAYMENT SCREEN (ORDER PERSISTED PRE-PAYMENT) -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-3">
     <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl max-h-sheet overflow-y-auto relative min-w-0">
       <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
@@ -361,30 +379,14 @@
         <i data-lucide="x" class="w-6 h-6"></i>
       </button>
 
-      <h3 class="text-2xl font-black text-forest-900 mb-1">Select Pickup Time & Pay</h3>
-      <p class="text-sm text-stone-500 mb-4 font-medium">Lead time is dynamically calculated based on your selected cart items.</p>
-
-      <!-- DYNAMIC PREP TIME INDICATOR PILL -->
-      <div id="prepTimeIndicatorPill" class="mb-4 text-xs md:text-sm font-extrabold text-forest-800 bg-amber-50 border border-amber-200 p-3 rounded-2xl flex items-center justify-between shadow-xs w-full">
-        <span class="flex items-center gap-1.5">
-          <i data-lucide="clock" class="w-4 h-4 text-amberBrand-600"></i>
-          <span>Estimated Preparation Time:</span>
-        </span>
-        <span class="font-black text-amberBrand-600 text-sm md:text-base" id="requiredPrepMinutesDisplay">15 mins</span>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="px-2.5 py-1 bg-amber-100 text-forest-900 rounded-lg text-xs font-black font-mono" id="checkoutOrderTokenDisplay">TOKEN #----</span>
+        <span class="text-xs font-bold text-green-700">Pre-Order Saved</span>
       </div>
+      <h3 class="text-2xl font-black text-forest-900 mb-1">Complete Order Payment</h3>
+      <p class="text-xs text-stone-500 mb-4 font-medium" id="checkoutScheduledSummary">Scheduled: Today • 15 mins prep</p>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-5 w-full">
-        <div class="w-full block min-w-0">
-          <label class="block text-sm font-extrabold text-stone-700 mb-1.5">Pickup Date</label>
-          <input type="date" id="pickupDate" onchange="updatePickupTimeConstraints()" class="w-full block min-w-0 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-bold outline-none min-h-[48px]" />
-        </div>
-        <div class="w-full block min-w-0">
-          <label class="block text-sm font-extrabold text-stone-700 mb-1.5">Pickup Time</label>
-          <input type="time" id="pickupTime" onchange="validatePickupTime()" class="w-full block min-w-0 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-base font-bold outline-none min-h-[48px]" />
-        </div>
-      </div>
-
-      <div class="border-t border-stone-100 pt-4 mb-4 w-full">
+      <div class="border-t border-stone-100 pt-3 mb-4 w-full">
         <label class="block text-sm font-extrabold text-stone-700 mb-2">Select Payment Mode</label>
         <div class="grid grid-cols-2 gap-3 w-full">
           <label id="walletPayOptionLabel" class="border border-stone-200 rounded-2xl p-4 flex flex-col gap-1 cursor-pointer has-[:checked]:border-forest-800 has-[:checked]:bg-forest-800/5 min-h-[48px] w-full">
@@ -396,7 +398,7 @@
           <label class="border border-stone-200 rounded-2xl p-4 flex flex-col gap-1 cursor-pointer has-[:checked]:border-forest-800 has-[:checked]:bg-forest-800/5 min-h-[48px] w-full">
             <input type="radio" name="paymentOption" value="Direct_UPI" onchange="togglePaymentUi()" class="text-forest-800" />
             <span class="text-base font-black text-forest-900">Direct UPI</span>
-            <span class="text-xs text-stone-500 font-semibold">Auto Order-ID QR</span>
+            <span class="text-xs text-stone-500 font-semibold">Auto Order QR</span>
           </label>
         </div>
       </div>
@@ -426,8 +428,8 @@
           <p class="text-xs text-stone-400 font-bold uppercase tracking-wider">Total Payable</p>
           <p class="text-2xl md:text-3xl font-black text-forest-900" id="checkoutFinalAmount">₹0.00</p>
         </div>
-        <button id="placeOrderBtn" onclick="submitFinalOrder()" class="px-7 py-4 bg-forest-800 hover:bg-forest-900 text-white text-base font-black rounded-2xl transition shadow-md flex items-center gap-2 min-h-[48px]">
-          <span>Confirm & Place Order</span>
+        <button id="placeOrderBtn" onclick="submitFinalPaymentConfirmation()" class="px-7 py-4 bg-forest-800 hover:bg-forest-900 text-white text-base font-black rounded-2xl transition shadow-md flex items-center gap-2 min-h-[48px]">
+          <span>Confirm & Verify</span>
           <i data-lucide="check-circle" class="w-5 h-5"></i>
         </button>
       </div>
@@ -561,7 +563,7 @@
     </div>
   </div>
 
-  <!-- CUSTOMER ORDER HISTORY DRAWER (FULL-WIDTH STRETCH FIXED) -->
+  <!-- CUSTOMER ORDER HISTORY DRAWER -->
   <div id="ordersModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl relative max-h-sheet overflow-y-auto min-w-0">
       <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
@@ -571,7 +573,24 @@
       </button>
 
       <h3 class="text-2xl font-black text-forest-900 mb-1">Your Order History</h3>
-      <p class="text-sm text-stone-500 mb-5 font-medium">Review real-time preparation states, pickup times, and tokens.</p>
+      <p class="text-sm text-stone-500 mb-4 font-medium">Review real-time preparation states, pickup times, and tokens.</p>
+
+      <!-- PERMANENT TOP PICKUP LOCATION & DIRECTIONS CARD -->
+      <div class="mb-4 p-3.5 sm:p-4 bg-white border border-stone-200 rounded-2xl sm:rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs w-full">
+        <div class="flex items-start gap-2.5 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-forest-800/10 text-forest-800 flex items-center justify-center shrink-0 mt-0.5">
+            <i data-lucide="map-pin" class="w-5 h-5 text-forest-800"></i>
+          </div>
+          <div class="min-w-0">
+            <h4 class="text-xs sm:text-sm font-black text-stone-900 leading-tight">Pickup Counter Hub</h4>
+            <p class="text-xs text-stone-600 font-medium truncate">Yaady's Kitchen, Neknampur, Manikonda, Hyderabad</p>
+          </div>
+        </div>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=17.387140,78.375860" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 bg-forest-800 hover:bg-forest-900 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition hover:scale-102 shrink-0 min-h-[40px] w-full sm:w-auto">
+          <i data-lucide="navigation" class="w-4 h-4"></i>
+          <span>Get Directions</span>
+        </a>
+      </div>
 
       <div id="ordersListContainer" class="space-y-4 w-full">
         <p class="text-center text-stone-400 py-8 text-sm">Loading orders...</p>
@@ -698,7 +717,7 @@
     </div>
   </div>
 
-  <!-- MOBILE CART SUMMARY DRAWER -->
+  <!-- MOBILE CART SUMMARY DRAWER WITH INTEGRATED PICKUP SCHEDULING -->
   <div id="mobileCartModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex flex-col justify-end">
     <div class="bg-white rounded-t-3xl p-6 max-h-sheet overflow-y-auto flex flex-col w-full">
       <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
@@ -712,9 +731,28 @@
         </button>
       </div>
       <div id="mobileCartItems" class="divide-y divide-stone-100 py-3.5 text-base w-full"></div>
+
+      <!-- SCHEDULING SECTION EMBEDDED DIRECTLY IN CART REVIEW -->
+      <div class="border-t border-stone-100 pt-3.5 my-2 space-y-3 w-full">
+        <div id="cartPrepPill" class="text-xs font-extrabold text-forest-800 bg-amber-50 border border-amber-200 p-2.5 rounded-xl flex items-center justify-between">
+          <span>Estimated Prep Time:</span>
+          <span class="font-black text-amberBrand-600" id="cartPrepMinutesDisplay">15 mins</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
+          <div>
+            <label class="block text-xs font-extrabold text-stone-700 mb-1">Pickup Date</label>
+            <input type="date" id="cartPickupDate" onchange="syncScheduling('date', this.value)" class="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-bold outline-none min-h-[44px]" />
+          </div>
+          <div>
+            <label class="block text-xs font-extrabold text-stone-700 mb-1">Pickup Time</label>
+            <input type="time" id="cartPickupTime" onchange="syncScheduling('time', this.value)" class="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-bold outline-none min-h-[44px]" />
+          </div>
+        </div>
+      </div>
+
       <div id="mobileCartBilling" class="border-t border-stone-100 pt-3.5 space-y-2 text-base text-stone-600 w-full"></div>
-      <button onclick="sanitizeAndProceedToCheckout()" class="w-full mt-5 py-4 bg-forest-800 text-white font-black rounded-2xl text-lg transition min-h-[48px]">
-        Select Pickup Time & Pay
+      <button id="mobileCheckoutBtn" onclick="initiatePreOrderCheckout()" class="w-full mt-4 py-4 bg-forest-800 text-white font-black rounded-2xl text-lg transition min-h-[48px]">
+        Proceed to Pay
       </button>
     </div>
   </div>
@@ -750,11 +788,12 @@
     let currentOrderUpiUri = "";
     let currentWalletUpiUri = "";
 
+    let chosenPickupDate = "";
+    let chosenPickupTime = "";
+
     let knownOrderStatusMap = {};
     let lastSeenWalletBalance = null;
     let audioCtxCustomer = null;
-
-    // PWA Prompt Storage
     let deferredPrompt = null;
 
     window.chatPollInterval = null;
@@ -799,12 +838,21 @@
       }
     }
 
-    // Inline lightweight Service Worker registration for PWA installability
     if ('serviceWorker' in navigator) {
       const swCode = `
-        self.addEventListener('install', (e) => self.skipWaiting());
-        self.addEventListener('activate', (e) => clients.claim());
-        self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => new Response('Offline'))); });
+        const CACHE_NAME = 'yaadys-shell-v1';
+        self.addEventListener('install', (e) => {
+          self.skipWaiting();
+        });
+        self.addEventListener('activate', (e) => {
+          e.waitUntil(clients.claim());
+        });
+        self.addEventListener('fetch', (e) => {
+          if (e.request.method !== 'GET') return;
+          e.respondWith(
+            fetch(e.request).catch(() => caches.match(e.request))
+          );
+        });
       `;
       const blob = new Blob([swCode], { type: 'application/javascript' });
       navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
@@ -982,67 +1030,77 @@
       document.getElementById("aboutModal").classList.add("hidden");
     }
 
+    // -------------------------------------------------------------
+    // INTEGRATED SCHEDULING (CART REVIEW & DESKTOP SIDEBAR)
+    // -------------------------------------------------------------
     function initDefaultPickupDate() {
       const istToday = getIstTodayDateString();
-      const dateEl = document.getElementById("pickupDate");
-      if (dateEl && !dateEl.value) {
-        dateEl.value = istToday;
-        dateEl.min = istToday;
-      }
-      updatePickupTimeConstraints();
+      chosenPickupDate = istToday;
+      updateCartPickupConstraints();
     }
 
-    function updatePickupTimeConstraints() {
-      const dateEl = document.getElementById("pickupDate");
-      const timeEl = document.getElementById("pickupTime");
-      const prepDisplay = document.getElementById("requiredPrepMinutesDisplay");
-      if (!dateEl || !timeEl) return;
-
-      const istToday = getIstTodayDateString();
-      const selectedDate = dateEl.value;
-
-      if (!selectedDate || selectedDate < istToday) {
-        dateEl.value = istToday;
+    function syncScheduling(type, val) {
+      if (type === 'date') {
+        chosenPickupDate = val;
+        updateCartPickupConstraints();
+      } else {
+        chosenPickupTime = val;
+        validateCartPickupTime();
       }
+    }
+
+    function updateCartPickupConstraints() {
+      const istToday = getIstTodayDateString();
+      if (!chosenPickupDate || chosenPickupDate < istToday) {
+        chosenPickupDate = istToday;
+      }
+
+      const mDate = document.getElementById("cartPickupDate");
+      const dDate = document.getElementById("desktopPickupDate");
+      const mTime = document.getElementById("cartPickupTime");
+      const dTime = document.getElementById("desktopPickupTime");
+      const prepSpan1 = document.getElementById("cartPrepMinutesDisplay");
+      const prepSpan2 = document.getElementById("desktopCartPrepDisplay");
+
+      const requiredLeadMinutes = getCartRequiredPrepTime();
+      if (prepSpan1) prepSpan1.innerText = `${requiredLeadMinutes} mins`;
+      if (prepSpan2) prepSpan2.innerText = `${requiredLeadMinutes} mins`;
+
+      if (mDate) { mDate.value = chosenPickupDate; mDate.min = istToday; }
+      if (dDate) { dDate.value = chosenPickupDate; dDate.min = istToday; }
 
       const istNow = getNowIst();
-      const requiredLeadMinutes = getCartRequiredPrepTime();
-      if (prepDisplay) {
-        prepDisplay.innerText = `${requiredLeadMinutes} mins`;
-      }
-
-      if (dateEl.value === istToday) {
+      if (chosenPickupDate === istToday) {
         const leadTime = new Date(istNow.getTime() + requiredLeadMinutes * 60 * 1000);
         const minH = String(leadTime.getHours()).padStart(2, '0');
         const minM = String(leadTime.getMinutes()).padStart(2, '0');
         const minTimeStr = `${minH}:${minM}`;
 
-        timeEl.min = minTimeStr;
-        timeEl.max = "22:00";
+        if (mTime) { mTime.min = minTimeStr; mTime.max = "22:00"; }
+        if (dTime) { dTime.min = minTimeStr; dTime.max = "22:00"; }
 
-        if (!timeEl.value || timeEl.value < minTimeStr) {
-          timeEl.value = minTimeStr;
+        if (!chosenPickupTime || chosenPickupTime < minTimeStr) {
+          chosenPickupTime = minTimeStr;
         }
       } else {
-        timeEl.min = "10:00";
-        timeEl.max = "22:00";
-        if (!timeEl.value) {
-          timeEl.value = "12:30";
+        if (mTime) { mTime.min = "10:00"; mTime.max = "22:00"; }
+        if (dTime) { dTime.min = "10:00"; dTime.max = "22:00"; }
+        if (!chosenPickupTime) {
+          chosenPickupTime = "12:30";
         }
       }
+
+      if (mTime) mTime.value = chosenPickupTime;
+      if (dTime) dTime.value = chosenPickupTime;
     }
 
-    function validatePickupTime() {
-      const dateEl = document.getElementById("pickupDate");
-      const timeEl = document.getElementById("pickupTime");
-      if (!dateEl || !timeEl || !timeEl.value) return;
-
+    function validateCartPickupTime() {
       const istToday = getIstTodayDateString();
       const istNow = getNowIst();
       const requiredLeadMinutes = getCartRequiredPrepTime();
 
-      if (dateEl.value === istToday) {
-        const [selH, selM] = timeEl.value.split(":").map(Number);
+      if (chosenPickupDate === istToday && chosenPickupTime) {
+        const [selH, selM] = chosenPickupTime.split(":").map(Number);
         const selDate = new Date(istNow);
         selDate.setHours(selH, selM, 0, 0);
 
@@ -1052,14 +1110,248 @@
           const earliestH = String(minValidTime.getHours()).padStart(2, '0');
           const earliestM = String(minValidTime.getMinutes()).padStart(2, '0');
           const earliestStr = `${earliestH}:${earliestM}`;
-          const formattedEarliest = formatTime12Hour(earliestStr);
+          chosenPickupTime = earliestStr;
 
-          showToast(`Kitchen requires ${requiredLeadMinutes} mins preparation time for your cart. Earliest pickup is at ${formattedEarliest}.`, "error");
-          timeEl.value = earliestStr;
+          const formattedEarliest = formatTime12Hour(earliestStr);
+          showToast(`Kitchen requires ${requiredLeadMinutes} mins preparation time. Earliest pickup is at ${formattedEarliest}.`, "error");
+
+          const mTime = document.getElementById("cartPickupTime");
+          const dTime = document.getElementById("desktopPickupTime");
+          if (mTime) mTime.value = earliestStr;
+          if (dTime) dTime.value = earliestStr;
         }
       }
     }
 
+    // -------------------------------------------------------------
+    // STRICT LIVE VALIDATION & PRE-ORDER INITIATION
+    // -------------------------------------------------------------
+    async function initiatePreOrderCheckout() {
+      if (!currentUser) {
+        showToast("Please log in or register before scheduling pickup.", "info");
+        openAuthModal();
+        return;
+      }
+
+      const cartArray = Object.entries(cart).map(([id, qty]) => ({ id, quantity: qty }));
+      if (cartArray.length === 0) {
+        showToast("Your cart is empty.", "error");
+        return;
+      }
+
+      validateCartPickupTime();
+      if (!chosenPickupTime) {
+        showToast("Please specify your desired pickup time.", "error");
+        return;
+      }
+
+      const btnDesk = document.getElementById("desktopCheckoutBtn");
+      const btnMob = document.getElementById("mobileCheckoutBtn");
+      if (btnDesk) btnDesk.disabled = true;
+      if (btnMob) btnMob.disabled = true;
+
+      showToast("Verifying kitchen & menu availability...", "info");
+
+      try {
+        const validityRes = await callBackendApi("CHECK_CART_VALIDITY", { cartItems: cartArray });
+
+        // Check 1: Kitchen Closed
+        if (validityRes.status === "KITCHEN_CLOSED" || !validityRes.kitchenOpen) {
+          showToast("Kitchen is currently closed for orders. Please check back later.", "error");
+          if (btnDesk) btnDesk.disabled = false;
+          if (btnMob) btnMob.disabled = false;
+          return;
+        }
+
+        // Check 2: Sold Out Items
+        if (validityRes.hasSoldOutItems) {
+          const removedNames = validityRes.unavailableItems.map(i => i.name).join(", ");
+          validityRes.unavailableItems.forEach(i => delete cart[i.id]);
+          updateCartUi();
+          updateCartPickupConstraints();
+
+          showToast(`Removed sold out items: ${removedNames}`, "error");
+
+          if (Object.keys(cart).length === 0) {
+            closeMobileCartDrawer();
+            if (btnDesk) btnDesk.disabled = true;
+            if (btnMob) btnMob.disabled = true;
+            return;
+          }
+
+          showToast("Cart updated with available items. Please review and tap Proceed to Pay again.", "info");
+          if (btnDesk) btnDesk.disabled = false;
+          if (btnMob) btnMob.disabled = false;
+          return;
+        }
+
+        // Check 3: All Valid & Open -> Proceed with Reservation
+        const bill = calculateBill();
+        closeMobileCartDrawer();
+
+        preAllocatedOrderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+        const token = preAllocatedOrderId.slice(-4);
+        const formattedPickupTime = formatTime12Hour(chosenPickupTime);
+
+        document.getElementById("checkoutOrderTokenDisplay").innerText = `TOKEN #${token}`;
+        document.getElementById("checkoutScheduledSummary").innerText = `Pickup: ${chosenPickupDate} at ${formattedPickupTime} (${getCartRequiredPrepTime()} mins prep)`;
+        document.getElementById("checkoutFinalAmount").innerText = `₹${bill.finalPayable}`;
+
+        try {
+          callBackendApi("INITIATE_PRE_ORDER", {
+            preAllocatedOrderId: preAllocatedOrderId,
+            customerId: currentUser.customerId,
+            customerName: currentUser.fullName,
+            customerPhone: currentUser.phone,
+            items: bill.itemsDetail,
+            totalItemsCount: bill.totalCount,
+            subtotal: bill.subtotal,
+            discountApplied: bill.discountAmount,
+            discountSlab: `${bill.discRate * 100}%`,
+            finalPayable: bill.finalPayable,
+            pickupDate: chosenPickupDate,
+            pickupTime: formattedPickupTime
+          });
+        } catch (err) {
+          console.warn("Pre-order persistence deferred: ", err);
+        }
+
+        document.getElementById("checkoutModal").classList.remove("hidden");
+        togglePaymentUi();
+      } catch (err) {
+        showToast("Error communicating with kitchen. Check internet.", "error");
+      } finally {
+        if (btnDesk) btnDesk.disabled = false;
+        if (btnMob) btnMob.disabled = false;
+      }
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById("checkoutModal").classList.add("hidden");
+    }
+
+    function togglePaymentUi() {
+      const mode = document.querySelector('input[name="paymentOption"]:checked').value;
+      const upiBox = document.getElementById("upiPaymentBox");
+      const bill = calculateBill();
+
+      if (mode === "Direct_UPI") {
+        upiBox.classList.remove("hidden");
+        const token = preAllocatedOrderId.slice(-4);
+        const txnNote = `YMR-Token-${token}`;
+        currentOrderUpiUri = `upi://pay?pa=${encodeURIComponent(appConfig.KITCHEN_UPI_ID)}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${encodeURIComponent(txnNote)}`;
+
+        const qrContainer = document.getElementById("orderUpiQr");
+        qrContainer.innerHTML = "";
+        new QRCode(qrContainer, { text: currentOrderUpiUri, width: 150, height: 150 });
+
+        document.getElementById("gpayBtn").href = `gpay://upi/pay?pa=${appConfig.KITCHEN_UPI_ID}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${txnNote}`;
+        document.getElementById("phonepeBtn").href = `phonepe://pay?pa=${appConfig.KITCHEN_UPI_ID}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${txnNote}`;
+        document.getElementById("paytmBtn").href = `paytmmp://pay?pa=${appConfig.KITCHEN_UPI_ID}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${txnNote}`;
+      } else {
+        upiBox.classList.add("hidden");
+      }
+    }
+
+    function launchUpiDirectIntent() {
+      if (currentOrderUpiUri) window.location.href = currentOrderUpiUri;
+    }
+
+    // -------------------------------------------------------------
+    // SUBMIT FINAL PAYMENT CONFIRMATION
+    // -------------------------------------------------------------
+    async function submitFinalPaymentConfirmation() {
+      const bill = calculateBill();
+      const mode = document.querySelector('input[name="paymentOption"]:checked').value;
+      let utr = "";
+
+      if (mode === "Wallet") {
+        if (Number(currentUser.walletBalance) < bill.finalPayable) {
+          showToast("Insufficient Wallet Balance. Top up or choose Direct UPI.", "error");
+          return;
+        }
+      } else {
+        utr = document.getElementById("orderUtrInput").value.trim();
+        if (!/^\d{12}$/.test(utr)) {
+          showToast("Valid 12-digit UPI UTR is mandatory.", "error");
+          return;
+        }
+      }
+
+      const btn = document.getElementById("placeOrderBtn");
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin inline-block mr-1">◌</span> Verifying...`;
+
+      const payload = {
+        orderId: preAllocatedOrderId,
+        customerId: currentUser.customerId,
+        paymentMode: mode,
+        utrNumber: utr,
+        finalPayable: bill.finalPayable
+      };
+
+      try {
+        const res = await callBackendApi("SUBMIT_FINAL_PAYMENT", payload);
+        if (res.status === "SUCCESS") {
+          cart = {};
+          updateCartUi();
+          closeCheckoutModal();
+          showToast(`Order Token #${preAllocatedOrderId.slice(-4)} Confirmed!`, "success");
+          knownOrderStatusMap[preAllocatedOrderId] = res.orderStatus;
+          openOrdersModal();
+          refreshProfileFromBackend();
+        } else {
+          showToast(res.message, "error");
+        }
+      } catch (err) {
+        showToast("Payment confirmation error. Check connection.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Confirm & Verify</span><i data-lucide="check-circle" class="w-5 h-5"></i>`;
+        lucide.createIcons();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // DIRECT VECTOR PDF RECEIPT DOWNLOAD (NO PREVIEW TAB)
+    // -------------------------------------------------------------
+    async function viewOrderReceipt(orderId) {
+      showToast("Downloading order receipt...", "info");
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=GET_ORDER_RECEIPT&orderId=${orderId}`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          let downloadHref = "";
+          if (res.base64Pdf) {
+            downloadHref = "data:application/pdf;base64," + res.base64Pdf;
+          } else if (res.downloadUrl) {
+            downloadHref = res.downloadUrl;
+          } else if (res.receiptUrl) {
+            downloadHref = res.receiptUrl;
+          }
+
+          if (downloadHref) {
+            const link = document.createElement("a");
+            link.href = downloadHref;
+            link.download = `Yaadys_Receipt_${orderId}.pdf`;
+            link.target = "_self";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Receipt downloaded successfully!", "success");
+          } else {
+            showToast("Receipt link not available.", "error");
+          }
+        } else {
+          showToast(res.message || "Failed to download receipt.", "error");
+        }
+      } catch (e) {
+        showToast("Error retrieving receipt file.", "error");
+      }
+    }
+
+    // -------------------------------------------------------------
+    // WALLET RECHARGE & CLAIMS
+    // -------------------------------------------------------------
     function openWallet() {
       if (!currentUser) {
         showToast("Please sign in to access your wallet.", "info");
@@ -1168,7 +1460,6 @@
 
     async function submitWalletRecharge() {
       const utr = document.getElementById("rechargeUtrInput").value.trim();
-
       if (!/^\d{12}$/.test(utr)) {
         showToast("Enter a valid 12-digit UTR from your payment app.", "error");
         return;
@@ -1286,163 +1577,6 @@
     }
 
     // -------------------------------------------------------------
-    // SANITIZATION & FINAL ORDER SUBMISSION
-    // -------------------------------------------------------------
-    async function sanitizeAndProceedToCheckout() {
-      if (!currentUser) {
-        showToast("Please log in or register before scheduling pickup.", "info");
-        openAuthModal();
-        return;
-      }
-
-      const cartArray = Object.entries(cart).map(([id, qty]) => ({ id, quantity: qty }));
-      if (cartArray.length === 0) {
-        showToast("Your cart is empty.", "error");
-        return;
-      }
-
-      showToast("Verifying live kitchen availability...", "info");
-
-      try {
-        const res = await callBackendApi("CHECK_CART_VALIDITY", { cartItems: cartArray });
-
-        if (res.status === "KITCHEN_CLOSED") {
-          showToast("The kitchen is currently closed for pickups. Orders cannot be scheduled.", "error");
-          return;
-        }
-
-        if (res.hasSoldOutItems) {
-          const removedNames = res.unavailableItems.map(i => i.name).join(", ");
-          res.unavailableItems.forEach(i => delete cart[i.id]);
-          updateCartUi();
-          showToast(`Sold out items removed from basket: ${removedNames}`, "error");
-
-          if (Object.keys(cart).length === 0) {
-            closeMobileCartDrawer();
-            return;
-          }
-        }
-
-        triggerCheckoutModal();
-      } catch (err) {
-        triggerCheckoutModal();
-      }
-    }
-
-    function triggerCheckoutModal() {
-      const bill = calculateBill();
-      if (bill.totalCount === 0) return;
-
-      closeMobileCartDrawer();
-      preAllocatedOrderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
-      document.getElementById("checkoutFinalAmount").innerText = `₹${bill.finalPayable}`;
-      document.getElementById("checkoutModal").classList.remove("hidden");
-      initDefaultPickupDate();
-      togglePaymentUi();
-    }
-
-    function closeCheckoutModal() {
-      document.getElementById("checkoutModal").classList.add("hidden");
-    }
-
-    function togglePaymentUi() {
-      const mode = document.querySelector('input[name="paymentOption"]:checked').value;
-      const upiBox = document.getElementById("upiPaymentBox");
-      const bill = calculateBill();
-
-      if (mode === "Direct_UPI") {
-        upiBox.classList.remove("hidden");
-        const token = preAllocatedOrderId.slice(-4);
-        const txnNote = `YMR-Token-${token}`;
-        currentOrderUpiUri = `upi://pay?pa=${encodeURIComponent(appConfig.KITCHEN_UPI_ID)}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${encodeURIComponent(txnNote)}`;
-
-        const qrContainer = document.getElementById("orderUpiQr");
-        qrContainer.innerHTML = "";
-        new QRCode(qrContainer, { text: currentOrderUpiUri, width: 150, height: 150 });
-
-        document.getElementById("gpayBtn").href = `gpay://upi/pay?pa=${appConfig.KITCHEN_UPI_ID}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${txnNote}`;
-        document.getElementById("phonepeBtn").href = `phonepe://pay?pa=${appConfig.KITCHEN_UPI_ID}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${txnNote}`;
-        document.getElementById("paytmBtn").href = `paytmmp://pay?pa=${appConfig.KITCHEN_UPI_ID}&pn=${encodeURIComponent(appConfig.KITCHEN_NAME)}&am=${bill.finalPayable}&cu=INR&tn=${txnNote}`;
-      } else {
-        upiBox.classList.add("hidden");
-      }
-    }
-
-    function launchUpiDirectIntent() {
-      if (currentOrderUpiUri) window.location.href = currentOrderUpiUri;
-    }
-
-    async function submitFinalOrder() {
-      validatePickupTime();
-
-      const timeInputVal = document.getElementById("pickupTime").value;
-      if (!timeInputVal) {
-        showToast("Please choose a pickup time.", "error");
-        return;
-      }
-
-      const formatted12HrPickupTime = formatTime12Hour(timeInputVal);
-      const bill = calculateBill();
-      const mode = document.querySelector('input[name="paymentOption"]:checked').value;
-      let utr = "";
-
-      if (mode === "Wallet") {
-        if (Number(currentUser.walletBalance) < bill.finalPayable) {
-          showToast("Insufficient Wallet Balance. Please top up or pay via Direct UPI.", "error");
-          return;
-        }
-      } else {
-        utr = document.getElementById("orderUtrInput").value.trim();
-        if (!/^\d{12}$/.test(utr)) {
-          showToast("Valid 12-digit UPI UTR is mandatory.", "error");
-          return;
-        }
-      }
-
-      const btn = document.getElementById("placeOrderBtn");
-      btn.disabled = true;
-      btn.innerHTML = `<span class="animate-spin inline-block mr-1">◌</span> Placing Order...`;
-
-      const payload = {
-        preAllocatedOrderId: preAllocatedOrderId,
-        customerId: currentUser.customerId,
-        customerName: currentUser.fullName,
-        customerPhone: currentUser.phone,
-        items: bill.itemsDetail,
-        totalItemsCount: bill.totalCount,
-        subtotal: bill.subtotal,
-        discountApplied: bill.discountAmount,
-        discountSlab: `${bill.discRate * 100}%`,
-        finalPayable: bill.finalPayable,
-        paymentMode: mode,
-        utrNumber: utr,
-        pickupDate: document.getElementById("pickupDate").value,
-        pickupTime: formatted12HrPickupTime
-      };
-
-      try {
-        const res = await callBackendApi("SUBMIT_ORDER", payload);
-        if (res.status === "SUCCESS") {
-          cart = {};
-          updateCartUi();
-          closeCheckoutModal();
-          showToast(`Order Token #${preAllocatedOrderId.slice(-4)} Placed for ${formatted12HrPickupTime}!`, "success");
-          knownOrderStatusMap[preAllocatedOrderId] = res.orderStatus;
-          openOrdersModal();
-          refreshProfileFromBackend();
-        } else {
-          showToast(res.message, "error");
-        }
-      } catch (err) {
-        showToast("Failed to place order. Check connection.", "error");
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<span>Confirm & Place Order</span><i data-lucide="check-circle" class="w-5 h-5"></i>`;
-        lucide.createIcons();
-      }
-    }
-
-    // -------------------------------------------------------------
     // CHAT & SUPPORT
     // -------------------------------------------------------------
     function openLiveChat() {
@@ -1518,7 +1652,7 @@
     }
 
     // -------------------------------------------------------------
-    // SANITIZED ORDER HISTORY (FULL WIDTH STRETCH & NO "IST")
+    // SANITIZED ORDER HISTORY (WITH DIRECT DOWNLOAD & CALLS)
     // -------------------------------------------------------------
     function openOrdersModal() {
       if (!currentUser) {
@@ -1574,39 +1708,28 @@
                     <p class="text-xs text-stone-400 font-semibold">Placed at ${cleanPlacedTime}</p>
                   </div>
                   <div class="flex items-center gap-2 shrink-0 self-end sm:self-start">
-                    <a href="${waTextUrl}" target="_blank" rel="noopener noreferrer" class="w-11 h-11 bg-green-600 hover:bg-green-700 text-white rounded-2xl flex items-center justify-center shadow-sm transition hover:scale-105 active:scale-95 shrink-0" title="WhatsApp Kitchen regarding this order">
+                    <button type="button" onclick="viewOrderReceipt('${order.orderId}')" class="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition shrink-0 min-h-[40px]" title="Download PDF Receipt">
+                      <i data-lucide="file-text" class="w-4 h-4 text-forest-800"></i>
+                      <span>Receipt</span>
+                    </button>
+                    <a href="${waTextUrl}" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center justify-center shadow-sm transition hover:scale-105 active:scale-95 shrink-0" title="WhatsApp Kitchen regarding this order">
                       <i data-lucide="message-circle" class="w-5 h-5"></i>
                     </a>
-                    <button type="button" onclick="startOrderContextChat('${order.orderId}', '${token}')" class="w-11 h-11 bg-forest-800 hover:bg-forest-900 text-white rounded-2xl flex items-center justify-center shadow-sm transition hover:scale-105 active:scale-95 shrink-0" title="Chat with Kitchen Desk">
+                    <button type="button" onclick="startOrderContextChat('${order.orderId}', '${token}')" class="w-10 h-10 bg-forest-800 hover:bg-forest-900 text-white rounded-xl flex items-center justify-center shadow-sm transition hover:scale-105 active:scale-95 shrink-0" title="Chat with Kitchen Desk">
                       <i data-lucide="message-square" class="w-5 h-5"></i>
                     </button>
-                    <span class="px-3.5 py-1.5 rounded-full text-xs font-black ${order.orderStatus === 'Ready_For_Pickup' ? 'bg-green-100 text-green-800' : order.orderStatus === 'Pending_Verification' ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-700'} shrink-0">
-                      ${String(order.orderStatus).replace('_', ' ')}
+                    <span class="px-3 py-1.5 rounded-full text-xs font-black ${order.orderStatus === 'Ready_For_Pickup' ? 'bg-green-100 text-green-800' : order.orderStatus === 'Pending_Verification' ? 'bg-amber-100 text-amber-800' : order.orderStatus === 'Payment_Pending' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-stone-200 text-stone-700'} shrink-0">
+                      ${String(order.orderStatus).replace(/_/g, ' ')}
                     </span>
                   </div>
                 </div>
 
-                <div class="text-sm text-stone-600 border-t border-b border-stone-200/60 py-2.5 space-y-1 w-full">
+                <div class="text-sm text-stone-600 border-t border-stone-200/60 pt-2.5 space-y-1 w-full">
                   ${(order.items || []).map(i => `<div class="flex justify-between w-full"><span>${i.quantity}x ${i.name}</span><span class="font-bold">₹${Number(i.lineTotal) || (Number(i.price) * Number(i.quantity))}</span></div>`).join("")}
                   <div class="flex justify-between font-black text-stone-900 text-base pt-1.5 border-t border-stone-100 w-full">
                     <span>Total Paid (${order.paymentMode})</span>
                     <span>₹${Number(order.finalPayable) || 0}</span>
                   </div>
-                </div>
-
-                <!-- DEDICATED FULL-WIDTH PICKUP POINT & GOOGLE MAPS DIRECTIONS BAR -->
-                <div class="p-3.5 bg-white border border-stone-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs w-full">
-                  <div class="flex items-start gap-2">
-                    <i data-lucide="map-pin" class="w-4 h-4 text-forest-800 shrink-0 mt-0.5"></i>
-                    <div>
-                      <p class="text-xs font-black text-stone-900">Pickup Counter Location:</p>
-                      <p class="text-xs text-stone-600 font-medium">Yaady's Kitchen, Neknampur, Manikonda, Hyderabad</p>
-                    </div>
-                  </div>
-                  <a href="https://www.google.com/maps/dir/?api=1&destination=17.387140,78.375860" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 bg-forest-800 hover:bg-forest-900 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition hover:scale-102 shrink-0 min-h-[38px] w-full sm:w-auto">
-                    <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
-                    <span>Get Directions</span>
-                  </a>
                 </div>
               </div>
             `;
@@ -1631,6 +1754,9 @@
       }
     }
 
+    // -------------------------------------------------------------
+    // MENU RENDERING & CART ENGINE
+    // -------------------------------------------------------------
     let currentCategory = "ALL";
     function filterCategory(cat) {
       currentCategory = cat;
@@ -1756,7 +1882,7 @@
       }
       cart[itemId] = (cart[itemId] || 0) + 1;
       updateCartUi();
-      updatePickupTimeConstraints();
+      updateCartPickupConstraints();
     }
 
     function changeQty(itemId, delta) {
@@ -1764,7 +1890,7 @@
       cart[itemId] += delta;
       if (cart[itemId] <= 0) delete cart[itemId];
       updateCartUi();
-      updatePickupTimeConstraints();
+      updateCartPickupConstraints();
     }
 
     function getDiscountRate() {
@@ -1893,6 +2019,9 @@
       }
     }
 
+    // -------------------------------------------------------------
+    // PASSWORD MANAGEMENT & PROFILE
+    // -------------------------------------------------------------
     function showForgotPasswordView() {
       document.getElementById("authForm").classList.add("hidden");
       document.getElementById("authTabSwitcher").classList.add("hidden");

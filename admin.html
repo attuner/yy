@@ -692,17 +692,13 @@
       renderMenuList();
     }
 
-    // -------------------------------------------------------------
-    // REAL-TIME ACTION-PENDING STATUS BADGES
-    // -------------------------------------------------------------
     function updateActionPendingBadges(data) {
       const orders = data.orders || [];
-      const pendingVerifCount = orders.filter(o => o.orderStatus === 'Pending_Verification').length;
+      const pendingVerifCount = orders.filter(o => o.orderStatus === 'Pending_Verification' || o.orderStatus === 'Payment_Pending').length;
       const acceptedCount = orders.filter(o => o.orderStatus === 'Kitchen_Accepted').length;
       const preparingCount = orders.filter(o => o.orderStatus === 'Preparing').length;
       const readyCount = orders.filter(o => o.orderStatus === 'Ready_For_Pickup').length;
 
-      // Sub-filter badges
       const setBadge = (elId, count) => {
         const el = document.getElementById(elId);
         if (el) {
@@ -720,7 +716,6 @@
       setBadge("subBadgeStove", preparingCount);
       setBadge("subBadgeReady", readyCount);
 
-      // Main Navigation Tabs Badges
       const totalPendingOrders = pendingVerifCount + acceptedCount + preparingCount;
       const totalPendingWallet = (data.pendingRecharges || []).length + (data.pendingClaims || []).length;
 
@@ -772,7 +767,13 @@
     function renderOrdersList() {
       if (!adminDataCache) return;
       const container = document.getElementById("adminOrdersContainer");
-      const filtered = adminDataCache.orders.filter(o => currentOrderFilter === "ALL" || o.orderStatus === currentOrderFilter);
+      const filtered = adminDataCache.orders.filter(o => {
+        if (currentOrderFilter === "ALL") return true;
+        if (currentOrderFilter === "Pending_Verification") {
+          return o.orderStatus === "Pending_Verification" || o.orderStatus === "Payment_Pending";
+        }
+        return o.orderStatus === currentOrderFilter;
+      });
 
       if (filtered.length === 0) {
         container.innerHTML = `<p class="text-stone-400 text-xs sm:text-sm py-8 col-span-2 text-center">No orders match filter.</p>`;
@@ -802,12 +803,18 @@
                 <p class="text-xs text-stone-600 font-semibold truncate">+91 ${o.customerPhone} • Pickup: <strong class="text-forest-800 font-black">${cleanTime}</strong></p>
                 <p class="text-[11px] text-stone-400">Placed: ${cleanPlaced} (${cleanDate})</p>
               </div>
-              <span class="px-2.5 py-1 rounded-xl text-[11px] font-black ${o.orderStatus === 'Ready_For_Pickup' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'} shrink-0">
-                ${String(o.orderStatus).replace('_', ' ')}
-              </span>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="viewAdminOrderReceipt('${o.orderId}')" class="px-2.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-lg text-xs font-bold flex items-center gap-1 transition shrink-0 min-h-[36px]" title="Download Order Receipt">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5 text-forest-800"></i>
+                  <span>Receipt</span>
+                </button>
+                <span class="px-2.5 py-1 rounded-xl text-[11px] font-black ${o.orderStatus === 'Ready_For_Pickup' ? 'bg-green-100 text-green-800' : o.orderStatus === 'Payment_Pending' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-amber-100 text-amber-800'} shrink-0">
+                  ${String(o.orderStatus).replace(/_/g, ' ')}
+                </span>
+              </div>
             </div>
 
-            <!-- DIRECT MOBILE & WHATSAPP ACTIONS -->
+            <!-- DIRECT CALL & WHATSAPP -->
             <div class="flex items-center gap-2 pt-1 border-t border-stone-100 w-full">
               <a href="tel:+91${phoneClean}" class="flex-1 py-2 px-3 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition min-h-[38px]">
                 <i data-lucide="phone" class="w-3.5 h-3.5 text-forest-800"></i>
@@ -828,7 +835,7 @@
             </div>
 
             <div class="flex flex-wrap gap-1.5 pt-0.5 w-full">
-              ${o.orderStatus === 'Pending_Verification' ? `
+              ${(o.orderStatus === 'Pending_Verification' || o.orderStatus === 'Payment_Pending') ? `
                 <button onclick="approveOrderPayment(${o.rowIndex})" class="flex-1 py-2 px-3 bg-green-700 hover:bg-green-800 text-white rounded-xl text-xs font-black shadow-xs transition min-h-[38px]">Verify</button>
               ` : ''}
               <button onclick="setOrderStatus(${o.rowIndex}, 'Preparing')" class="flex-1 py-2 px-3 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-bold transition min-h-[38px]">Stove</button>
@@ -839,6 +846,43 @@
         `;
       }).join("");
       lucide.createIcons();
+    }
+
+    // -------------------------------------------------------------
+    // DIRECT VECTOR PDF RECEIPT DOWNLOAD FOR ADMIN (NO PREVIEW TAB)
+    // -------------------------------------------------------------
+    async function viewAdminOrderReceipt(orderId) {
+      showToast("Downloading order receipt...", "info");
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=GET_ORDER_RECEIPT&orderId=${orderId}`).then(r => r.json());
+        if (res.status === "SUCCESS") {
+          let downloadHref = "";
+          if (res.base64Pdf) {
+            downloadHref = "data:application/pdf;base64," + res.base64Pdf;
+          } else if (res.downloadUrl) {
+            downloadHref = res.downloadUrl;
+          } else if (res.receiptUrl) {
+            downloadHref = res.receiptUrl;
+          }
+
+          if (downloadHref) {
+            const link = document.createElement("a");
+            link.href = downloadHref;
+            link.download = `Yaadys_Receipt_${orderId}.pdf`;
+            link.target = "_self";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Receipt downloaded!", "success");
+          } else {
+            showToast("Download link not available.", "error");
+          }
+        } else {
+          showToast(res.message || "Failed to retrieve receipt.", "error");
+        }
+      } catch (e) {
+        showToast("Error retrieving receipt.", "error");
+      }
     }
 
     async function approveOrderPayment(rowIndex) {
@@ -897,11 +941,16 @@
             <p class="text-xs text-stone-500">Pickup: <strong class="text-forest-800">${o.pickupTime}</strong> | ${(o.items || []).map(i => `${i.quantity}x ${i.name}`).join(", ")}</p>
           </div>
           <div class="flex items-center gap-2 self-end sm:self-auto">
+            <button onclick="viewAdminOrderReceipt('${o.orderId}')" class="px-2 py-1 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-lg text-xs font-bold flex items-center gap-1 transition shrink-0 min-h-[36px]" title="Download Receipt">
+              <i data-lucide="file-text" class="w-3.5 h-3.5 text-forest-800"></i>
+              <span>Receipt</span>
+            </button>
             <span class="font-black text-forest-900">₹${o.finalPayable}</span>
             <span class="px-2 py-0.5 rounded-lg text-[11px] font-black ${o.orderStatus === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-stone-100 text-stone-700'}">${o.orderStatus}</span>
           </div>
         </div>
       `).join("");
+      lucide.createIcons();
     }
 
     function sortReportOrders(criteria) {
