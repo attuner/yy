@@ -6,11 +6,14 @@
   <title>Yaady's Millet Roti Meals | Traditional Millet Kitchen</title>
   
   <!-- Comprehensive PWA Web App Manifest -->
-  <link rel="manifest" href='data:application/manifest+json,{"name":"Yaady&#39;s Millet Roti Meals","short_name":"Yaady&#39;s","start_url":"./index.html","display":"standalone","background_color":"#FAF7F2","theme_color":"#1C3D2B","orientation":"portrait","icons":[{"src":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=192&h=192&fit=crop","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=512&h=512&fit=crop","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}' />
-  <meta name="theme-color" content="#1C3D2B" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Yaady's" />
+<link rel="manifest" href="./manifest.json" />
+
+<!-- Browser Toolbar & Apple Status Bar Theming -->
+<meta name="theme-color" content="#1C3D2B" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Yaady's" />
+
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -2373,5 +2376,18 @@
       return await res.json();
     }
   </script>
+  
+  if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then((registration) => {
+        console.log('ServiceWorker registered with scope:', registration.scope);
+      })
+      .catch((error) => {
+        console.error('ServiceWorker registration failed:', error);
+      });
+  });
+}
+
 </body>
 </html>
