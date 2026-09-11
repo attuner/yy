@@ -5,15 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Yaady's Millet Roti Meals | Traditional Millet Kitchen</title>
   
-  <!-- Comprehensive PWA Web App Manifest -->
-<link rel="manifest" href="./manifest.json" />
-
-<!-- Browser Toolbar & Apple Status Bar Theming -->
-<meta name="theme-color" content="#1C3D2B" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Yaady's" />
-
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#1C3D2B" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Yaady's" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -85,7 +81,6 @@
       </div>
 
       <nav class="space-y-2">
-        <!-- PWA DESKTOP INSTALL BUTTON -->
         <button id="btnInstallAppDesktop" onclick="triggerPwaInstall()" class="hidden w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-forest-900 font-black text-base transition shadow-sm min-h-[48px]">
           <i data-lucide="download" class="w-5 h-5"></i>
           <span>Install App</span>
@@ -123,13 +118,12 @@
     <div class="pt-4 border-t border-forest-800/80 text-xs text-stone-400 space-y-1">
       <p class="font-bold text-stone-300">Pickup Counter Hub</p>
       <p>Neknampur, Manikonda, Hyderabad</p>
-      <p class="font-bold text-amber-400 pt-1">+91 9000001690</p>
+      <p class="font-bold text-amber-400 pt-1">Timings: 7:00 AM to 10:00 PM</p>
     </div>
   </aside>
 
   <!-- STICKY TOP BAR -->
   <header class="sticky top-0 z-40 bg-linen/95 backdrop-blur-md border-b border-stone-200 w-full">
-    <!-- MOBILE HEADER (< lg) -->
     <div class="lg:hidden h-16 px-3.5 flex items-center justify-between w-full">
       <div onclick="openAboutModal()" class="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition min-w-0">
         <div class="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl bg-forest-800 text-amber-400 font-black text-xl flex items-center justify-center shrink-0 shadow-xs">
@@ -142,7 +136,6 @@
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
-        <!-- PWA MOBILE INSTALL HEADER PILL -->
         <button id="btnInstallAppMobile" onclick="triggerPwaInstall()" class="hidden px-2.5 py-1.5 rounded-full bg-amber-500 text-forest-900 text-xs font-black items-center gap-1 shadow-xs transition hover:scale-105 active:scale-95 shrink-0">
           <i data-lucide="download" class="w-3.5 h-3.5"></i>
           <span>Install</span>
@@ -160,11 +153,10 @@
       </div>
     </div>
 
-    <!-- DESKTOP TOP BAR (>= lg) -->
     <div class="hidden lg:flex max-w-7xl mx-auto px-6 py-4 items-center justify-between">
       <div onclick="openAboutModal()" class="flex items-center gap-2 cursor-pointer hover:opacity-90 transition">
-        <h2 class="text-2xl font-black text-forest-900">Traditional Millet Kitchen Counter</h2>
-        <span class="text-xs font-bold text-forest-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">About Us</span>
+        <h2 class="text-2xl font-black text-forest-900">Traditional Millet Roti Meals</h2>
+        <!-- <span class="text-xs font-bold text-forest-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">About Us</span> -->
       </div>
 
       <div class="flex items-center gap-3">
@@ -179,7 +171,6 @@
       </div>
     </div>
 
-    <!-- CLEAN BROADCAST ANNOUNCEMENT BANNER (TEXT ONLY, ZERO ICONS) -->
     <div id="announcementBanner" class="bg-forest-900 text-amber-300 px-4 py-2 text-xs md:text-sm text-center font-black tracking-wide w-full">
       <span id="announcementBannerText">Fresh Harvest Specials: Hot Jowar & Ragi Rotis made live upon pickup!</span>
     </div>
@@ -189,9 +180,6 @@
   <main class="max-w-7xl mx-auto px-4 py-5 md:py-7 w-full">
     <div id="discountBanner" class="mb-6 p-5 rounded-3xl bg-gradient-to-r from-forest-800 to-forest-900 text-white flex items-center justify-between shadow-md w-full">
       <div class="flex items-center gap-3.5">
-        <!-- <div class="p-3 rounded-2xl bg-amber-500/20 text-amber-300">
-          <i data-lucide="sparkles" class="w-7 h-7"></i>
-        </div> -->
         <div>
           <h4 class="text-base md:text-lg font-black" id="discountBannerTitle">Prepay & Save up to 20%</h4>
           <p class="text-xs md:text-sm text-stone-300 font-medium" id="discountBannerSub">Maintain ₹500+ wallet balance for instant automatic discounts.</p>
@@ -203,7 +191,6 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-12 gap-6 xl:gap-8 w-full">
-      <!-- LEFT / MAIN COLUMN: Menu & Items -->
       <section class="md:col-span-7 xl:col-span-8 space-y-6 w-full min-w-0">
         <div class="flex flex-col sm:flex-row gap-3.5 w-full">
           <div class="relative flex-1 w-full">
@@ -211,7 +198,6 @@
             <input id="searchInput" oninput="renderMenu()" type="text" placeholder="Search Jowar Roti, Thali, Curries..." class="w-full pl-12 pr-4 py-3.5 text-base md:text-lg bg-white border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-forest-800 shadow-sm font-medium min-h-[48px]" />
           </div>
 
-          <!-- CATEGORY PILLS -->
           <div id="categoryPills" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1 w-full sm:w-auto">
             <button onclick="filterCategory('ALL')" class="category-pill active px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-forest-800 text-white border border-transparent font-black shadow-sm transition min-h-[48px]">All Items</button>
             <button onclick="filterCategory('Millet Rotis')" class="category-pill px-4 py-3 text-sm md:text-base rounded-2xl whitespace-nowrap bg-white text-stone-700 border border-stone-200 font-extrabold hover:bg-stone-50 transition min-h-[48px]">Millet Rotis</button>
@@ -227,7 +213,6 @@
         </div>
       </section>
 
-      <!-- RIGHT COLUMN: Adaptive Interactive Cart Sidebar on Tablets & Desktops -->
       <section class="hidden md:block md:col-span-5 xl:col-span-4 space-y-4 w-full">
         <div class="bg-white rounded-3xl border border-stone-200 p-6 shadow-sm sticky top-24 w-full">
           <div class="flex items-center justify-between border-b border-stone-100 pb-3.5">
@@ -241,7 +226,6 @@
             <div class="text-center py-10 text-stone-400 text-base">Your basket is empty.</div>
           </div>
 
-          <!-- EMBEDDED PICKUP SCHEDULING CONTROLS FOR DESKTOP/TABLETS -->
           <div id="desktopSchedulingSection" class="border-t border-stone-100 pt-3.5 my-2 space-y-2.5 w-full">
             <div class="text-xs font-extrabold text-forest-800 bg-amber-50 border border-amber-200 p-2.5 rounded-xl flex items-center justify-between">
               <span>Estimated Preparation:</span>
@@ -302,8 +286,6 @@
       <span class="text-xs font-extrabold">Profile</span>
     </button>
   </nav>
-
-  <!-- ==================== BOTTOM SHEET MODALS / DRAWERS ==================== -->
 
   <!-- BRAND ABOUT KITCHEN MODAL -->
   <div id="aboutModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -373,7 +355,7 @@
     </div>
   </div>
 
-  <!-- CHECKOUT PAYMENT SCREEN (ORDER PERSISTED PRE-PAYMENT) -->
+  <!-- CHECKOUT PAYMENT SCREEN -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-3">
     <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl max-h-sheet overflow-y-auto relative min-w-0">
       <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
@@ -492,9 +474,7 @@
 
         <div class="text-center py-3 bg-white rounded-2xl border border-stone-200 p-4 space-y-2">
           <p class="text-xs font-extrabold text-stone-500">Scan or Tap QR to Launch UPI App</p>
-          
           <div id="walletDynamicQr" onclick="launchWalletRechargeIntent()" class="mx-auto w-[160px] h-[160px] min-w-[160px] min-h-[160px] bg-white p-2 border-2 border-forest-800/30 rounded-2xl flex items-center justify-center shadow-md cursor-pointer hover:border-forest-800 transition" title="Tap to open default UPI App"></div>
-          
           <div class="pt-1">
             <p class="text-lg font-black text-forest-900" id="walletQrAmountDisplay">Amount: ₹500</p>
             <p class="text-xs font-mono font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full inline-block mt-1" id="walletQrTokenDisplay">Token: #WLT-XXXX</p>
@@ -514,7 +494,7 @@
 
       <div id="walletClaimSection" class="hidden p-5 bg-stone-50 border border-stone-200 rounded-3xl space-y-4 mb-5">
         <h4 class="text-base font-black text-forest-900">Request Balance Withdrawal</h4>
-        <p class="text-xs text-stone-500">Refunds are settled directly via UPI with an official PDF acknowledgment.</p>
+        <p class="text-xs text-stone-500">Refunds are settled directly via UPI.</p>
         <input type="number" id="claimAmountInput" placeholder="Amount to withdraw (₹)" class="w-full px-4 py-3.5 bg-white border border-stone-300 rounded-2xl text-base font-bold outline-none min-h-[48px]" />
         <input type="text" id="claimUpiInput" placeholder="Recipient UPI ID (e.g. name@bank)" class="w-full px-4 py-3.5 bg-white border border-stone-300 rounded-2xl text-base font-medium outline-none min-h-[48px]" />
         <input type="text" id="claimReasonInput" placeholder="Reason for refund request" class="w-full px-4 py-3.5 bg-white border border-stone-300 rounded-2xl text-base font-medium outline-none min-h-[48px]" />
@@ -576,7 +556,7 @@
       </button>
 
       <h3 class="text-2xl font-black text-forest-900 mb-1">Your Order History</h3>
-      <p class="text-sm text-stone-500 mb-4 font-medium">Review real-time preparation states, pickup times, and tokens.</p>
+      <p class="text-sm text-stone-500 mb-4 font-medium">Review real-time vouchers, scheduled pickups, and status updates.</p>
 
       <!-- PERMANENT TOP PICKUP LOCATION & DIRECTIONS CARD -->
       <div class="mb-4 p-3.5 sm:p-4 bg-white border border-stone-200 rounded-2xl sm:rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs w-full">
@@ -589,7 +569,7 @@
             <p class="text-xs text-stone-600 font-medium truncate">Yaady's Kitchen, Neknampur, Manikonda, Hyderabad</p>
           </div>
         </div>
-        <a href="https://www.google.com/maps/dir/?api=1&destination=17.387140,78.375860" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 bg-forest-800 hover:bg-forest-900 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition hover:scale-102 shrink-0 min-h-[40px] w-full sm:w-auto">
+        <a href="https://maps.app.goo.gl/SMztjDExTACnc2Nt6" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 bg-forest-800 hover:bg-forest-900 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition hover:scale-102 shrink-0 min-h-[40px] w-full sm:w-auto">
           <i data-lucide="navigation" class="w-4 h-4"></i>
           <span>Get Directions</span>
         </a>
@@ -601,7 +581,7 @@
     </div>
   </div>
 
-  <!-- AUTHENTICATION & PASSWORD RECOVERY DRAWER -->
+  <!-- AUTHENTICATION & PROFILE DRAWER -->
   <div id="authModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 md:p-8 shadow-2xl relative max-h-sheet overflow-y-auto">
       <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto mb-2 sm:hidden"></div>
@@ -803,9 +783,7 @@
     window.syncPollInterval = null;
     window.heartbeatInterval = null;
 
-    // -------------------------------------------------------------
-    // PWA INSTALLATION ENGINE & SERVICE WORKER INJECTION
-    // -------------------------------------------------------------
+    // PWA Install Handlers
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
@@ -834,7 +812,7 @@
       } else {
         const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         if (isIos) {
-          showToast("To install: Tap the Share button below, then select 'Add to Home Screen'.", "info");
+          showToast("To install: Tap Share (box with arrow), then select 'Add to Home Screen'.", "info");
         } else {
           showToast("App is ready. If installed, launch it from your home screen or browser menu.", "info");
         }
@@ -843,18 +821,12 @@
 
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'yaadys-shell-v1';
-        self.addEventListener('install', (e) => {
-          self.skipWaiting();
-        });
-        self.addEventListener('activate', (e) => {
-          e.waitUntil(clients.claim());
-        });
+        const CACHE_NAME = 'yaadys-shell-v2';
+        self.addEventListener('install', (e) => { self.skipWaiting(); });
+        self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
         self.addEventListener('fetch', (e) => {
           if (e.request.method !== 'GET') return;
-          e.respondWith(
-            fetch(e.request).catch(() => caches.match(e.request))
-          );
+          e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
         });
       `;
       const blob = new Blob([swCode], { type: 'application/javascript' });
@@ -1018,6 +990,10 @@
               const sBadge = document.getElementById("sidebarOrderBadge");
               if (mBadge) mBadge.classList.remove("hidden");
               if (sBadge) sBadge.classList.remove("hidden");
+
+              if (!document.getElementById("ordersModal").classList.contains("hidden")) {
+                fetchCustomerOrders();
+              }
             }
             knownOrderStatusMap[oId] = newStatus;
           });
@@ -1158,7 +1134,6 @@
       try {
         const validityRes = await callBackendApi("CHECK_CART_VALIDITY", { cartItems: cartArray });
 
-        // Check 1: Kitchen Closed
         if (validityRes.status === "KITCHEN_CLOSED" || !validityRes.kitchenOpen) {
           showToast("Kitchen is currently closed for orders. Please check back later.", "error");
           if (btnDesk) btnDesk.disabled = false;
@@ -1166,7 +1141,6 @@
           return;
         }
 
-        // Check 2: Sold Out Items
         if (validityRes.hasSoldOutItems) {
           const removedNames = validityRes.unavailableItems.map(i => i.name).join(", ");
           validityRes.unavailableItems.forEach(i => delete cart[i.id]);
@@ -1188,7 +1162,6 @@
           return;
         }
 
-        // Check 3: All Valid & Open -> Proceed with Reservation
         const bill = calculateBill();
         closeMobileCartDrawer();
 
@@ -1312,43 +1285,6 @@
         btn.disabled = false;
         btn.innerHTML = `<span>Confirm & Verify</span><i data-lucide="check-circle" class="w-5 h-5"></i>`;
         lucide.createIcons();
-      }
-    }
-
-    // -------------------------------------------------------------
-    // DIRECT VECTOR PDF RECEIPT DOWNLOAD (NO PREVIEW TAB)
-    // -------------------------------------------------------------
-    async function viewOrderReceipt(orderId) {
-      showToast("Downloading order receipt...", "info");
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=GET_ORDER_RECEIPT&orderId=${orderId}`).then(r => r.json());
-        if (res.status === "SUCCESS") {
-          let downloadHref = "";
-          if (res.base64Pdf) {
-            downloadHref = "data:application/pdf;base64," + res.base64Pdf;
-          } else if (res.downloadUrl) {
-            downloadHref = res.downloadUrl;
-          } else if (res.receiptUrl) {
-            downloadHref = res.receiptUrl;
-          }
-
-          if (downloadHref) {
-            const link = document.createElement("a");
-            link.href = downloadHref;
-            link.download = `Yaadys_Receipt_${orderId}.pdf`;
-            link.target = "_self";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("Receipt downloaded successfully!", "success");
-          } else {
-            showToast("Receipt link not available.", "error");
-          }
-        } else {
-          showToast(res.message || "Failed to download receipt.", "error");
-        }
-      } catch (e) {
-        showToast("Error retrieving receipt file.", "error");
       }
     }
 
@@ -1549,13 +1485,12 @@
         if (res.status === "SUCCESS" && res.transactions.length > 0) {
           list.innerHTML = res.transactions.map(t => {
             const isApproved = t.status === "Approved";
-            const isClaim = t.type === "Debit_Claim";
             const cleanDate = new Date(t.timestamp).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
             return `
               <div class="py-3 flex flex-col gap-1 w-full">
                 <div class="flex items-center justify-between w-full">
                   <div>
-                    <p class="font-black text-stone-800 text-sm md:text-base">${String(t.type).replace('_', ' ')}</p>
+                    <p class="font-black text-stone-800 text-sm md:text-base">${String(t.type).replace(/_/g, ' ')}</p>
                     <p class="text-xs text-stone-400 font-mono">${cleanDate} • Ref: ${t.utrRef || 'N/A'}</p>
                   </div>
                   <div class="text-right">
@@ -1563,12 +1498,6 @@
                     <p class="text-xs font-bold ${isApproved ? 'text-green-600' : 'text-amber-600'}">${t.status}</p>
                   </div>
                 </div>
-                ${isClaim && isApproved && t.receiptPdfUrl ? `
-                  <a href="${t.receiptPdfUrl}" target="_blank" rel="noopener noreferrer" class="mt-1 inline-flex items-center gap-1.5 text-xs font-bold text-forest-800 bg-amber-100/60 px-3 py-1.5 rounded-xl self-start hover:bg-amber-100 transition">
-                    <i data-lucide="file-text" class="w-4 h-4"></i>
-                    <span>📄 View Refund Acknowledgment (PDF)</span>
-                  </a>
-                ` : ''}
               </div>
             `;
           }).join("");
@@ -1655,7 +1584,7 @@
     }
 
     // -------------------------------------------------------------
-    // SANITIZED ORDER HISTORY (WITH DIRECT DOWNLOAD & CALLS)
+    // SANITIZED ORDER HISTORY (SIMPLIFIED LIGHTWEIGHT RECEIPT CARDS)
     // -------------------------------------------------------------
     function openOrdersModal() {
       if (!currentUser) {
@@ -1702,38 +1631,63 @@
 
             const waTextUrl = `https://wa.me/919000001690?text=${encodeURIComponent("Hello Yaady's Kitchen! Inquiring regarding Order Token #" + token + " (" + order.orderId + ") placed for " + cleanDate + " at " + cleanTime + " (Total: ₹" + order.finalPayable + "). Status: " + order.orderStatus + ". Please assist.")}`;
 
+            const statusBadgeBg = order.orderStatus === 'Ready_For_Pickup' ? 'bg-green-100 text-green-800' : order.orderStatus === 'Kitchen_Accepted' ? 'bg-blue-100 text-blue-800' : order.orderStatus === 'Preparing' ? 'bg-amber-100 text-amber-800' : 'bg-stone-100 text-stone-700';
+
             return `
-              <div class="bg-stone-50 border border-stone-200 rounded-3xl p-4 sm:p-5 space-y-3.5 w-full block shadow-xs">
-                <div class="flex flex-col sm:flex-row justify-between items-start gap-2 w-full">
-                  <div>
-                    <span class="text-xs font-mono font-black text-forest-800">TOKEN #${token}</span>
-                    <h4 class="font-black text-stone-900 text-lg">${cleanDate} • Pickup: ${cleanTime}</h4>
-                    <p class="text-xs text-stone-400 font-semibold">Placed at ${cleanPlacedTime}</p>
-                  </div>
-                  <div class="flex items-center gap-2 shrink-0 self-end sm:self-start">
-                    <button type="button" onclick="viewOrderReceipt('${order.orderId}')" class="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition shrink-0 min-h-[40px]" title="Download PDF Receipt">
-                      <i data-lucide="file-text" class="w-4 h-4 text-forest-800"></i>
-                      <span>Receipt</span>
-                    </button>
-                    <a href="${waTextUrl}" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center justify-center shadow-sm transition hover:scale-105 active:scale-95 shrink-0" title="WhatsApp Kitchen regarding this order">
-                      <i data-lucide="message-circle" class="w-5 h-5"></i>
-                    </a>
-                    <button type="button" onclick="startOrderContextChat('${order.orderId}', '${token}')" class="w-10 h-10 bg-forest-800 hover:bg-forest-900 text-white rounded-xl flex items-center justify-center shadow-sm transition hover:scale-105 active:scale-95 shrink-0" title="Chat with Kitchen Desk">
-                      <i data-lucide="message-square" class="w-5 h-5"></i>
-                    </button>
-                    <span class="px-3 py-1.5 rounded-full text-xs font-black ${order.orderStatus === 'Ready_For_Pickup' ? 'bg-green-100 text-green-800' : order.orderStatus === 'Pending_Verification' ? 'bg-amber-100 text-amber-800' : order.orderStatus === 'Payment_Pending' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-stone-200 text-stone-700'} shrink-0">
+              <!-- SIMPLIFIED LIGHTWEIGHT RECEIPT CARD -->
+              <div class="bg-white border border-stone-200 rounded-2xl sm:rounded-3xl p-4 sm:p-5 space-y-3 shadow-xs hover:shadow-sm transition w-full block">
+                
+                <!-- Clean Top Header Row -->
+                <div class="flex items-center justify-between gap-2 border-b border-stone-100 pb-2.5">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="text-amberBrand-600 font-mono font-black text-lg">#${token}</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black ${statusBadgeBg}">
                       ${String(order.orderStatus).replace(/_/g, ' ')}
                     </span>
                   </div>
-                </div>
-
-                <div class="text-sm text-stone-600 border-t border-stone-200/60 pt-2.5 space-y-1 w-full">
-                  ${(order.items || []).map(i => `<div class="flex justify-between w-full"><span>${i.quantity}x ${i.name}</span><span class="font-bold">₹${Number(i.lineTotal) || (Number(i.price) * Number(i.quantity))}</span></div>`).join("")}
-                  <div class="flex justify-between font-black text-stone-900 text-base pt-1.5 border-t border-stone-100 w-full">
-                    <span>Total Paid (${order.paymentMode})</span>
-                    <span>₹${Number(order.finalPayable) || 0}</span>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <a href="${waTextUrl}" target="_blank" rel="noopener noreferrer" class="w-9 h-9 bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center justify-center shadow-xs transition hover:scale-105 active:scale-95 shrink-0" title="WhatsApp Kitchen regarding this order">
+                      <i data-lucide="message-circle" class="w-4 h-4"></i>
+                    </a>
+                    <button type="button" onclick="startOrderContextChat('${order.orderId}', '${token}')" class="w-9 h-9 bg-forest-800 hover:bg-forest-900 text-white rounded-xl flex items-center justify-center shadow-xs transition hover:scale-105 active:scale-95 shrink-0" title="Chat with Kitchen Desk">
+                      <i data-lucide="message-square" class="w-4 h-4"></i>
+                    </button>
                   </div>
                 </div>
+
+                <!-- Essential Schedule & Payment Metadata -->
+                <div class="space-y-0.5">
+                  <p class="text-forest-900 font-extrabold text-sm sm:text-base leading-snug">
+                    Pickup: ${cleanDate} • ${cleanTime}
+                  </p>
+                  <p class="text-stone-400 text-xs font-medium">
+                    Placed at ${cleanPlacedTime} • Paid via ${order.paymentMode} ${order.utrNumber && order.utrNumber !== 'WALLET_DEDUCT' ? `(Ref: ${order.utrNumber})` : ''}
+                  </p>
+                </div>
+
+                <!-- Simplified Items List -->
+                <div class="py-2.5 border-t border-b border-stone-100 space-y-1.5 text-xs sm:text-sm text-stone-700">
+                  ${(order.items || []).map(i => `
+                    <div class="flex justify-between items-center">
+                      <span class="truncate pr-2"><strong class="font-bold text-stone-900">${i.quantity}×</strong> ${i.name}</span>
+                      <span class="font-semibold text-stone-800 shrink-0">₹${(Number(i.lineTotal) || (Number(i.price) * Number(i.quantity))).toFixed(2)}</span>
+                    </div>
+                  `).join("")}
+                </div>
+
+                <!-- Compact Bill & Total Bar -->
+                <div class="pt-0.5 space-y-1">
+                  ${Number(order.discountApplied) > 0 ? `
+                  <div class="flex justify-between text-xs text-green-700 font-bold">
+                    <span>Wallet Perk Discount (${order.discountSlab || 'Perk'}):</span>
+                    <span>-₹${Number(order.discountApplied).toFixed(2)}</span>
+                  </div>` : ''}
+                  <div class="flex justify-between items-center text-sm sm:text-base font-black text-forest-900 pt-1">
+                    <span>Total Paid:</span>
+                    <span class="text-lg sm:text-xl font-black text-forest-800">₹${Number(order.finalPayable).toFixed(2)}</span>
+                  </div>
+                </div>
+
               </div>
             `;
           }).join("");
@@ -2022,9 +1976,6 @@
       }
     }
 
-    // -------------------------------------------------------------
-    // PASSWORD MANAGEMENT & PROFILE
-    // -------------------------------------------------------------
     function showForgotPasswordView() {
       document.getElementById("authForm").classList.add("hidden");
       document.getElementById("authTabSwitcher").classList.add("hidden");

@@ -1,16 +1,15 @@
 /**
  * YAADY'S MILLET ROTI MEALS - MASTER SERVERLESS BACKEND
  * File: Code.gs
- * Version: 10.0.0 (Direct Vector PDF Download, Real-Time Status Hydration & Strict Pre-Payment Validation)
+ * Version: 12.0.0 (Pure Structured JSON Receipts, Instant In-App Rendering & Real-Time Sync)
  */
 
-const RECEIPTS_FOLDER_NAME = "Yaadys_Order_Receipts";
 const REFUND_RECEIPTS_FOLDER_NAME = "Yaadys_Wallet_Refund_Receipts";
 const MENU_IMAGES_FOLDER_NAME = "Yaadys_Menu_Images";
 const TIMEZONE_IST = "Asia/Kolkata";
 
 // --------------------------------------------------------------------------
-// TIME & DATE SANITIZATION HELPERS (PREVENTS 1899 EPOCH BUG & STRIPS "IST")
+// TIME & DATE SANITIZATION HELPERS
 // --------------------------------------------------------------------------
 function cleanSheetDateString(val) {
   if (!val) return Utilities.formatDate(new Date(), TIMEZONE_IST, "yyyy-MM-dd");
@@ -53,9 +52,7 @@ function doGet(e) {
       case "getOrderStatus":
         return sendJsonResponse(getOrderStatus(params.orderId));
       case "GET_ORDER_RECEIPT":
-        return sendJsonResponse(getOrderReceipt(params.orderId));
-      case "DOWNLOAD_RECEIPT_PDF":
-        return downloadReceiptDirect(params.orderId);
+        return sendJsonResponse(getOrderReceiptData(params.orderId));
       case "getWalletLedger":
         return sendJsonResponse(getWalletLedger(params.customerId));
       case "getAdminData":
@@ -167,7 +164,7 @@ function sendJsonResponse(data) {
 }
 
 // -------------------------------------------------------------
-// DATABASE SETUP & SEEDING
+// DATABASE SETUP & MIGRATION
 // -------------------------------------------------------------
 function setupDatabase() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -183,7 +180,7 @@ function setupDatabase() {
     },
     {
       name: "Orders",
-      headers: ["Order_ID", "Timestamp", "Customer_ID", "Customer_Name", "Customer_Phone", "Items_JSON", "Total_Items_Count", "Subtotal", "Discount_Applied", "Discount_Slab", "Final_Payable", "Payment_Mode", "UTR_Number", "Payment_Screenshot_Drive_URL", "Pickup_Date", "Pickup_Time", "Order_Status", "Admin_Notes", "Receipt_Drive_URL"]
+      headers: ["Order_ID", "Timestamp", "Customer_ID", "Customer_Name", "Customer_Phone", "Items_JSON", "Total_Items_Count", "Subtotal", "Discount_Applied", "Discount_Slab", "Final_Payable", "Payment_Mode", "UTR_Number", "Payment_Screenshot_Drive_URL", "Pickup_Date", "Pickup_Time", "Order_Status", "Admin_Notes"]
     },
     {
       name: "Wallet_Ledger",
@@ -266,7 +263,6 @@ function setupDatabase() {
     defaultMenu.forEach(function(m) { menuSheet.appendRow(m); });
   }
 
-  getOrCreateFolder(RECEIPTS_FOLDER_NAME);
   getOrCreateFolder(REFUND_RECEIPTS_FOLDER_NAME);
   getOrCreateFolder(MENU_IMAGES_FOLDER_NAME);
 }
@@ -397,8 +393,7 @@ function initiatePreOrder(payload) {
     cleanPickupDate,
     storedPickupTimeString,
     "Payment_Pending",
-    "Early Pre-Order Reservation",
-    ""
+    "Early Pre-Order Reservation"
   ]);
 
   return {
@@ -409,7 +404,7 @@ function initiatePreOrder(payload) {
 }
 
 // -------------------------------------------------------------
-// STEP 2: FINAL PAYMENT SUBMISSION & REAL-TIME RECEIPT CREATION
+// STEP 2: FINAL PAYMENT SUBMISSION & RECONCILIATION
 // -------------------------------------------------------------
 function submitFinalPayment(payload) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -483,29 +478,6 @@ function submitFinalPayment(payload) {
   ordersSheet.getRange(orderRow, 13).setValue(mode === "Wallet" ? "WALLET_DEDUCT" : utr);
   ordersSheet.getRange(orderRow, 17).setValue(targetStatus);
 
-  // Generate real-time updated PDF receipt with latest payment status
-  try {
-    const freshPdf = generateOrderReceiptPdf({
-      orderId: orderId,
-      customerName: orderRecord[3],
-      customerPhone: orderRecord[4],
-      items: JSON.parse(orderRecord[5] || "[]"),
-      subtotal: orderRecord[7],
-      discountApplied: orderRecord[8],
-      discountSlab: orderRecord[9],
-      finalPayable: payable,
-      paymentMode: mode,
-      utrNumber: mode === "Wallet" ? "WALLET_DEDUCT" : utr,
-      pickupDate: orderRecord[14],
-      pickupTime: cleanSheetTimeString(orderRecord[15]),
-      orderStatus: targetStatus,
-      timestamp: orderRecord[1]
-    });
-    ordersSheet.getRange(orderRow, 19).setValue(freshPdf.publicUrl);
-  } catch (pdfErr) {
-    console.warn("PDF receipt compilation warning: " + pdfErr.message);
-  }
-
   recordOrderAnalytics(Number(orderRecord[6]) || 1, payable);
   recordHourlyOrderPlacement();
 
@@ -532,150 +504,9 @@ function submitFinalPayment(payload) {
 }
 
 // -------------------------------------------------------------
-// DYNAMIC VECTOR PDF RECEIPT ENGINE (DIRECT DOWNLOAD & BASE64)
+// PURE STRUCTURED RECEIPT DATA PROVIDER (NO DRIVE/PDF OVERHEAD)
 // -------------------------------------------------------------
-function generateOrderReceiptPdf(orderData) {
-  const folder = getOrCreateFolder(RECEIPTS_FOLDER_NAME);
-  const token = String(orderData.orderId).slice(-4);
-  const formattedDate = cleanSheetDateString(orderData.pickupDate);
-  const formattedTime = cleanSheetTimeString(orderData.pickupTime);
-
-  const itemsRows = (orderData.items || []).map(i => `
-    <tr>
-      <td style="padding:10px 12px;border-bottom:1px solid #e7e5e4;font-weight:bold;color:#1c1917;">
-        ${i.name}
-      </td>
-      <td style="padding:10px 12px;border-bottom:1px solid #e7e5e4;text-align:center;color:#44403c;">
-        ${i.quantity}
-      </td>
-      <td style="padding:10px 12px;border-bottom:1px solid #e7e5e4;text-align:right;color:#44403c;">
-        ₹${Number(i.price).toFixed(2)}
-      </td>
-      <td style="padding:10px 12px;border-bottom:1px solid #e7e5e4;text-align:right;font-weight:bold;color:#1c1917;">
-        ₹${(Number(i.quantity) * Number(i.price)).toFixed(2)}
-      </td>
-    </tr>
-  `).join("");
-
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1c1917; padding: 36px; margin: 0; background: #fff; }
-        .header { border-bottom: 3px solid #1C3D2B; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start; }
-        .brand-title { font-size: 24px; font-weight: 900; color: #1C3D2B; margin: 0; letter-spacing: -0.5px; }
-        .brand-sub { font-size: 12px; color: #78716c; margin-top: 4px; font-weight: 600; }
-        .token-badge { background: #FAF7F2; border: 2px solid #1C3D2B; padding: 8px 16px; border-radius: 12px; text-align: right; }
-        .token-val { font-size: 20px; font-weight: 900; color: #1C3D2B; font-family: monospace; }
-        .meta-grid { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-        .meta-grid td { padding: 6px 0; font-size: 13px; }
-        .meta-label { color: #78716c; font-weight: bold; width: 28%; }
-        .meta-val { color: #1c1917; font-weight: 700; }
-        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-        .items-table th { background: #FAF7F2; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #78716c; font-weight: 800; border-bottom: 2px solid #e7e5e4; }
-        .summary-box { float: right; width: 45%; margin-bottom: 24px; }
-        .summary-total { border-top: 2px solid #1C3D2B; padding-top: 8px; margin-top: 6px; display: flex; justify-content: space-between; font-size: 18px; font-weight: 900; color: #1C3D2B; }
-        .footer-note { clear: both; margin-top: 36px; padding: 16px; background: #FAF7F2; border-radius: 12px; border: 1px solid #e7e5e4; font-size: 11px; color: #78716c; line-height: 1.6; }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <div>
-          <h1 class="brand-title">YAADY'S MILLET ROTI MEALS</h1>
-          <div class="brand-sub">Traditional Hand-Patted Sorghum & Ragi Meals • Neknampur Hub, Hyderabad</div>
-          <div class="brand-sub">+91 9000001690 • yaadyskitchen@upi</div>
-        </div>
-        <div class="token-badge">
-          <div style="font-size: 10px; font-weight: 800; color: #78716c; text-transform: uppercase;">Order Token</div>
-          <div class="token-val">#${token}</div>
-        </div>
-      </div>
-
-      <table class="meta-grid">
-        <tr>
-          <td class="meta-label">Order Reference:</td>
-          <td class="meta-val">${orderData.orderId}</td>
-          <td class="meta-label">Scheduled Pickup:</td>
-          <td class="meta-val">${formattedDate} at ${formattedTime}</td>
-        </tr>
-        <tr>
-          <td class="meta-label">Customer Name:</td>
-          <td class="meta-val">${orderData.customerName}</td>
-          <td class="meta-label">Payment Mode:</td>
-          <td class="meta-val">${orderData.paymentMode} (${orderData.utrNumber || 'N/A'})</td>
-        </tr>
-        <tr>
-          <td class="meta-label">Customer Mobile:</td>
-          <td class="meta-val">+91 ${orderData.customerPhone}</td>
-          <td class="meta-label">Order Status:</td>
-          <td class="meta-val">${String(orderData.orderStatus).replace(/_/g, ' ')}</td>
-        </tr>
-      </table>
-
-      <table class="items-table">
-        <thead>
-          <tr>
-            <th style="text-align: left;">Item Description</th>
-            <th style="text-align: center;">Qty</th>
-            <th style="text-align: right;">Unit Price</th>
-            <th style="text-align: right;">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsRows}
-        </tbody>
-      </table>
-
-      <div class="summary-box">
-        <table style="width: 100%; font-size: 13px;">
-          <tr>
-            <td style="color: #78716c; padding: 4px 0;">Item Subtotal:</td>
-            <td style="text-align: right; font-weight: bold; padding: 4px 0;">₹${Number(orderData.subtotal).toFixed(2)}</td>
-          </tr>
-          ${Number(orderData.discountApplied) > 0 ? `
-          <tr>
-            <td style="color: #15803d; padding: 4px 0;">Wallet Perk Discount (${orderData.discountSlab || 'Perk'}):</td>
-            <td style="text-align: right; font-weight: bold; color: #15803d; padding: 4px 0;">-₹${Number(orderData.discountApplied).toFixed(2)}</td>
-          </tr>` : ''}
-          <tr style="border-top: 2px solid #1C3D2B;">
-            <td style="font-size: 16px; font-weight: 900; color: #1C3D2B; padding: 8px 0 0;">Final Payable:</td>
-            <td style="font-size: 18px; font-weight: 900; color: #1C3D2B; text-align: right; padding: 8px 0 0;">₹${Number(orderData.finalPayable).toFixed(2)}</td>
-          </tr>
-        </table>
-      </div>
-
-      <div class="footer-note">
-        <strong>Official Customer Pickup Voucher & Receipt</strong><br>
-        Please show this voucher at the Neknampur pickup counter. Rotis are freshly hand-patted and baked live on traditional cast iron tawas. Thank you for choosing authentic millets!
-      </div>
-    </body>
-    </html>
-  `;
-
-  const fileName = "Yaadys_Receipt_" + orderData.orderId + ".pdf";
-  const blob = Utilities.newBlob(html, "text/html", "Receipt_" + orderData.orderId + ".html")
-    .getAs("application/pdf")
-    .setName(fileName);
-
-  // Overwrite existing file with same name to keep status fresh
-  const existingFiles = folder.getFilesByName(fileName);
-  while (existingFiles.hasNext()) {
-    existingFiles.next().setTrashed(true);
-  }
-
-  const file = folder.createFile(blob);
-  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-
-  return {
-    publicUrl: file.getUrl(),
-    downloadUrl: file.getDownloadUrl(),
-    base64Pdf: Utilities.base64Encode(blob.getBytes())
-  };
-}
-
-function getOrderReceipt(orderId) {
+function getOrderReceiptData(orderId) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const ordersSheet = ss.getSheetByName("Orders");
   const data = ordersSheet.getDataRange().getValues();
@@ -683,32 +514,24 @@ function getOrderReceipt(orderId) {
 
   for (let i = 1; i < data.length; i++) {
     if (String(data[i][0]).trim() === cleanId) {
-      // Always regenerate fresh PDF to reflect real-time order status
-      const freshPdf = generateOrderReceiptPdf({
-        orderId: cleanId,
-        customerName: data[i][3],
-        customerPhone: data[i][4],
-        items: JSON.parse(data[i][5] || "[]"),
-        subtotal: data[i][7],
-        discountApplied: data[i][8],
-        discountSlab: data[i][9],
-        finalPayable: data[i][10],
-        paymentMode: data[i][11],
-        utrNumber: data[i][12],
-        pickupDate: data[i][14],
-        pickupTime: cleanSheetTimeString(data[i][15]),
-        orderStatus: data[i][16],
-        timestamp: data[i][1]
-      });
-
-      ordersSheet.getRange(i + 1, 19).setValue(freshPdf.publicUrl);
-
       return {
         status: "SUCCESS",
-        orderId: cleanId,
-        receiptUrl: freshPdf.publicUrl,
-        downloadUrl: freshPdf.downloadUrl,
-        base64Pdf: freshPdf.base64Pdf
+        order: {
+          orderId: cleanId,
+          token: cleanId.slice(-4),
+          customerName: String(data[i][3]).trim(),
+          customerPhone: String(data[i][4]).trim(),
+          pickupDate: cleanSheetDateString(data[i][14]),
+          pickupTime: cleanSheetTimeString(data[i][15]),
+          paymentMode: String(data[i][11]).trim(),
+          utrNumber: String(data[i][12] || "").trim(),
+          orderStatus: String(data[i][16]).trim(),
+          subtotal: Number(data[i][7]) || Number(data[i][10]) || 0,
+          discountApplied: Number(data[i][8]) || 0,
+          discountSlab: String(data[i][9] || ""),
+          finalPayable: Number(data[i][10]) || 0,
+          items: JSON.parse(data[i][5] || "[]")
+        }
       };
     }
   }
@@ -716,18 +539,8 @@ function getOrderReceipt(orderId) {
   return { status: "ERROR", message: "Order reference not found." };
 }
 
-function downloadReceiptDirect(orderId) {
-  const receiptResult = getOrderReceipt(orderId);
-  if (receiptResult.status === "SUCCESS" && receiptResult.base64Pdf) {
-    const bytes = Utilities.base64Decode(receiptResult.base64Pdf);
-    return ContentService.createTextOutput(Utilities.base64Encode(bytes))
-      .setMimeType(ContentService.MimeType.TEXT);
-  }
-  return sendJsonResponse({ status: "ERROR", message: "Unable to process direct download." });
-}
-
 // -------------------------------------------------------------
-// LEGACY COMPATIBLE SUBMIT ORDER (FALLBACK)
+// DIRECT FALLBACK ORDER SUBMISSION
 // -------------------------------------------------------------
 function submitOrder(payload) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -792,27 +605,6 @@ function submitOrder(payload) {
   const cleanPickupTime = String(payload.pickupTime || "").replace(/\s*\(?IST\)?/gi, "").trim();
   const storedPickupTimeString = cleanPickupTime ? "'" + cleanPickupTime : "'Flexible";
 
-  let receiptUrl = "";
-  try {
-    const pdfRes = generateOrderReceiptPdf({
-      orderId: orderId,
-      customerName: payload.customerName,
-      customerPhone: phone,
-      items: payload.items || [],
-      subtotal: subtotal,
-      discountApplied: discountApplied,
-      discountSlab: payload.discountSlab,
-      finalPayable: payable,
-      paymentMode: payload.paymentMode,
-      utrNumber: payload.utrNumber,
-      pickupDate: cleanPickupDate,
-      pickupTime: cleanPickupTime,
-      orderStatus: orderStatus,
-      timestamp: istFormattedTimestamp
-    });
-    receiptUrl = pdfRes.publicUrl;
-  } catch (err) {}
-
   ordersSheet.appendRow([
     orderId,
     istFormattedTimestamp,
@@ -831,8 +623,7 @@ function submitOrder(payload) {
     cleanPickupDate,
     storedPickupTimeString,
     orderStatus,
-    String(payload.adminNotes || ""),
-    receiptUrl
+    String(payload.adminNotes || "")
   ]);
 
   recordOrderAnalytics(itemsCount, payable);
@@ -1124,8 +915,7 @@ function getDaywiseReport(pin, targetDateStr) {
         utr: String(data[i][12] || "").trim(),
         pickupDate: orderDate,
         pickupTime: cleanSheetTimeString(data[i][15]),
-        orderStatus: status,
-        receiptUrl: String(data[i][18] || "").trim()
+        orderStatus: status
       });
     }
   }
@@ -1165,8 +955,7 @@ function getCustomerOrders(phone) {
         utrNumber: String(data[i][12] || ""),
         pickupDate: cleanDate,
         pickupTime: cleanTime,
-        orderStatus: String(data[i][16] || "").trim(),
-        receiptUrl: String(data[i][18] || "").trim()
+        orderStatus: String(data[i][16] || "").trim()
       });
     }
   }
@@ -1196,8 +985,7 @@ function getOrderStatus(orderId) {
           utrNumber: String(data[i][12] || ""),
           pickupDate: cleanDate,
           pickupTime: cleanTime,
-          orderStatus: String(data[i][16] || "").trim(),
-          receiptUrl: String(data[i][18] || "").trim()
+          orderStatus: String(data[i][16] || "").trim()
         }
       };
     }
@@ -1497,8 +1285,7 @@ function getAdminData(pin) {
       screenshotUrl: String(oData[i][13] || ""),
       pickupDate: cleanDate,
       pickupTime: cleanTime,
-      orderStatus: String(oData[i][16] || "").trim(),
-      receiptUrl: String(oData[i][18] || "").trim()
+      orderStatus: String(oData[i][16] || "").trim()
     });
   }
 
@@ -1575,306 +1362,15 @@ function adminApproveClaim(payload) {
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const ledgerSheet = ss.getSheetByName("Wallet_Ledger");
-  const customersSheet = ss.getSheetByName("Customers");
   const rowIndex = Number(payload.rowIndex);
   const transferUtr = String(payload.transferUtr || "").trim();
 
   if (!/^\d{12}$/.test(transferUtr)) return { status: "ERROR", message: "Please provide a valid 12-digit bank transfer UTR." };
 
-  const claimId = ledgerSheet.getRange(rowIndex, 1).getValue();
-  const customerId = ledgerSheet.getRange(rowIndex, 3).getValue();
-  const amount = ledgerSheet.getRange(rowIndex, 5).getValue();
-  const payoutUpi = ledgerSheet.getRange(rowIndex, 10).getValue();
-
-  let customerName = "Customer";
-  let customerPhone = "";
-  const custData = customersSheet.getDataRange().getValues();
-  for (let i = 1; i < custData.length; i++) {
-    if (custData[i][0] === customerId) {
-      customerName = custData[i][1];
-      customerPhone = custData[i][2];
-      break;
-    }
-  }
-
-  const pdfUrl = generateRefundPdf({
-    claimId: claimId,
-    customerName: customerName,
-    customerPhone: customerPhone,
-    amount: amount,
-    payoutUpi: payoutUpi,
-    transferUtr: transferUtr,
-    timestamp: new Date()
-  });
-
   ledgerSheet.getRange(rowIndex, 6).setValue(transferUtr);
   ledgerSheet.getRange(rowIndex, 7).setValue("Approved");
-  ledgerSheet.getRange(rowIndex, 9).setValue(pdfUrl);
 
-  return { status: "SUCCESS", message: "Claim disbursed. PDF acknowledgment generated.", pdfUrl: pdfUrl };
-}
-
-function generateRefundPdf(data) {
-  const folder = getOrCreateFolder(REFUND_RECEIPTS_FOLDER_NAME);
-  const formattedDate = Utilities.formatDate(data.timestamp, TIMEZONE_IST, "dd MMM yyyy, hh:mm a");
-
-  const html = `
-    <!DOCTYPE html><html><head><meta charset="utf-8">
-    <style>
-      body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1c3d2b;padding:40px;margin:0;}
-      .header{border-bottom:3px solid #1c3d2b;padding-bottom:15px;margin-bottom:25px;}
-      .title{font-size:24px;font-weight:bold;margin:0;color:#1c3d2b;}
-      .grid{width:100%;border-collapse:collapse;margin-top:20px;}
-      .grid td{padding:10px 12px;font-size:13px;border-bottom:1px solid #eee;}
-      .grid td.lbl{font-weight:bold;color:#555;width:40%;background:#faf7f2;}
-      .amt-box{margin-top:25px;background:#1c3d2b;color:#fff;padding:18px;border-radius:8px;text-align:center;}
-      .amt-val{font-size:26px;font-weight:bold;color:#f59e0b;margin-top:4px;}
-    </style></head><body>
-      <div class="header">
-        <div class="title">YAADY'S MILLET ROTI MEALS</div>
-        <div style="font-size:13px;color:#666;margin-top:4px;">Official Balance Refund Settlement Acknowledgment</div>
-      </div>
-      <table class="grid">
-        <tr><td class="lbl">Claim ID</td><td><strong>${data.claimId}</strong></td></tr>
-        <tr><td class="lbl">Disbursement Time</td><td>${formattedDate}</td></tr>
-        <tr><td class="lbl">Beneficiary Name</td><td>${data.customerName}</td></tr>
-        <tr><td class="lbl">Customer Phone</td><td>+91 ${data.customerPhone}</td></tr>
-        <tr><td class="lbl">Settlement UPI ID</td><td><strong>${data.payoutUpi}</strong></td></tr>
-        <tr><td class="lbl">Bank Transfer UTR</td><td><strong>${data.transferUtr}</strong></td></tr>
-        <tr><td class="lbl">Status</td><td style="color:#2e7d32;font-weight:bold;">DISBURSED & VERIFIED</td></tr>
-      </table>
-      <div class="amt-box">
-        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;">Settled Refund Amount</div>
-        <div class="amt-val">₹${Number(data.amount).toFixed(2)}</div>
-      </div>
-    </body></html>
-  `;
-
-  const blob = Utilities.newBlob(html, "text/html", "Claim_" + data.claimId + ".html")
-    .getAs("application/pdf")
-    .setName("Refund_Receipt_" + data.claimId + ".pdf");
-  const file = folder.createFile(blob);
-  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  return file.getUrl();
-}
-
-function forgotPassword(payload) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Customers");
-  const data = sheet.getDataRange().getValues();
-  const phone = String(payload.phone || "").trim();
-  const email = String(payload.email || "").trim().toLowerCase();
-
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][2]).trim() === phone) {
-      const storedEmail = String(data[i][5] || "").trim().toLowerCase();
-      if (!storedEmail || storedEmail !== email) {
-        return { status: "ERROR", message: "Registered email address does not match this mobile number." };
-      }
-
-      const resetCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-      const expires = new Date(Date.now() + 15 * 60 * 1000);
-
-      sheet.getRange(i + 1, 11).setValue(resetCode);
-      sheet.getRange(i + 1, 12).setValue(expires);
-
-      try {
-        GmailApp.sendEmail(
-          storedEmail,
-          "Password Reset Code - Yaady's Millet Roti Meals",
-          "",
-          {
-            htmlBody: `
-              <div style="font-family:'Segoe UI',sans-serif;max-width:500px;margin:auto;border:1px solid #e0e0e0;border-radius:12px;padding:24px;">
-                <h2 style="color:#1C3D2B;margin-top:0;">Yaady's Password Assistance</h2>
-                <p>Hello <strong>${data[i][1]}</strong>,</p>
-                <p>Here is your 6-character password verification code:</p>
-                <div style="background:#FAF7F2;padding:16px;border-radius:8px;text-align:center;font-size:28px;font-weight:bold;letter-spacing:4px;color:#1C3D2B;border:1px solid #EDE8DE;">
-                  ${resetCode}
-                </div>
-                <p style="font-size:12px;color:#777;margin-top:16px;">Expires in 15 minutes. If you did not request this, please ignore.</p>
-              </div>
-            `
-          }
-        );
-      } catch (err) {
-        return { status: "ERROR", message: "Failed to dispatch email. Please check configuration." };
-      }
-
-      return { status: "SUCCESS", message: "Reset code dispatched to " + storedEmail };
-    }
-  }
-
-  return { status: "ERROR", message: "Mobile number not found in customer registry." };
-}
-
-function resetPassword(payload) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Customers");
-  const data = sheet.getDataRange().getValues();
-  const phone = String(payload.phone || "").trim();
-  const resetCode = String(payload.resetCode || "").trim().toUpperCase();
-  const newPassword = String(payload.newPassword || "").trim();
-
-  if (!newPassword || newPassword.length < 4) {
-    return { status: "ERROR", message: "New password must be at least 4 characters long." };
-  }
-
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][2]).trim() === phone) {
-      const storedCode = String(data[i][10] || "").trim().toUpperCase();
-      const expires = new Date(data[i][11]);
-
-      if (!storedCode || storedCode !== resetCode) {
-        return { status: "ERROR", message: "Invalid verification code." };
-      }
-      if (Date.now() > expires.getTime()) {
-        return { status: "ERROR", message: "Verification code has expired. Please request a new code." };
-      }
-
-      sheet.getRange(i + 1, 4).setValue(hashString(newPassword));
-      sheet.getRange(i + 1, 11).setValue("");
-      sheet.getRange(i + 1, 12).setValue("");
-
-      return { status: "SUCCESS", message: "Password reset successfully. You may now log in." };
-    }
-  }
-  return { status: "ERROR", message: "Account not found." };
-}
-
-function changePassword(payload) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Customers");
-  const data = sheet.getDataRange().getValues();
-  const phone = String(payload.phone || "").trim();
-  const currentPassword = String(payload.currentPassword || "").trim();
-  const newPassword = String(payload.newPassword || "").trim();
-
-  if (!newPassword || newPassword.length < 4) {
-    return { status: "ERROR", message: "New password must be at least 4 characters long." };
-  }
-
-  const currentHash = hashString(currentPassword);
-
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][2]).trim() === phone) {
-      if (String(data[i][3]) !== currentHash) {
-        return { status: "ERROR", message: "Current password does not match our records." };
-      }
-
-      sheet.getRange(i + 1, 4).setValue(hashString(newPassword));
-      return { status: "SUCCESS", message: "Password updated successfully." };
-    }
-  }
-  return { status: "ERROR", message: "Customer account not found." };
-}
-
-function sendChatMessage(payload) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Chat_Messages");
-  const msgId = "MSG-" + Date.now();
-  const custId = String(payload.customerId || "").trim();
-  const custName = String(payload.customerName || "Customer").trim();
-  const sender = String(payload.sender || "CUSTOMER").toUpperCase();
-  const text = String(payload.messageText || "").trim();
-
-  if (!text) return { status: "ERROR", message: "Empty message text." };
-
-  const istTimestamp = Utilities.formatDate(new Date(), TIMEZONE_IST, "yyyy-MM-dd HH:mm:ss");
-  sheet.appendRow([msgId, istTimestamp, custId, custName, sender, text, false]);
-  return { status: "SUCCESS", messageId: msgId, timestamp: istTimestamp };
-}
-
-function getChatMessages(customerId) {
-  if (!customerId) return { status: "ERROR", message: "Customer ID is required." };
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Chat_Messages");
-  const data = sheet.getDataRange().getValues();
-  const messages = [];
-  const cleanId = String(customerId).trim();
-
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][2]).trim() === cleanId) {
-      messages.push({
-        id: data[i][0],
-        timestamp: data[i][1],
-        customerId: data[i][2],
-        customerName: data[i][3],
-        sender: data[i][4],
-        text: data[i][5],
-        isRead: data[i][6]
-      });
-    }
-  }
-
-  return { status: "SUCCESS", messages: messages };
-}
-
-function getAllChatThreads(pin) {
-  const config = getConfigData().data;
-  if (String(pin) !== String(config.ADMIN_PIN)) return { status: "ERROR", message: "Unauthorized PIN." };
-
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Chat_Messages");
-  const data = sheet.getDataRange().getValues();
-  const threads = {};
-
-  for (let i = 1; i < data.length; i++) {
-    const custId = String(data[i][2]).trim();
-    if (!threads[custId]) {
-      threads[custId] = {
-        customerId: custId,
-        customerName: data[i][3],
-        lastMessage: data[i][5],
-        lastTimestamp: data[i][1],
-        sender: data[i][4],
-        unreadCount: 0
-      };
-    }
-    threads[custId].lastMessage = data[i][5];
-    threads[custId].lastTimestamp = data[i][1];
-    threads[custId].sender = data[i][4];
-    if (data[i][4] === "CUSTOMER" && !data[i][6]) {
-      threads[custId].unreadCount += 1;
-    }
-  }
-
-  return { status: "SUCCESS", threads: Object.values(threads).sort((a, b) => new Date(b.lastTimestamp) - new Date(a.lastTimestamp)) };
-}
-
-function recordHeartbeat(payload) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Active_Sessions");
-  const custId = String(payload.customerId || "").trim();
-  if (!custId) return { status: "ERROR", message: "Missing Customer ID." };
-
-  const data = sheet.getDataRange().getValues();
-  const now = new Date();
-  const nowIst = Utilities.formatDate(now, TIMEZONE_IST, "yyyy-MM-dd HH:mm:ss");
-  let found = false;
-
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][0]).trim() === custId) {
-      sheet.getRange(i + 1, 4).setValue(nowIst);
-      found = true;
-      break;
-    }
-  }
-
-  if (!found) sheet.appendRow([custId, payload.fullName || "Guest", payload.phone || "", nowIst]);
-  return { status: "SUCCESS", timestamp: nowIst };
-}
-
-function getOnlineUsers(pin) {
-  const config = getConfigData().data;
-  if (String(pin) !== String(config.ADMIN_PIN)) return { status: "ERROR", message: "Unauthorized PIN." };
-
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Active_Sessions");
-  const data = sheet.getDataRange().getValues();
-  const nowMs = Date.now();
-  const activeList = [];
-
-  for (let i = 1; i < data.length; i++) {
-    const lastActive = new Date(data[i][3]).getTime();
-    if (nowMs - lastActive <= 60000) {
-      activeList.push({ customerId: data[i][0], customerName: data[i][1], phone: data[i][2], lastActive: data[i][3] });
-    }
-  }
-
-  return { status: "SUCCESS", count: activeList.length, activeUsers: activeList };
+  return { status: "SUCCESS", message: "Claim disbursed successfully." };
 }
 
 function adminAddMenuItem(payload) {
